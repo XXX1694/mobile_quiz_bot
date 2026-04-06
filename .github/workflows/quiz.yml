@@ -2,11 +2,14 @@ name: Send Daily Quiz
 
 on:
   schedule:
-    # Время в UTC! (Алматы +5, значит 11:00 — это 06:00 UTC)
-    - cron: '0 6 * * *'  # 11:00 по Алматы
-    - cron: '0 9 * * *'  # 14:00 по Алматы
-    - cron: '0 12 * * *' # 17:00 по Алматы
-  workflow_dispatch: # Позволяет запустить вручную для теста
+    # Время в UTC (Алматы -5 часов)
+    # 11:13 по Алматы (06:13 UTC)
+    - cron: '13 6 * * *'  
+    # 14:27 по Алматы (09:27 UTC)
+    - cron: '27 9 * * *'  
+    # 17:42 по Алматы (12:42 UTC)
+    - cron: '42 12 * * *' 
+  workflow_dispatch: # Кнопка для ручного запуска
 
 jobs:
   build:
@@ -27,9 +30,27 @@ jobs:
         env:
           BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
         run: |
-          # Логика выбора тега в зависимости от часа
-          HOUR=$(date +%H)
-          if [ "$HOUR" == "06" ]; then TAG="Swift";
-          elif [ "$HOUR" == "09" ]; then TAG="Kotlin";
-          else TAG="Flutter"; fi
+          # Получаем текущий час в UTC
+          H=$(date -u +%H)
+          echo "Current UTC hour: $H"
+
+          # Логика выбора тега по интервалам (UTC):
+          # Если запуск в промежутке 05:00 - 08:59 UTC -> Swift
+          if [ "$H" -ge 5 ] && [ "$H" -lt 9 ]; then
+            TAG="Swift"
+          
+          # Если запуск в промежутке 09:00 - 11:59 UTC -> Kotlin
+          elif [ "$H" -ge 9 ] && [ "$H" -lt 12 ]; then
+            TAG="Kotlin"
+          
+          # Если запуск в промежутке 12:00 - 15:59 UTC -> Flutter
+          elif [ "$H" -ge 12 ] && [ "$H" -lt 16 ]; then
+            TAG="Flutter"
+          
+          # Запасной вариант на случай ночного запуска
+          else
+            TAG="Flutter"
+          fi
+
+          echo "Selected TAG based on interval: $TAG"
           python bot.py $TAG
