@@ -1,5 +1,6 @@
 import asyncio
 import hashlib
+import html
 import json
 import os
 import random
@@ -10,12 +11,19 @@ from aiogram import Bot
 TOKEN = os.getenv("BOT_TOKEN")
 CHAT_ID = -1003554574954
 TOPIC_ID = 559
-QUESTIONS_PATH = "questions.json"
+QUESTIONS_DIR = "questions"
 STATE_PATH = "state.json"
+
+LANG_BY_TAG = {
+    "Swift": "swift",
+    "Kotlin": "kotlin",
+    "Flutter": "dart",
+}
 
 
 def qid(question: dict) -> str:
-    return hashlib.md5(question["q"].encode("utf-8")).hexdigest()[:10]
+    src = question["q"] + "\n" + question.get("code", "")
+    return hashlib.md5(src.encode("utf-8")).hexdigest()[:10]
 
 
 def load_state() -> dict:
@@ -43,12 +51,16 @@ def pick_question(questions: list, seen: set) -> tuple[dict, str, bool]:
     return quiz, qid(quiz), reset
 
 
+def load_questions(tag: str) -> list:
+    path = os.path.join(QUESTIONS_DIR, f"{tag.lower()}.json")
+    with open(path, "r", encoding="utf-8") as f:
+        return json.load(f)
+
+
 async def send_one_quiz() -> None:
     tag = sys.argv[1] if len(sys.argv) > 1 else "Flutter"
 
-    with open(QUESTIONS_PATH, "r", encoding="utf-8") as f:
-        data = json.load(f)
-    questions = data.get(tag) or []
+    questions = load_questions(tag)
     if not questions:
         raise SystemExit(f"No questions for tag {tag}")
 
@@ -63,6 +75,16 @@ async def send_one_quiz() -> None:
 
     bot = Bot(token=TOKEN)
     try:
+        code = quiz.get("code")
+        if code:
+            lang = LANG_BY_TAG.get(tag, "")
+            body = f'<pre><code class="language-{lang}">{html.escape(code)}</code></pre>'
+            await bot.send_message(
+                chat_id=CHAT_ID,
+                message_thread_id=TOPIC_ID,
+                text=body,
+                parse_mode="HTML",
+            )
         await bot.send_poll(
             chat_id=CHAT_ID,
             message_thread_id=TOPIC_ID,

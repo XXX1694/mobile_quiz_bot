@@ -1,0 +1,782 @@
+[
+  {
+    "type": "output",
+    "code": "val x = listOf(1, 2, 3)\n    .also { println(\"size=\" + it.size) }\n    .map { it * 2 }\nprintln(x)",
+    "q": "Какой вывод?",
+    "a": [
+      "Только [2, 4, 6] — also возвращает Unit, первый блок съелся",
+      "[2, 4, 6], затем size=3 — map выполняется до побочных эффектов",
+      "size=3, затем [2, 4, 6] — also печатает и возвращает receiver",
+      "Ошибка типа — also после listOf не совместим с map"
+    ],
+    "c": 2,
+    "e": "also: receiver=it, return=receiver. listOf.also печатает size и возвращает исходный list, затем map."
+  },
+  {
+    "type": "output",
+    "code": "val s: String? = null\nval r = s?.let { \"len=${it.length}\" } ?: \"empty\"\nprintln(r)",
+    "q": "Что напечатает?",
+    "a": [
+      "empty — s?.let пропускается для null, сработал правый операнд ?:",
+      "len=0 — let безопасен при null, вернёт свойство по умолчанию",
+      "null — любая трансформация nullable-источника остаётся nullable",
+      "NullPointerException: it.length читает свойство null-объекта"
+    ],
+    "c": 0,
+    "e": "?.let выполняется только для non-null, иначе пропускается. Результат null → ?: возвращает правую часть."
+  },
+  {
+    "type": "output",
+    "code": "class Box {\n    lateinit var name: String\n    fun read(): String = if (::name.isInitialized) name else \"unset\"\n}\nval b = Box()\nprintln(b.read())\nb.name = \"X\"\nprintln(b.read())",
+    "q": "Какой вывод?",
+    "a": [
+      "unset, X — isInitialized проверяет до assign, после даёт имя",
+      "X, X — lateinit инициализируется default-значением типа",
+      "null, X — lateinit var — это nullable под капотом",
+      "UninitializedPropertyAccessException при первом read()"
+    ],
+    "c": 0,
+    "e": "::name.isInitialized позволяет проверить lateinit без доступа; до присваивания false → 'unset'."
+  },
+  {
+    "type": "output",
+    "code": "fun log(s: String) { println(s) }\nval r = log(\"A\") ?: log(\"B\")",
+    "q": "Что произойдёт?",
+    "a": [
+      "Напечатает A — ?: на Unit эквивалентен блоку if-else",
+      "Напечатает A и B — оба log вызываются при elvis-fallback",
+      "Не скомпилируется: ?: требует nullable, log() возвращает Unit",
+      "NullPointerException — Unit передан как не-null в elvis"
+    ],
+    "c": 2,
+    "e": "log возвращает Unit (non-nullable); elvis ?: применим только к nullable выражениям — compiler error."
+  },
+  {
+    "type": "output",
+    "code": "class Holder {\n    var value: String? = \"x\"\n    fun length(): Int = if (value != null) value.length else 0\n}",
+    "q": "Почему length() не скомпилируется?",
+    "a": [
+      "if-выражение не возвращает Int — нужен when-блок",
+      "value.length требует ?. поскольку value объявлено как nullable type",
+      "kotlin.String не имеет свойства length — есть только size",
+      "var с mutable открытым доступом — smart cast отключён после if"
+    ],
+    "c": 3,
+    "e": "Для open/mutable var smart cast небезопасен: value может измениться между проверкой и использованием. Нужно локальную переменную или ?. "
+  },
+  {
+    "type": "output",
+    "code": "val a: Int = 1000\nval b: Int = 1000\nval x: Any = a\nval y: Any = b\nprintln(x == y)\nprintln(x === y)",
+    "q": "Что напечатает?",
+    "a": [
+      "true true — Int разворачивается в примитив, идентичный",
+      "false false — boxed Integer всегда создают разные объекты",
+      "false true — JVM кеширует малые Integer, 1000 за пределами кеша",
+      "true false — == сравнивает value, === сравнивает ссылки boxed-объектов"
+    ],
+    "c": 3,
+    "e": "== сравнивает значения (true). При boxing Int в Any создаются два Integer; Integer cache работает только для -128..127, здесь === false."
+  },
+  {
+    "type": "output",
+    "code": "val seq = sequenceOf(1, 2, 3, 4, 5)\n    .map { println(\"map $it\"); it * 2 }\n    .first { it > 4 }\nprintln(\"=> $seq\")",
+    "q": "Какой вывод?",
+    "a": [
+      "map 1 map 2 map 3 map 4 map 5 => 6 — Sequence материализует всё",
+      "=> 6 — Sequence не вызывает map без terminal-потребителя",
+      "map 1 map 2 map 3 => 6 — Sequence тянет поэлементно до first-matching",
+      "Exception — first без element бросает NoSuchElementException"
+    ],
+    "c": 2,
+    "e": "Sequence lazy: map применяется по запросу first(); 3*2=6 удовлетворяет предикату, остальные элементы не трогаются."
+  },
+  {
+    "type": "output",
+    "code": "val n = 5\nval msg = when {\n    n > 10 -> \"big\"\n    n > 3 -> \"mid\"\n    else -> \"small\"\n}\nprintln(msg)",
+    "q": "Что напечатает?",
+    "a": [
+      "big — первый истинный branch останавливает проверку",
+      "mid — порядок сверху вниз, 5 > 10 false, 5 > 3 true",
+      "small — when без аргумента ограничен equality-матчингом",
+      "UnsupportedOperationException — when без else с Boolean guards"
+    ],
+    "c": 1,
+    "e": "when без аргумента — chain of if/else if/else; проверка сверху вниз, первый истинный branch выигрывает."
+  },
+  {
+    "type": "output",
+    "code": "val r = (1..10 step 3).toList()\nval p = (10 downTo 1 step 4).toList()\nprintln(r)\nprintln(p)",
+    "q": "Какой вывод?",
+    "a": [
+      "[1, 4, 7] / [10, 6, 2] — 10 не попадает по шагу, исключается",
+      "[1, 4, 7, 10] / [10, 6, 2] — range step включает кратные границы",
+      "[1, 4, 7, 10] / [10, 6, 2, -2] — downTo игнорирует lower bound",
+      "[1, 3, 6, 9] / [10, 6, 2] — step интерпретируется как сдвиг"
+    ],
+    "c": 1,
+    "e": "IntRange step: 1,4,7,10; downTo 1 step 4: 10,6,2 (следующее 10-12 = -2 < 1, обрезается). Границы включаются при совпадении."
+  },
+  {
+    "type": "output",
+    "code": "data class Point(val x: Int, val y: Int)\nval (a, b) = Point(3, 4).copy(y = 10)\nprintln(\"$a $b\")",
+    "q": "Что напечатает?",
+    "a": [
+      "3 14 — copy делает merge старого и нового значения поля",
+      "3 4 — copy без явного override копирует исходное состояние",
+      "3 10 — copy(y=10), deconstruct через component1/component2",
+      "Compile error — named argument запрещён в chain-деструктуризации"
+    ],
+    "c": 2,
+    "e": "copy(y=10) возвращает Point(3, 10); componentN: a=x=3, b=y=10."
+  },
+  {
+    "type": "output",
+    "code": "fun outer() {\n    listOf(1, 2, 3).forEach {\n        if (it == 2) return\n        println(it)\n    }\n    println(\"done\")\n}\nouter()",
+    "q": "Какой вывод?",
+    "a": [
+      "1, done — return выходит из forEach и продолжает outer",
+      "1, 2, 3, done — forEach игнорирует return в lambda",
+      "1, 2 — return по default выходит только из текущей итерации",
+      "1 — return без метки — non-local return из outer(), done не печатается"
+    ],
+    "c": 3,
+    "e": "forEach — inline функция; return без метки в её лямбде эквивалентен return из outer(). Нужен return@forEach для continue."
+  },
+  {
+    "type": "output",
+    "code": "sealed class Shape\ndata class Circle(val r: Double): Shape()\ndata class Square(val s: Double): Shape()\n\nfun area(s: Shape) = when (s) {\n    is Circle -> s.r * s.r * 3.14\n    is Square -> s.s * s.s\n}\nprintln(area(Circle(2.0)))",
+    "q": "Что напечатает?",
+    "a": [
+      "12.56 — when с sealed exhaustive, без else разрешён",
+      "4.0 — компилятор берёт последний case как default",
+      "Compile error: when не исчерпан, нужен else-branch",
+      "ClassCastException: s: Shape не может быть Circle в runtime"
+    ],
+    "c": 0,
+    "e": "sealed + when с is-matching считается exhaustive — else не нужен. 3.14 * 2^2 = 12.56."
+  },
+  {
+    "type": "output",
+    "code": "class Counter {\n    companion object {\n        val instance = Counter()\n        const val LIMIT = 10\n    }\n    init { println(\"init\") }\n}\nprintln(Counter.LIMIT)",
+    "q": "Каков вывод?",
+    "a": [
+      "10 — const val не триггерит class loading",
+      "init, затем 10 — доступ к LIMIT загружает class и companion",
+      "init, 10, init — инициализация повторяется на const",
+      "Просто init — const недоступен как top-level вызов"
+    ],
+    "c": 1,
+    "e": "Доступ к Counter.LIMIT требует Class.load → companion init → Counter() → print('init'). Затем 10."
+  },
+  {
+    "type": "output",
+    "code": "val nums = listOf(1, 2, 3)\nval result = nums.fold(10) { acc, n -> acc - n }\nprintln(result)",
+    "q": "Что напечатает?",
+    "a": [
+      "16 — fold суммирует 10 + 1 + 2 + 3",
+      "10 — fold без seed игнорирует initial value",
+      "-6 — fold применяется справа налево (reduceRight-поведение)",
+      "4 — fold вычитает слева направо: 10-1=9, 9-2=7, 7-3=4"
+    ],
+    "c": 3,
+    "e": "fold(10) итерирует слева направо: acc=10 → 10-1=9 → 9-2=7 → 7-3=4."
+  },
+  {
+    "type": "output",
+    "code": "val m = mutableMapOf(\"a\" to 1)\nval v = m.getOrPut(\"b\") {\n    println(\"compute\")\n    99\n}\nprintln(\"$v / ${m[\"b\"]}\")",
+    "q": "Какой вывод?",
+    "a": [
+      "compute, 99 / 99 — ключа нет, вычислили, сохранили, вернули",
+      "99 / 99 — getOrPut кэширует результат даже без compute-трасы",
+      "compute, 99 / null — getOrPut не сохраняет, только возвращает",
+      "null / null — lambda выполняется лениво, v=null"
+    ],
+    "c": 0,
+    "e": "getOrPut: если ключа нет — вызывает lambda, сохраняет результат, возвращает. Видим 'compute' и 99 в обоих."
+  },
+  {
+    "type": "bug",
+    "code": "data class User(val name: String, val tags: MutableList<String>)\nval shared = mutableListOf(\"admin\")\nval u1 = User(\"A\", shared)\nval u2 = User(\"B\", shared)\nu1.tags.add(\"x\")\nprintln(u2.tags)",
+    "q": "Что напечатает и почему это баг?",
+    "a": [
+      "[admin, x] — tags разделена между u1 и u2, мутация видна обоим",
+      "[admin] — data class копирует конструкторные аргументы by value",
+      "Compile error — MutableList запрещён внутри data class",
+      "[admin, x, admin] — Kotlin дублирует при поздней mutate"
+    ],
+    "c": 0,
+    "e": "data class хранит ссылки на параметры; общий shared list — мутация через один инстанс видна всем, кто держит ссылку."
+  },
+  {
+    "type": "bug",
+    "code": "data class User(var name: String, val id: Int)\nval set = hashSetOf(User(\"A\", 1))\nval u = set.first()\nu.name = \"B\"\nprintln(set.contains(User(\"B\", 1)))",
+    "q": "Что напечатает и в чём баг?",
+    "a": [
+      "false — hash элемента сохранён при add, мутация сломала bucket-инвариант",
+      "true — data class == сравнивает все поля, B совпадает с B",
+      "ConcurrentModificationException — нельзя мутировать при read",
+      "Compile error — data class запрещает var без copy-ctor"
+    ],
+    "c": 0,
+    "e": "HashSet индексирует по hashCode при добавлении; мутация name меняет hash — элемент «застревает» в неправильной bucket."
+  },
+  {
+    "type": "bug",
+    "code": "class Repo {\n    lateinit var api: Api\n    fun load() = api.fetch()\n}\nval r = Repo()\nr.load()",
+    "q": "Что случится при вызове load?",
+    "a": [
+      "NullPointerException — lateinit возвращает null при чтении до init",
+      "Compile error — lateinit требует ::api.isInitialized-guard",
+      "Работает — lateinit инициализируется дефолтным объектом",
+      "UninitializedPropertyAccessException — обращение до присваивания"
+    ],
+    "c": 3,
+    "e": "lateinit позволяет объявить без значения, но чтение до присваивания — UninitializedPropertyAccessException в runtime."
+  },
+  {
+    "type": "bug",
+    "code": "class Cache {\n    val data by lazy(LazyThreadSafetyMode.NONE) { loadHeavy() }\n    private fun loadHeavy(): List<Int> = List(1_000_000) { it }\n}\n// доступ к data из нескольких потоков",
+    "q": "В чём проблема?",
+    "a": [
+      "lazy требует @Volatile-аннотацию для корректной видимости в JVM",
+      "Lazy всегда synchronized на JVM — NONE игнорируется для совместимости",
+      "List(1_000_000) гарантированно бросит OutOfMemoryError при lazy-init",
+      "NONE отключает синхронизацию — initializer может выполниться несколько раз"
+    ],
+    "c": 3,
+    "e": "NONE отключает все синхронизации — идеально для single-thread. При concurrent access — гонка, потенциальная двойная загрузка."
+  },
+  {
+    "type": "bug",
+    "code": "class Counter {\n    private var n = 0\n    fun inc() {\n        synchronized(Any()) { n++ }\n    }\n}",
+    "q": "Почему synchronized не синхронизирует?",
+    "a": [
+      "Каждый inc создаёт новый Any — потоки не конкурируют за один замок",
+      "Any() без конструктора — компилятор оптимизирует блок в no-op",
+      "Synchronized требует class-level блокировку, а не instance-level",
+      "n++ атомарен в Kotlin — synchronized вообще излишен"
+    ],
+    "c": 0,
+    "e": "Синхронизация эффективна только по стабильному объекту (shared lock); новый Any() на каждый вызов — каждому своё, эффекта нет."
+  },
+  {
+    "type": "bug",
+    "code": "data class Config(val rules: MutableList<Rule>)\nfun freeze(c: Config): Config = c.copy()",
+    "q": "Почему freeze не делает то, что ожидается?",
+    "a": [
+      "freeze нужно пометить @Synchronized для thread-freeze",
+      "copy возвращает null при не-Serializable полях",
+      "copy пересобирает rules через deep-clone, это тяжёлая операция",
+      "copy — shallow; rules — тот же MutableList в оригинале и копии"
+    ],
+    "c": 3,
+    "e": "data class.copy() — поверхностная копия; mutable-поля остаются общими ссылками — изменения в rules видны обоим объектам."
+  },
+  {
+    "type": "bug",
+    "code": "class Activity {\n    companion object {\n        var current: Activity? = null\n    }\n    init { current = this }\n}",
+    "q": "Какая главная проблема?",
+    "a": [
+      "current — var, не потокобезопасно; возможна race при launch",
+      "init не должен обращаться к companion — это циклическая зависимость",
+      "companion держит Activity через static поле — вся иерархия view утекает",
+      "this в init не готов — current получит частично сконструированный Activity"
+    ],
+    "c": 2,
+    "e": "companion object живёт пока загружен class (≈ пока жив процесс); хранение Activity в его поле — leak всего, что он удерживает."
+  },
+  {
+    "type": "bug",
+    "code": "val data = Array(1_000_000) { it }   // тип Array<Int>\nvar sum = 0L\nfor (v in data) sum += v",
+    "q": "Что плохо?",
+    "a": [
+      "Array<Int> аллоцирует Integer-боксы вместо примитивных int",
+      "Array нельзя заполнять lambda-инициализатором",
+      "Integer arithmetic медленнее Long — нужно toLong()",
+      "for-in не оптимизирован для Array, только для IntRange"
+    ],
+    "c": 0,
+    "e": "Array<Int> = Integer[] (boxed), IntArray = int[] (primitive). IntArray экономит память и быстрее доступ на JVM."
+  },
+  {
+    "type": "bug",
+    "code": "fun build(items: List<String>): String {\n    var s = \"\"\n    for (it in items) s += it\n    return s\n}",
+    "q": "Что плохо для списка из 10 000 элементов?",
+    "a": [
+      "s должна быть val — val + StringBuilder быстрее автоматически",
+      "String.plus на каждой итерации создаёт новую строку — O(n²) по памяти",
+      "Для коллекции нужно использовать joinToString — он в 2x быстрее",
+      "for-in не подходит для строк, нужен forEach для оптимизации"
+    ],
+    "c": 1,
+    "e": "String immutable; += создаёт новую String на каждой итерации. Kotlin compile-оптимизация для += не всегда помогает внутри циклов — используйте buildString."
+  },
+  {
+    "type": "bug",
+    "code": "val mutex = Mutex()\nsuspend fun critical() {\n    mutex.withLock {\n        withContext(Dispatchers.IO) {\n            heavyIO()\n        }\n    }\n}",
+    "q": "Какой антипаттерн?",
+    "a": [
+      "Держать mutex через suspension point — блокирует всех надолго",
+      "Mutex несовместим с withContext — должен быть @Synchronized",
+      "Dispatchers.IO игнорирует Mutex, lock снимается автоматически",
+      "withContext внутри withLock создаёт deadlock на следующем вызове"
+    ],
+    "c": 0,
+    "e": "Long-running suspend внутри Mutex сериализует всех, кто хочет lock — узкое место. Делать IO вне mutex, внутри — только критическую секцию."
+  },
+  {
+    "type": "bug",
+    "code": "class VM {\n    val state = MutableStateFlow(0)\n    init {\n        state.onEach { println(it) }.launchIn(???)\n    }\n    fun inc() { state.update { it + 1 } }\n}",
+    "q": "Как правильно выбрать scope для launchIn?",
+    "a": [
+      "coroutineScope-builder — корректный structured concurrency способ",
+      "GlobalScope — flow cold, сам закроется после emit",
+      "viewModelScope — жизнь коллекта совпадает с VM, авто-отмена в onCleared",
+      "runBlocking — чтобы init блокировал до первой подписки"
+    ],
+    "c": 2,
+    "e": "Flow холодный; без scope вообще не коллектится. GlobalScope — leak. viewModelScope привязан к lifecycle VM — оптимально для Android."
+  },
+  {
+    "type": "bug",
+    "code": "override fun onCreate(s: Bundle?) {\n    super.onCreate(s)\n    val user = runBlocking { api.getUser() }\n    bindUser(user)\n}",
+    "q": "Что сломается в Android?",
+    "a": [
+      "onCreate должен быть async — Android не передаёт coroutineScope",
+      "runBlocking на main блокирует UI thread — ANR и зависание экрана",
+      "api.getUser нельзя вызывать из main — только из Service-потоков",
+      "bindUser упадёт, потому что user всегда null вне LifecycleScope"
+    ],
+    "c": 1,
+    "e": "runBlocking блокирует вызывающий поток до завершения корутины; на Android main thread это ANR. Нужен lifecycleScope.launch."
+  },
+  {
+    "type": "bug",
+    "code": "val parent = Job()\nval scope = CoroutineScope(parent + Dispatchers.Default)\nscope.launch { doA() }\nscope.launch { doB() }\n// позже\nparent.cancel()",
+    "q": "Что произойдёт с doA и doB при parent.cancel()?",
+    "a": [
+      "Только первая отменится — cancel останавливает текущую job",
+      "Обе будут отменены каскадно через Job-hierarchy",
+      "Обе завершатся нормально — cancel на parent не касается children",
+      "CancellationException бросится в точку парентского вызова"
+    ],
+    "c": 1,
+    "e": "Job-hierarchy: parent.cancel() каскадирует отмену всем child-jobs; обе корутины получат CancellationException при следующей suspend-точке."
+  },
+  {
+    "type": "bug",
+    "code": "abstract class Animal(open val name: String) {\n    override fun equals(other: Any?): Boolean {\n        if (this === other) return true\n        if (other !is Animal) return false\n        return name == other.name\n    }\n}\nclass Dog(name: String): Animal(name)\nclass Cat(name: String): Animal(name)\n\nprintln(Dog(\"A\").equals(Cat(\"A\")))",
+    "q": "Какой результат и в чём баг?",
+    "a": [
+      "false — Kotlin учитывает runtime type при equals подклассов",
+      "Compile error — equals между Dog и Cat запрещён типовой системой",
+      "true — equals проверяет только имя; Dog \"A\" = Cat \"A\"",
+      "NullPointerException — open val name может быть null при cast"
+    ],
+    "c": 2,
+    "e": "equals без javaClass-проверки считает подклассы равными по общим полям — нарушает symmetric/consistency invariant Set/Map."
+  },
+  {
+    "type": "bug",
+    "code": "class Money(val cents: Long) {\n    override fun equals(other: Any?): Boolean =\n        other is Money && other.cents == cents\n    // hashCode не переопределён\n}\n\nval set = hashSetOf(Money(100))\nprintln(set.contains(Money(100)))",
+    "q": "Что напечатает и почему?",
+    "a": [
+      "true — hashSetOf использует equals напрямую для поиска элемента",
+      "Compile error — override equals без hashCode запрещён в Kotlin",
+      "false — hashCode наследуется от Any (identity), bucket не совпадает",
+      "Exception — HashSet требует Hashable-интерфейс явно"
+    ],
+    "c": 2,
+    "e": "HashSet ищет через hashCode → bucket → equals. Any.hashCode — identity; два Money дают разные bucket, contains не найдёт."
+  },
+  {
+    "type": "pattern",
+    "code": "interface Animal { fun sound(): String }\nclass Dog : Animal { override fun sound() = \"woof\" }\n\nclass Barker(animal: Animal) : Animal by animal {\n    fun bark() = sound().uppercase()\n}",
+    "q": "Какая фича Kotlin основная?",
+    "a": [
+      "Composition через extension function на интерфейсе",
+      "Inheritance with secondary constructor — делегирование в super",
+      "Class delegation через `by` — автоматическое проксирование методов",
+      "Smart cast в конструктор — animal трансформируется в Dog"
+    ],
+    "c": 2,
+    "e": "`by animal` — Kotlin-delegation: интерфейс Animal реализуется за счёт делегирования всем методам переданного объекта."
+  },
+  {
+    "type": "pattern",
+    "code": "sealed interface Result<out T>\ndata class Ok<T>(val value: T) : Result<T>\ndata class Err(val e: Throwable) : Result<Nothing>\ndata object Loading : Result<Nothing>\n\nfun <T> handle(r: Result<T>): String = when (r) {\n    is Ok -> \"value: ${r.value}\"\n    is Err -> \"error: ${r.e.message}\"\n    Loading -> \"loading\"\n}",
+    "q": "Что характеризует этот стиль моделирования?",
+    "a": [
+      "Enum class с обогащением — каждый case хранит свои данные",
+      "Tagged union через data class — runtime-тэги проверяются вручную",
+      "Sum type / sealed hierarchy — закрытое множество variant'ов",
+      "Abstract factory — Loading, Ok, Err создаются через Result.of"
+    ],
+    "c": 2,
+    "e": "sealed + data/object — закрытая алгебраическая иерархия; when по ней exhaustive, компилятор гарантирует обработку всех вариантов."
+  },
+  {
+    "type": "pattern",
+    "code": "@JvmInline\nvalue class UserId(val raw: Long) {\n    init { require(raw > 0) }\n}\n\nfun fetch(id: UserId) { /* ... */ }",
+    "q": "Что даёт value class?",
+    "a": [
+      "Оптимизированная обёртка без boxing, плюс type-safety",
+      "Stateless wrapper — UserId всегда const, память не тратится",
+      "Alias для типа без изменения runtime-представления — как typealias",
+      "Immutable class — автоматически thread-safe через JVM-barrier"
+    ],
+    "c": 0,
+    "e": "value class (inline class) оборачивает одно поле; на JVM компилятор стирает обёртку где возможно — нет allocation, но типы разные."
+  },
+  {
+    "type": "pattern",
+    "code": "class HttpClient private constructor(val base: String) {\n    companion object {\n        fun prod() = HttpClient(\"https://api.x.com\")\n        fun staging() = HttpClient(\"https://stg.x.com\")\n    }\n}\n\nval c = HttpClient.prod()",
+    "q": "Какой паттерн?",
+    "a": [
+      "Singleton — HttpClient всегда один инстанс на JVM",
+      "Abstract Factory — companion выбирает concrete type",
+      "Builder — постепенная настройка через цепочку",
+      "Static Factory Method — named constructor через companion"
+    ],
+    "c": 3,
+    "e": "Private constructor + named factory-методы в companion — удобные «имена» для вариантов создания; каждый возвращает новый инстанс."
+  },
+  {
+    "type": "pattern",
+    "code": "fun String.isValidEmail(): Boolean =\n    contains(\"@\") && contains(\".\") && length > 5\n\nval ok = \"x@y.com\".isValidEmail()",
+    "q": "Какая фича Kotlin?",
+    "a": [
+      "Top-level function — resolve идёт через импорт пакета",
+      "Extension function — новый метод доступен как член типа",
+      "Companion extension — доступна через String.Companion",
+      "Infix function — вызов без точки в dot-chain"
+    ],
+    "c": 1,
+    "e": "fun String.X() — extension; статически резолвится, добавляет метод без изменения String."
+  },
+  {
+    "type": "pattern",
+    "code": "fun html(init: Html.() -> Unit): Html = Html().apply(init)\n\nclass Html {\n    fun body(init: Body.() -> Unit) { Body().apply(init) }\n}\nclass Body {\n    fun p(text: String) { println(text) }\n}\n\nval page = html {\n    body {\n        p(\"Hello\")\n    }\n}",
+    "q": "Какой паттерн?",
+    "a": [
+      "Builder с fluent API — цепочка returns this для chain-вызовов",
+      "Prototype — Html и Body копируются из заготовок",
+      "DSL через operator overload — plus и invoke собирают AST",
+      "Type-safe builder через receiver-lambda (T.() -> Unit)"
+    ],
+    "c": 3,
+    "e": "T.() -> Unit — лямбда с receiver: внутри this — T, вложенные функции resolve на receiver. База Kotlin-DSL (HTML, Gradle)."
+  },
+  {
+    "type": "pattern",
+    "code": "val user = User(\"A\").apply {\n    age = 30\n    email = \"a@a.com\"\n}",
+    "q": "Почему apply, а не also/let/run?",
+    "a": [
+      "apply возвращает receiver, а не результат lambda — для цепочки после",
+      "apply = also с небольшими отличиями в возврате Unit",
+      "apply ленив — настройки применяются при первом вызове метода",
+      "apply даёт this = receiver и возвращает receiver — удобно конфигурировать"
+    ],
+    "c": 3,
+    "e": "apply: receiver=this, return=this. Удобен для конфигурирования объекта сразу после конструктора."
+  },
+  {
+    "type": "pattern",
+    "code": "val user: User? = /* ... */\nval name = user?.let {\n    save(it)\n    it.name\n} ?: \"anon\"\n",
+    "q": "Почему let, а не apply/run/with?",
+    "a": [
+      "let быстрее apply — меньше overhead на this-binding",
+      "let берёт объект как `it`, возвращает результат блока — удобен с ?.",
+      "let автоматически обрабатывает null, apply бросает NPE",
+      "let = apply с результатом lambda вместо receiver"
+    ],
+    "c": 1,
+    "e": "let: arg=it, return=блок. Для null-safe трансформации с возвратом значения — стандартный выбор."
+  },
+  {
+    "type": "pattern",
+    "code": "object AppConfig {\n    const val VERSION = \"1.0\"\n    val startedAt = System.currentTimeMillis()\n    fun reload() { /* ... */ }\n}",
+    "q": "Что такое `object` в Kotlin тут?",
+    "a": [
+      "Keyword для data-only record; JVM компилит в static-класс без ctor",
+      "Singleton на уровне JVM — один инстанс, lazy-init при первом доступе",
+      "Эквивалент companion object, но без ассоциации с enclosing type",
+      "Анонимный тип для литерала — выделяется через runtime factory"
+    ],
+    "c": 1,
+    "e": "`object` — singleton, инициализируется через Class.forName при первом обращении; thread-safe за счёт JVM class-loading."
+  },
+  {
+    "type": "pattern",
+    "code": "fun <T, R> List<T>.mapTo(dst: MutableList<R>, f: (T) -> R): MutableList<R> {\n    for (it in this) dst.add(f(it))\n    return dst\n}",
+    "q": "Какая ключевая особенность?",
+    "a": [
+      "Extension function — расширение List без наследования",
+      "Higher-order function — параметр (T) -> R — функция первого класса",
+      "Mixin — объединение нескольких типов в один",
+      "Curried function — частичное применение аргументов"
+    ],
+    "c": 1,
+    "e": "Функция принимает другую функцию как параметр — higher-order. Extension — тоже здесь, но ключевая ценность — передача f в аргумент."
+  },
+  {
+    "type": "pattern",
+    "code": "inline fun <reified T> Any.tryCast(): T? = this as? T\n\nval x: String? = 42.tryCast<String>()\nval y: Int? = 42.tryCast<Int>()",
+    "q": "Какая фича обеспечивает работу as? T внутри функции?",
+    "a": [
+      "T резолвится в Any через type erasure; as? Any всегда успех",
+      "Kotlin reflects generic type через ClassLoader при каждом вызове",
+      "reified T доступен в runtime благодаря inline — тело копируется в call site",
+      "reified требует @Suppress на erasure — иначе runtime-фэйл"
+    ],
+    "c": 2,
+    "e": "reified работает только для inline-функций: компилятор подставляет конкретный T в call site → обход type erasure."
+  },
+  {
+    "type": "pattern",
+    "code": "searchQueries.flatMapLatest { q ->\n    api.search(q)\n}",
+    "q": "Отличие flatMapLatest от flatMapConcat?",
+    "a": [
+      "Latest запускает upstream параллельно, concat — последовательно",
+      "Latest отменяет предыдущий inner Flow при новом emit — для search-input",
+      "Latest кеширует предыдущий результат; concat каждый раз заново",
+      "Семантически одинаковы, отличаются именами в разных версиях"
+    ],
+    "c": 1,
+    "e": "flatMapLatest: при новом emission внешнего Flow отменяет текущую inner-коллекцию и подписывается на новую — классика search-input."
+  },
+  {
+    "type": "pattern",
+    "code": "val state: StateFlow<Int> = flow.stateIn(scope, SharingStarted.Eagerly, 0)\nval events: SharedFlow<Event> = flow.shareIn(scope, SharingStarted.WhileSubscribed())",
+    "q": "Ключевое отличие StateFlow от SharedFlow?",
+    "a": [
+      "StateFlow хранит текущее значение и conflate; SharedFlow — поток без state",
+      "SharedFlow быстрее, StateFlow — UI-specific обёртка",
+      "StateFlow для single value, SharedFlow обязательно replay=all",
+      "StateFlow hot, SharedFlow cold — разница в eagerness"
+    ],
+    "c": 0,
+    "e": "StateFlow: initial + conflate + value-property. SharedFlow: настраиваемый replay/extraBuffer, не обязан иметь value."
+  },
+  {
+    "type": "pattern",
+    "code": "data class User(val name: String, val age: Int)\nval u1 = User(\"A\", 20)\nval u2 = u1.copy(age = 21)",
+    "q": "Какой подход реализован через copy?",
+    "a": [
+      "Immutable update — новая копия с изменённым полем, оригинал не трогается",
+      "Structural sharing — u2 ссылается на поля u1 до modify",
+      "Lens pattern — точечное изменение поля вложенного объекта",
+      "Memento — сохранение предыдущего состояния для rollback"
+    ],
+    "c": 0,
+    "e": "data class + copy — idiom для immutable-обновления; оригинал неизменен, u2 — новый объект с age=21."
+  },
+  {
+    "type": "pattern",
+    "code": "infix fun Int.pow(n: Int): Int {\n    var r = 1; repeat(n) { r *= this }; return r\n}\nval x = 2 pow 10",
+    "q": "Что даёт ключевое слово `infix`?",
+    "a": [
+      "Позволяет вызывать функцию как `receiver name arg` без точек и скобок",
+      "Делает функцию inline — тело копируется в call site",
+      "Разрешает перегружать операторы +, -, * через свой символ",
+      "Помечает функцию как чистую (pure) для оптимизации компилятора"
+    ],
+    "c": 0,
+    "e": "infix — член или extension с одним параметром; вызывается без точки и скобок: `2 pow 10`. Читабельно для DSL."
+  },
+  {
+    "type": "coroutines",
+    "code": "val j: Job = GlobalScope.launch { delay(100); println(\"A\") }\nval d: Deferred<Int> = GlobalScope.async { delay(100); 42 }",
+    "q": "Какая разница между launch и async?",
+    "a": [
+      "launch для CPU-bound, async для I/O-bound — разные dispatchers",
+      "async блокирует текущую корутину, launch — нет",
+      "Оба возвращают Job; async — синтаксис только в Kotlin 1.8+",
+      "launch возвращает Job (fire-and-forget), async — Deferred<T> с await()"
+    ],
+    "c": 3,
+    "e": "launch — fire-and-forget, Job без значения. async — задача с результатом: Deferred<T>, read через await()."
+  },
+  {
+    "type": "coroutines",
+    "code": "runBlocking {\n    val d = async { throw IllegalStateException(\"x\") }\n    try {\n        d.await()\n    } catch (e: IllegalStateException) {\n        println(\"caught\")\n    }\n}",
+    "q": "Что напечатает?",
+    "a": [
+      "caught — await пробрасывает сохранённое исключение Deferred",
+      "Ничего — async проглатывает исключение без ручной обработки",
+      "runBlocking падает до try — caught не напечатается",
+      "Deadlock — исключение в async блокирует runBlocking"
+    ],
+    "c": 0,
+    "e": "async хранит исключение в Deferred; await пробрасывает его. Здесь try/catch ловит — 'caught'. Но parent scope тоже может упасть."
+  },
+  {
+    "type": "coroutines",
+    "code": "suspend fun load() = coroutineScope {\n    val a = async { fetchA() }\n    val b = async { throw RuntimeException(\"b failed\") }\n    a.await() to b.await()\n}",
+    "q": "Что произойдёт при падении b?",
+    "a": [
+      "a продолжит работу, b вернёт null — async изолирует исключения",
+      "SupervisorJob автоматически ловит ошибку b — a завершится нормально",
+      "coroutineScope отменит a и пробросит исключение b наверх",
+      "to-конструкция пошлёт Throwable в результат вместо Pair"
+    ],
+    "c": 2,
+    "e": "coroutineScope = structured concurrency: падение любого ребёнка отменяет всех и пробрасывает исключение наверх. supervisorScope отличался бы."
+  },
+  {
+    "type": "coroutines",
+    "code": "suspend fun readFile(): String = withContext(Dispatchers.IO) {\n    File(\"x.txt\").readText()\n}",
+    "q": "Что делает withContext?",
+    "a": [
+      "Создаёт новую корутину и ждёт её завершения — как async+await",
+      "Запускает блок в фоне — возврат без блокировки",
+      "Переключает контекст выполнения блока на указанный dispatcher",
+      "Синоним launch с waiting-семантикой — блокирует до finish"
+    ],
+    "c": 2,
+    "e": "withContext — suspend-функция: исполняет блок на другом dispatcher и возвращает результат блока. Не создаёт новую Job."
+  },
+  {
+    "type": "coroutines",
+    "code": "val scope = CoroutineScope(SupervisorJob())\nscope.launch { throw IllegalStateException(\"A\") }\nscope.launch { delay(100); println(\"B\") }",
+    "q": "Напечатает ли \"B\"?",
+    "a": [
+      "Нет — исключение в первой launch отменяет весь scope",
+      "Зависит от dispatcher — на IO да, на Main нет",
+      "Да — SupervisorJob изолирует failures между дочерними job'ами",
+      "Crash всего процесса — unhandled exception в root scope"
+    ],
+    "c": 2,
+    "e": "SupervisorJob: падение одного ребёнка не каскадирует на братьев (в отличие от обычного Job). B исполнится."
+  },
+  {
+    "type": "coroutines",
+    "code": "suspend fun fromCallback(): String = suspendCancellableCoroutine { cont ->\n    api.fetch(object : Callback {\n        override fun onResult(s: String) { cont.resume(s) }\n        override fun onError(e: Throwable) { cont.resumeWithException(e) }\n    })\n    cont.invokeOnCancellation { api.cancel() }\n}",
+    "q": "Что делает suspendCancellableCoroutine?",
+    "a": [
+      "Обёртка callback-API в suspend с поддержкой отмены через invokeOnCancellation",
+      "Создаёт корутину которая работает только в single-thread режиме",
+      "Блокирует текущий поток до первого resume — как runBlocking",
+      "Запускает новую корутину с передачей continuation наружу"
+    ],
+    "c": 0,
+    "e": "suspendCancellableCoroutine — мост между callback-based кодом и suspend-функциями; поддерживает отмену через invokeOnCancellation."
+  },
+  {
+    "type": "coroutines",
+    "code": "class Adapter {\n    fun onClick() {\n        GlobalScope.launch {\n            val r = api.load()\n            updateUi(r)\n        }\n    }\n}",
+    "q": "Что плохо в Android UI-контексте?",
+    "a": [
+      "GlobalScope стал ошибкой компиляции начиная с Kotlin 1.6.0",
+      "launch на onClick блокирует UI thread до завершения api.load()",
+      "GlobalScope живёт до конца процесса — updateUi на разрушенный view",
+      "Ничего — GlobalScope рекомендован для короткоживущих callback-задач"
+    ],
+    "c": 2,
+    "e": "GlobalScope живёт до конца процесса; если view уничтожен до завершения корутины — updateUi падает. Используйте lifecycleScope/viewModelScope."
+  },
+  {
+    "type": "coroutines",
+    "code": "suspend fun double(x: Int): Int = 2 * x\nsuspend fun use() {\n    runBlocking {\n        println(double(5))\n    }\n}",
+    "q": "Что плохо в use()?",
+    "a": [
+      "Nested runBlocking запрещён с Kotlin 1.5 — бросит IllegalStateException",
+      "double вызывается без withContext — нарушение contract",
+      "runBlocking внутри suspend блокирует поток, убивая параллелизм",
+      "println в корутине небезопасен — нужен Logger.coroutine"
+    ],
+    "c": 2,
+    "e": "runBlocking — вход из non-coroutine; внутри suspend это регресс, блокирует thread. Используйте просто `double(5)` или coroutineScope."
+  },
+  {
+    "type": "coroutines",
+    "code": "val flow = flow<Int> {\n    println(\"producer start\")\n    emit(1); emit(2); emit(3)\n    println(\"producer done\")\n}\n// никто не collect",
+    "q": "Что произойдёт?",
+    "a": [
+      "Напечатает producer start и три emission, producer done",
+      "Runtime error — flow без terminal-оператора запрещён",
+      "Ничего — Flow cold, блок выполняется только при collect",
+      "Auto-collect через lazy — выполнится когда есть free dispatcher"
+    ],
+    "c": 2,
+    "e": "Cold Flow: код внутри flow{} выполняется для каждого collect подписчика отдельно. Без collect блок не запускается."
+  },
+  {
+    "type": "coroutines",
+    "code": "upstream\n    .buffer(10)\n    .collect { slowProcess(it) }",
+    "q": "Что делает buffer(10)?",
+    "a": [
+      "Собирает 10 элементов в одну пачку и эмитит как batch — batching",
+      "Делает Flow горячим с replay-буфером на последние 10 значений",
+      "Удаляет дубликаты в скользящем окне 10 — аналог distinctUntilChanged",
+      "Producer в отдельной coroutine через канал на 10 — без back-pressure"
+    ],
+    "c": 3,
+    "e": "buffer запускает upstream параллельно downstream через канал заданной ёмкости; collect не блокирует producer."
+  },
+  {
+    "type": "coroutines",
+    "code": "CoroutineScope(Dispatchers.IO).launch {\n    val data = File(\"a.json\").readText()\n    val parsed = parseJson(data)\n    withContext(Dispatchers.Default) {\n        heavyCompute(parsed)\n    }\n}",
+    "q": "Зачем IO для read + Default для compute?",
+    "a": [
+      "IO и Default — одинаковые пулы, просто разные метки",
+      "IO — пул для blocking-I/O (~64 threads); Default — по ядрам для CPU-bound",
+      "IO единственный dispatcher, поддерживающий File API",
+      "Default быстрее IO — всегда используйте его для максимальной скорости"
+    ],
+    "c": 1,
+    "e": "IO — большой пул, threads спят в blocking calls. Default — компактный (количество ядер) для CPU работы. Разное размерение под разные нагрузки."
+  },
+  {
+    "type": "coroutines",
+    "code": "val a = flowOf(1, 2, 3)\nval b = flowOf(\"x\", \"y\", \"z\", \"w\")\na.combine(b) { i, s -> \"$i-$s\" }.collect { println(it) }",
+    "q": "Как combine объединяет flows?",
+    "a": [
+      "По индексу: пары (1,x), (2,y), (3,z) — это поведение zip-оператора",
+      "Cross product — все комбинации (3 * 4 = 12 пар в итоге)",
+      "Latest каждого Flow; первый emit — когда оба эмитнули хотя бы раз",
+      "Ждёт закрытия обоих потоков и сливает результат в один List<Pair>"
+    ],
+    "c": 2,
+    "e": "combine: при любом emit одного Flow комбинирует с latest другого; zip строже — пары по индексу."
+  },
+  {
+    "type": "coroutines",
+    "code": "val shared = flow.shareIn(\n    scope,\n    SharingStarted.WhileSubscribed(5000),\n    replay = 1\n)",
+    "q": "Что даёт WhileSubscribed(5000)?",
+    "a": [
+      "Upstream работает постоянно, 5000 — интервал поллинга в мс",
+      "Start at first subscribe; stop через 5с после ухода последнего подписчика",
+      "Задержка 5с между каждым emit — аналог debounce",
+      "Ограничивает stream на 5 секунд работы, потом закрывает"
+    ],
+    "c": 1,
+    "e": "WhileSubscribed привязывает upstream к подписчикам; timeout сохраняет stream короткое время — для быстрой ре-подписки (config changes)."
+  },
+  {
+    "type": "coroutines",
+    "code": "val handler = CoroutineExceptionHandler { _, e -> println(\"caught $e\") }\nval scope = CoroutineScope(Job() + handler)\nscope.launch { throw IllegalStateException(\"x\") }\nscope.async { throw IllegalStateException(\"y\") }",
+    "q": "Где сработает handler?",
+    "a": [
+      "Только на первом launch — async прячет exception в Deferred до await",
+      "На обоих — handler универсален для любых coroutine-билдеров",
+      "Ни на одном — handler работает только с SupervisorJob",
+      "Только на async — launch по умолчанию swallows exceptions"
+    ],
+    "c": 0,
+    "e": "CoroutineExceptionHandler ловит unhandled exceptions только в root launch. async сохраняет исключение в Deferred — проявится на await."
+  },
+  {
+    "type": "coroutines",
+    "code": "suspend fun work() = withContext(Dispatchers.IO) {\n    try {\n        heavy()\n    } finally {\n        cleanupSuspend()\n    }\n}",
+    "q": "Проблема с cleanupSuspend() при отмене корутины?",
+    "a": [
+      "finally выполняется, но suspend внутри бросает CancellationException сразу",
+      "finally не выполняется при cancellation — нужен withContext(NonCancellable)",
+      "cleanupSuspend запустится на Main — потенциальный ANR",
+      "CancellationException не наследует Throwable — finally пропустит её"
+    ],
+    "c": 0,
+    "e": "finally-блок вызывается, но любая suspend-точка внутри отменённой корутины сразу бросает CancellationException. Для cleanup нужен withContext(NonCancellable)."
+  }
+]

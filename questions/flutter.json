@@ -1,0 +1,782 @@
+[
+  {
+    "type": "output",
+    "code": "void main() {\n  print(identical(const [], const []));\n  print(identical([], []));\n}",
+    "q": "Что напечатает?",
+    "a": [
+      "true false — const canonicalized, runtime литералы — новые объекты",
+      "false false — identical сравнивает по pointer, списки разные",
+      "true true — Dart canonicalizes все пустые списки runtime",
+      "false true — runtime cache для [] работает, const — нет"
+    ],
+    "c": 0,
+    "e": "const литералы canonicalized при компиляции — тот же объект. Не-const литерал создаёт новый List на каждом выполнении."
+  },
+  {
+    "type": "output",
+    "code": "void main() {\n  Future.microtask(() => print('micro'));\n  Future(() => print('future'));\n  print('sync');\n}",
+    "q": "Порядок вывода?",
+    "a": [
+      "micro sync future — microtask выполняется до sync-кода",
+      "future micro sync — все async планируется до sync-кода",
+      "sync future micro — Future до microtask из-за priority",
+      "sync micro future — sync продолжается, затем microtask, затем event"
+    ],
+    "c": 3,
+    "e": "Сначала оставшийся sync-код; затем microtask queue (она выше приоритет); затем event queue (обычные Future)."
+  },
+  {
+    "type": "output",
+    "code": "void main() async {\n  print('A');\n  await Future.value(0);\n  print('B');\n  print('C');\n}",
+    "q": "Что напечатает?",
+    "a": [
+      "A B C — await на готовом Future возвращает через microtask",
+      "A C B — await проваливает sync-пути",
+      "B A C — async функция возвращает до print('A')",
+      "A — await Future.value зависает без scheduler"
+    ],
+    "c": 0,
+    "e": "await на готовом Future идёт через microtask, но выполнение продолжается по порядку: A, пауза на microtask, B, C."
+  },
+  {
+    "type": "output",
+    "code": "Iterable<int> gen() sync* {\n  print('start');\n  yield 1;\n  print('mid');\n  yield 2;\n  print('end');\n}\n\nvoid main() {\n  final g = gen();\n  print('pre');\n  g.take(1).toList();\n  print('post');\n}",
+    "q": "Какой вывод?",
+    "a": [
+      "start mid end pre post — sync* блокирует main до завершения",
+      "start pre mid end post — sync* eager, выполняется при создании",
+      "pre start mid post — yield 2 всё равно считается для take(1)",
+      "pre start post — sync* lazy, take(1) тянет только первый yield"
+    ],
+    "c": 3,
+    "e": "sync* ленив; toList на take(1) запрашивает один элемент — 'start', yield 1, стоп. 'mid'/'end' не выполняются."
+  },
+  {
+    "type": "output",
+    "code": "void main() {\n  final a = [1, 2, 3];\n  final b = [...a, 4];\n  a.add(99);\n  print(b);\n}",
+    "q": "Что напечатает?",
+    "a": [
+      "[1, 2, 3, 4, 99] — b ссылается на a через spread",
+      "[1, 2, 3, 4] — spread копирует элементы в момент создания b",
+      "[1, 2, 3, 99, 4] — Dart вставляет add между spread-элементами",
+      "[99, 1, 2, 3, 4] — spread применяется lazy, при print"
+    ],
+    "c": 1,
+    "e": "Spread ...a — mutation a после создания b не влияет на него."
+  },
+  {
+    "type": "output",
+    "code": "void main() {\n  final String? name = null;\n  print('Hi, $name');\n}",
+    "q": "Что напечатает?",
+    "a": [
+      "Hi, null — Dart зовёт toString() на null, даёт 'null'",
+      "Hi, — пустая интерполяция для null",
+      "NoSuchMethodError на name.toString()",
+      "Compile error — nullable в интерполяции требует ??"
+    ],
+    "c": 0,
+    "e": "Интерполяция вызывает toString(); null.toString() возвращает 'null'. Null-safe; исключения нет."
+  },
+  {
+    "type": "output",
+    "code": "void main() {\n  final xs = [1, 2, 3, 4, 5];\n  xs.removeWhere((e) => e.isOdd);\n  print(xs);\n}",
+    "q": "Что напечатает?",
+    "a": [
+      "[1, 3, 5] — removeWhere возвращает отфильтрованную копию",
+      "[2, 4] — removeWhere мутирует список, убирая нечётные",
+      "[] — isOdd для всех true из-за coercion правил",
+      "Unsupported — removeWhere требует List<num>"
+    ],
+    "c": 1,
+    "e": "removeWhere мутирует исходный список in-place, удаляя элементы, удовлетворяющие предикату."
+  },
+  {
+    "type": "output",
+    "code": "void main() {\n  print(7 / 2);\n  print(7 ~/ 2);\n  print(7 % 2);\n}",
+    "q": "Что выведет?",
+    "a": [
+      "3.5 3 1 — /даёт double, ~/ целое, % остаток",
+      "3.5 3.5 1 — все деления возвращают double",
+      "3 3 1 — все три возвращают int",
+      "3 3.5 1 — ~/ округляет вверх, / обрезает"
+    ],
+    "c": 0,
+    "e": "/ всегда double; ~/ — целое деление (floor); % — остаток."
+  },
+  {
+    "type": "output",
+    "code": "class Box {\n  late final int x;\n}\n\nvoid main() {\n  final b = Box();\n  print(b.x);\n}",
+    "q": "Что случится?",
+    "a": [
+      "null — late final инициализирует в null по умолчанию",
+      "LateInitializationError — чтение late до assign = runtime ошибка",
+      "0 — late для числовых типов даёт default zero",
+      "Compile error — late final без initializer запрещён"
+    ],
+    "c": 1,
+    "e": "late без initializer требует присваивания до первого чтения; иначе LateInitializationError."
+  },
+  {
+    "type": "output",
+    "code": "enum Color { red, green, blue }\n\nvoid main() {\n  print(Color.values.map((c) => c.name).toList());\n}",
+    "q": "Какой вывод?",
+    "a": [
+      "[Color.red, Color.green, Color.blue] — полное имя с префиксом",
+      "[red, green, blue] — .name возвращает имя case без префикса",
+      "[0, 1, 2] — .name возвращает ordinal в виде строки",
+      "Compile error — .name недоступен для enhanced enum без override"
+    ],
+    "c": 1,
+    "e": ".values в порядке объявления; .name — строковое имя без префикса класса."
+  },
+  {
+    "type": "output",
+    "code": "void main() async {\n  try {\n    await Future.error('boom');\n  } catch (e) {\n    print('caught $e');\n  }\n}",
+    "q": "Что напечатает?",
+    "a": [
+      "boom — Future.error выбрасывает в sync-контекст",
+      "caught boom — await разворачивает error в исключение для try/catch",
+      "null — caught, но print проглотил error без данных",
+      "Uncaught Exception — Future.error не перехватывается в async"
+    ],
+    "c": 1,
+    "e": "Future.error — уже failed future; await пробрасывает ошибку как Dart exception — ловится try/catch."
+  },
+  {
+    "type": "output",
+    "code": "void main() {\n  final m = <String, int>{'a': 1, 'b': 2};\n  final r = m.map((k, v) => MapEntry(v, k));\n  print(r);\n}",
+    "q": "Какой вывод?",
+    "a": [
+      "{1: a, 2: b} — key/value меняются местами через MapEntry",
+      "{a: 1, b: 2} — map возвращает тот же dict",
+      "{1: a}, {2: b} — map возвращает список entries",
+      "Compile error — MapEntry нельзя вернуть из map"
+    ],
+    "c": 0,
+    "e": "Map.map трансформирует каждую пару (k,v) в новую MapEntry; здесь swap ключ/значение — получается Map<int, String>."
+  },
+  {
+    "type": "output",
+    "code": "class A {\n  A() { print('A'); }\n}\nclass B extends A {\n  B() { print('B'); }\n}\n\nvoid main() { B(); }",
+    "q": "Порядок вывода?",
+    "a": [
+      "A B — super-constructor вызывается до тела derived",
+      "B A — derived ctor сначала, затем implicit super",
+      "B — Dart не вызывает super неявно",
+      "Compile error — super() обязателен явно"
+    ],
+    "c": 0,
+    "e": "Dart автоматически вызывает super() до тела derived constructor; сначала print в A, затем в B."
+  },
+  {
+    "type": "output",
+    "code": "void main() {\n  const a = [1, 2, 3];\n  final b = const [1, 2, 3];\n  print(identical(a, b));\n}",
+    "q": "Что напечатает?",
+    "a": [
+      "false — разные объявления дают разные экземпляры",
+      "true — оба const со Structurally равным содержимым canonicalized",
+      "Compile error — identical между const-литералами запрещён",
+      "Runtime type error — const требует const-контекста для equality"
+    ],
+    "c": 1,
+    "e": "const + const list с одинаковыми элементами canonicalized в один объект; identical true."
+  },
+  {
+    "type": "output",
+    "code": "Stream<int> src() async* {\n  yield 1;\n  yield 2;\n  yield 3;\n}\n\nvoid main() async {\n  await for (final v in src().take(2)) {\n    print(v);\n  }\n}",
+    "q": "Какой вывод?",
+    "a": [
+      "1 2 3 — take(2) ограничивает только buffer, stream проходит весь",
+      "1 2 — take(2) отписывается после 2-го элемента",
+      "2 3 — take(2) пропускает первые N-2 элементов",
+      "Ошибка — take не работает с async*-generator"
+    ],
+    "c": 1,
+    "e": "async* ленив; take(2) отписывается после 2 emit'ов, producer паузится."
+  },
+  {
+    "type": "bug",
+    "code": "class _S extends State<MyWidget> {\n  late Stream<int> stream =\n      Stream.periodic(Duration(seconds: 1), (i) => i);\n  StreamSubscription<int>? sub;\n\n  @override\n  void initState() {\n    super.initState();\n    sub = stream.listen((v) => print(v));\n  }\n\n  @override\n  Widget build(BuildContext c) => Container();\n}",
+    "q": "Чего не хватает для корректного lifecycle?",
+    "a": [
+      "Виджет должен быть StatelessWidget — Stream не нуждается в State",
+      "listen нужно перенести в didChangeDependencies — context важен",
+      "Stream.periodic требует явного Timer — listen не подхватывается",
+      "dispose() с sub?.cancel() — иначе subscription живёт после разрушения"
+    ],
+    "c": 3,
+    "e": "Активные subscriptions и controllers обязательно dispose'ить в State.dispose(); иначе leak и callbacks в уничтоженном State."
+  },
+  {
+    "type": "bug",
+    "code": "class _S extends State<MyWidget> {\n  int count = 0;\n  @override\n  Widget build(BuildContext c) {\n    setState(() => count++);\n    return Text('$count');\n  }\n}",
+    "q": "Что произойдёт при исполнении?",
+    "a": [
+      "Красивый счётчик, пересобирается при каждом build",
+      "setState в build игнорируется — Flutter защищает от рекурсии",
+      "Compile error — setState запрещён в build-методе",
+      "Бесконечная перестройка — setState триггерит rebuild → новый setState"
+    ],
+    "c": 3,
+    "e": "setState помечает widget dirty и планирует rebuild; в build это рекурсивный цикл — Flutter бросит assertion в debug."
+  },
+  {
+    "type": "bug",
+    "code": "Future<void> loadAndPush() async {\n  final data = await api.fetch();\n  if (!mounted) return;\n  Navigator.of(context).push(\n    MaterialPageRoute(builder: (_) => Detail(data: data)),\n  );\n}",
+    "q": "Что всё равно может пойти не так?",
+    "a": [
+      "Navigator.push требует await — иначе Future зависает",
+      "context устаревает между проверкой mounted и использованием",
+      "await внутри async-метода блокирует main thread",
+      "api.fetch должен возвращать Stream, а не Future"
+    ],
+    "c": 1,
+    "e": "Между if(!mounted) и Navigator.of может случиться rebuild/dispose; безопаснее использовать BuildContext-guard непосредственно."
+  },
+  {
+    "type": "bug",
+    "code": "class _S extends State<MyWidget> {\n  @override\n  Widget build(BuildContext c) {\n    return FutureBuilder<User>(\n      future: api.getUser(),\n      builder: (c, snap) => Text(snap.data?.name ?? '...'),\n    );\n  }\n}",
+    "q": "Основная проблема с перформансом?",
+    "a": [
+      "api.getUser() создаётся при каждом build — лишний запрос на каждый rebuild",
+      "FutureBuilder плохо совместим со StatefulWidget — нужен Stream",
+      "snap.data всегда null до ConnectionState.done — текст '...' постоянен",
+      "Text без Key не diff'ится в итоге показывается пустой"
+    ],
+    "c": 0,
+    "e": "Future создаётся inline в build — любой rebuild вызывает новый запрос. Future должно храниться в State-поле."
+  },
+  {
+    "type": "bug",
+    "code": "ListView.builder(\n  itemCount: items.length,\n  itemBuilder: (c, i) => Dismissible(\n    child: ListTile(title: Text(items[i])),\n  ),\n);",
+    "q": "Что не так?",
+    "a": [
+      "Dismissible требует Key для отслеживания identity между rebuild",
+      "ListView.builder несовместим с Dismissible — нужен ListView по умолчанию",
+      "itemCount должен быть null для infinite scroll",
+      "ListTile нельзя оборачивать — Dismissible требует Container"
+    ],
+    "c": 0,
+    "e": "Dismissible/ReorderableListView используют Key для связи State с элементом; без него Flutter путает элементы при dismiss."
+  },
+  {
+    "type": "bug",
+    "code": "class _S extends State<MyWidget> {\n  final List<int> items = [];\n  void addItem(int x) {\n    items.add(x);\n  }\n  @override\n  Widget build(BuildContext c) => Text(items.length.toString());\n}",
+    "q": "Почему UI не обновляется после addItem?",
+    "a": [
+      "addItem не вызывает setState — Flutter не знает про mutation",
+      "items должен быть var, не final — final не перекрашивается",
+      "Text требует Key для автоматического rebuild",
+      "List.add не работает в State — нужен Set"
+    ],
+    "c": 0,
+    "e": "Мутация сама по себе не триггерит rebuild; нужен setState(() { items.add(x); }) чтобы Element перестроил widget."
+  },
+  {
+    "type": "bug",
+    "code": "Future<void> load() async {\n  final r = await api.fetch();\n  setState(() { data = r; });\n}",
+    "q": "Какая опасность в паре с dispose?",
+    "a": [
+      "setState в async-методе запрещён — нужен scheduleMicrotask",
+      "await блокирует dispose до завершения — leak",
+      "r может быть null если fetch отменяется — setState крашится",
+      "setState после dispose бросит assertion — State уже disposed"
+    ],
+    "c": 3,
+    "e": "Если State был disposed за время await — setState бросит FlutterError. Перед setState нужна проверка `if (!mounted) return;`."
+  },
+  {
+    "type": "bug",
+    "code": "class _S extends State<MyWidget> {\n  double? _width;\n\n  @override\n  void initState() {\n    super.initState();\n    _width = MediaQuery.of(context).size.width;\n  }\n\n  @override\n  Widget build(BuildContext c) => Container(width: _width);\n}",
+    "q": "Что упадёт и почему?",
+    "a": [
+      "size.width возвращает 0.0 до первого layout",
+      "_width должен быть late final, не nullable",
+      "MediaQuery.of в initState — context без InheritedWidget-предков",
+      "Container требует non-null width — crash при build"
+    ],
+    "c": 2,
+    "e": "initState имеет context, но ещё не прикреплён к InheritedWidget. Используйте didChangeDependencies или build для MediaQuery."
+  },
+  {
+    "type": "bug",
+    "code": "Row(children: [\n  Text('Очень длинный текст в одну строку...'),\n  Icon(Icons.star),\n])",
+    "q": "Что произойдёт на узком экране?",
+    "a": [
+      "Текст автоматически перенесётся на новую строку",
+      "RenderFlex overflowed — жёлто-чёрные stripes в debug",
+      "Icon исчезнет, Row обрежется по ширине",
+      "Row перейдёт в wrap-mode автоматически"
+    ],
+    "c": 1,
+    "e": "Row не constraint'ит children по ширине; Text растягивается сколько хочет. Оборачивать Text в Expanded/Flexible."
+  },
+  {
+    "type": "bug",
+    "code": "class Page extends StatelessWidget {\n  const Page({super.key});\n  @override\n  Widget build(BuildContext c) {\n    final cfg = Provider.of<Config>(c, listen: false);\n    return Container(color: cfg.color);\n  }\n}",
+    "q": "В чём проблема при изменении Config.color?",
+    "a": [
+      "Provider.of должен быть в initState для корректной работы",
+      "listen: false → widget не перестраивается на notifyListeners",
+      "Container.color не перекрашивается — нужен AnimatedContainer",
+      "Config должен быть StatefulWidget — ChangeNotifier требует State"
+    ],
+    "c": 1,
+    "e": "listen: false пропускает подписку — виджет не получает уведомления об изменениях. Используйте context.watch или Consumer."
+  },
+  {
+    "type": "bug",
+    "code": "void handleTap() {\n  Navigator.of(context).push(\n    MaterialPageRoute(builder: (_) => Detail()),\n  );\n  showSnackBar('opened');\n}",
+    "q": "Какой момент упускается?",
+    "a": [
+      "showSnackBar ищет Scaffold в Detail, не находит — error",
+      "push требует await — иначе Detail не рендерится",
+      "push не дожидается закрытия — snackbar в текущем Scaffold",
+      "handleTap должен быть async — Navigator блокирует main"
+    ],
+    "c": 2,
+    "e": "push — не блокирующий вызов, возвращает Future<T?>. Snackbar покажется сразу в исходном Scaffold, а не в Detail."
+  },
+  {
+    "type": "bug",
+    "code": "class Tile extends StatelessWidget {\n  final String label;\n  const Tile({required this.label, super.key});\n\n  @override\n  Widget build(BuildContext c) => Text(\n    label,\n    style: TextStyle(color: Colors.red),\n  );\n}",
+    "q": "Что упускается с точки зрения производительности?",
+    "a": [
+      "super.key устарел с Flutter 3.x — замените на Key?",
+      "Tile должен быть StatefulWidget для optimal diff",
+      "label должен быть var — final блокирует hot reload",
+      "TextStyle не const — новый объект на каждый build"
+    ],
+    "c": 3,
+    "e": "TextStyle(color: Colors.red) создаётся каждый раз; даже const-widget не помогает. Решение: static const _style или `const TextStyle(color: Colors.red)`."
+  },
+  {
+    "type": "bug",
+    "code": "ChangeNotifierProvider<Config>(\n  create: (_) => Config(),\n  child: MaterialApp(home: HomePage()),\n);\n// Config.setColor мутирует одно поле и зовёт notifyListeners",
+    "q": "Риск при частых изменениях одного поля?",
+    "a": [
+      "notifyListeners не работает с MaterialApp — нужен Selector",
+      "Provider всегда пересоздаёт все children — leak по памяти",
+      "Всё поддерево под Provider пересобирается — over-rebuild",
+      "ChangeNotifier thread-safe только с Mutex обёрткой"
+    ],
+    "c": 2,
+    "e": "Широкий ChangeNotifier → listener вызывает rebuild у всех подписчиков. Решение: Selector/Consumer или split на мелкие notifier."
+  },
+  {
+    "type": "bug",
+    "code": "Image.network('https://example.com/img.jpg')",
+    "q": "Что упускается в production-коде?",
+    "a": [
+      "width/height обязательны для Image.network",
+      "errorBuilder для сетевых сбоев — иначе broken image без fallback",
+      "fit: BoxFit.cover — дефолт даёт растянутую картинку",
+      "Image.network синхронный — нужен FutureBuilder-обёртка"
+    ],
+    "c": 1,
+    "e": "Без errorBuilder сетевая ошибка даёт пустой widget или broken state; всегда указывайте fallback (placeholder/иконку)."
+  },
+  {
+    "type": "bug",
+    "code": "class _S extends State<Page> {\n  String _name = '';\n  @override\n  Widget build(BuildContext c) {\n    return TextField(\n      onChanged: (v) => setState(() => _name = v),\n    );\n  }\n}",
+    "q": "Что проблемно для большого экрана?",
+    "a": [
+      "TextField требует explicit controller — onChanged deprecated",
+      "setState на каждом keystroke пересобирает весь _S subtree",
+      "String не thread-safe — onChanged вызывается с IO",
+      "onChanged не срабатывает без FocusNode"
+    ],
+    "c": 1,
+    "e": "Каждый ввод символа → rebuild всего _S; если дерево большое, лаги. Используйте TextEditingController + local ValueNotifier."
+  },
+  {
+    "type": "pattern",
+    "code": "class CounterCubit extends Cubit<int> {\n  CounterCubit() : super(0);\n  void inc() => emit(state + 1);\n  void dec() => emit(state - 1);\n}\n\n// UI: BlocBuilder<CounterCubit, int>(\n//   builder: (_, s) => Text('$s'),\n// )",
+    "q": "Какой архитектурный паттерн?",
+    "a": [
+      "MVC — Cubit это controller между View и Model",
+      "BLoC / Cubit — однонаправленный data flow, state через emit",
+      "Redux — Cubit это единый store с reducers",
+      "MVVM — Cubit играет роль ViewModel с двусторонним binding"
+    ],
+    "c": 1,
+    "e": "Cubit — упрощённый BLoC: метод → emit → stream state → UI. Ключевое: unidirectional flow, immutable state transitions."
+  },
+  {
+    "type": "pattern",
+    "code": "class ThemeNotifier extends InheritedWidget {\n  final ThemeData theme;\n  const ThemeNotifier({\n    required this.theme,\n    required super.child,\n    super.key,\n  });\n\n  static ThemeNotifier of(BuildContext c) =>\n      c.dependOnInheritedWidgetOfExactType<ThemeNotifier>()!;\n\n  @override\n  bool updateShouldNotify(ThemeNotifier old) => theme != old.theme;\n}",
+    "q": "Какой паттерн реализован?",
+    "a": [
+      "Singleton, распределённый по контексту через BuildContext",
+      "Provider с автоматической типизацией через generic <ThemeData>",
+      "Observer через Stream — dependOnInheritedWidget подписывает",
+      "InheritedWidget — propagation + reactive подписка вниз по дереву"
+    ],
+    "c": 3,
+    "e": "InheritedWidget — Flutter primitive для DI по дереву; updateShouldNotify решает, перебилдить ли подписчиков."
+  },
+  {
+    "type": "pattern",
+    "code": "Provider<Api>(\n  create: (_) => RealApi(),\n  dispose: (_, api) => api.dispose(),\n  child: App(),\n);\n\n// глубоко: context.read<Api>().fetch()",
+    "q": "Какой паттерн реализуется?",
+    "a": [
+      "DI через scoped Provider — зависимость живёт в поддереве",
+      "Factory — каждый вызов read() создаёт новый Api",
+      "Service Locator — context.read ищет в глобальном реестре",
+      "Singleton с lifecycle hooks — dispose зовётся при teardown"
+    ],
+    "c": 0,
+    "e": "Provider инжектит scoped-зависимость в поддерево через context; service locator — global, здесь scope ограничен poddeREVом."
+  },
+  {
+    "type": "pattern",
+    "code": "ListView.builder(\n  itemCount: users.length,\n  itemBuilder: (c, i) => ListTile(\n    key: ValueKey(users[i].id),\n    title: Text(users[i].name),\n  ),\n)",
+    "q": "Зачем ValueKey(users[i].id)?",
+    "a": [
+      "Сохраняет identity Element при reorder/insert/delete",
+      "Ускоряет rendering за счёт hash-based lookup в compositor",
+      "Обязателен для ListView.builder — без Key не рендерится",
+      "Группирует элементы с одинаковым id — дедупликация"
+    ],
+    "c": 0,
+    "e": "Key связывает widget с Element; при reorder State и animation следуют за элементом, а не за позицией в списке."
+  },
+  {
+    "type": "pattern",
+    "code": "class AppRouter extends RouterDelegate<Uri>\n    with ChangeNotifier, PopNavigatorRouterDelegateMixin<Uri> {\n  final _stack = <Page>[];\n\n  @override\n  Widget build(BuildContext c) => Navigator(\n    pages: _stack.toList(),\n    onPopPage: _pop,\n  );\n  // ...\n}",
+    "q": "Какая модель навигации используется?",
+    "a": [
+      "Navigator 1.0 — императивные push/pop команды",
+      "Navigator 2.0 — декларативный Router через список Page",
+      "Custom navigation через Overlay и WidgetsApp",
+      "GoRouter — это его официальный API"
+    ],
+    "c": 1,
+    "e": "RouterDelegate + pages:List<Page> — Navigator 2.0: стек экранов как декларативное состояние, pop через onPopPage."
+  },
+  {
+    "type": "pattern",
+    "code": "class UserCard extends StatelessWidget {\n  final User user;\n  const UserCard({required this.user, super.key});\n\n  @override\n  Widget build(BuildContext c) => Card(\n    child: Column(children: [\n      Avatar(url: user.avatar),\n      Text(user.name),\n      Text(user.email),\n    ]),\n  );\n}",
+    "q": "Какой принцип лежит в основе Flutter-UI?",
+    "a": [
+      "Inheritance — UserCard наследуется от Card",
+      "Template Method — Card задаёт скелет, UserCard переопределяет",
+      "Composition — UI собран из мелких widget, без наследования",
+      "Prototype — UserCard клонируется из базы Card"
+    ],
+    "c": 2,
+    "e": "Flutter предпочитает композицию наследованию; StatelessWidget агрегирует children через build() без extends от UI-классов."
+  },
+  {
+    "type": "pattern",
+    "code": "class Counter with ChangeNotifier {\n  int _value = 0;\n  int get value => _value;\n  void inc() {\n    _value++;\n    notifyListeners();\n  }\n}",
+    "q": "Какой паттерн?",
+    "a": [
+      "Singleton — Counter используется как глобальный state",
+      "Observer — Counter уведомляет listeners через notifyListeners",
+      "Visitor — listeners посещают Counter при изменениях",
+      "Mediator — Counter координирует между listeners"
+    ],
+    "c": 1,
+    "e": "ChangeNotifier — каноничный Observer: listeners подписываются addListener, получают callback на изменения."
+  },
+  {
+    "type": "pattern",
+    "code": "final results = await Future.wait([\n  api.fetchUser(),\n  api.fetchPosts(),\n  api.fetchComments(),\n]);",
+    "q": "Как выполняются эти futures?",
+    "a": [
+      "Последовательно — каждый ждёт предыдущий",
+      "Параллельно — все стартуют сразу, Future.wait ждёт завершения",
+      "Только первый — остальные игнорируются",
+      "Только последний — wait возвращает результат последнего"
+    ],
+    "c": 1,
+    "e": "Future создаётся при вызове функции (hot); wait — агрегатор. Все три fetch идут одновременно; результат List в порядке аргументов."
+  },
+  {
+    "type": "pattern",
+    "code": "final ctrl = StreamController<int>.broadcast();\n\nfinal s1 = ctrl.stream.listen((v) => print('A $v'));\nfinal s2 = ctrl.stream.listen((v) => print('B $v'));\n\nctrl.add(42);",
+    "q": "Зачем broadcast?",
+    "a": [
+      "Ускоряет доставку событий через параллельные callbacks",
+      "Разрешает >1 подписок; single-sub Stream бросит StateError",
+      "Автоматически закрывает stream после всех listen",
+      "Позволяет добавлять события из listen-callback безопасно"
+    ],
+    "c": 1,
+    "e": "Обычный Stream single-subscription — вторая listen бросит StateError. Broadcast отдаёт каждое событие всем подписчикам."
+  },
+  {
+    "type": "pattern",
+    "code": "mixin LoggingMixin {\n  void log(String s) => print('[${DateTime.now()}] $s');\n}\n\nclass MyService with LoggingMixin {\n  void run() => log('running');\n}",
+    "q": "Что даёт ключевое слово mixin?",
+    "a": [
+      "Ограничивает класс — только один `with` на декларацию",
+      "Автоматический singleton для встраиваемого объекта",
+      "Alias для abstract class с default-методами",
+      "Множественное наследование от нескольких mixin без сложной иерархии"
+    ],
+    "c": 3,
+    "e": "mixin — переиспользуемые методы без класса-базы; класс может `with A, B, C` — линеаризация вместо diamond-проблем."
+  },
+  {
+    "type": "pattern",
+    "code": "extension StringX on String {\n  String capitalize() =>\n      isEmpty ? this : '${this[0].toUpperCase()}${substring(1)}';\n}\n\nfinal r = 'hello'.capitalize();",
+    "q": "Какой механизм языка?",
+    "a": [
+      "Extension method — добавление метода статически",
+      "Prototype — изменяется String.prototype через decorator",
+      "Inheritance — StringX наследуется от String",
+      "Mixin — String with StringX даёт новые методы"
+    ],
+    "c": 0,
+    "e": "extension ... on String — статический вызов capitalize(); доступен только там, где импортирован, не модифицирует String."
+  },
+  {
+    "type": "pattern",
+    "code": "class Logger {\n  Logger._internal();\n  static final Logger _i = Logger._internal();\n  factory Logger() => _i;\n\n  void log(String s) => print(s);\n}\n\nfinal l1 = Logger();\nfinal l2 = Logger();",
+    "q": "Что возвращает Logger()?",
+    "a": [
+      "Тот же экземпляр — Singleton через factory + static field",
+      "Каждый раз новый Logger — factory создаёт новый инстанс",
+      "Null — приватный ctor блокирует внешнее создание Logger",
+      "Throws at runtime — factory без body бросает исключение"
+    ],
+    "c": 0,
+    "e": "Приватный ctor + static field + factory возвращающий field — классический Singleton в Dart."
+  },
+  {
+    "type": "pattern",
+    "code": "ValueListenableBuilder<int>(\n  valueListenable: counter,\n  builder: (c, v, _) => Text('$v'),\n)",
+    "q": "Когда перестраивается Text?",
+    "a": [
+      "При каждом frame — ValueListenableBuilder ticker-based",
+      "При любом rebuild родителя — обычный inherited model",
+      "При подписке/отписке — Stream-based reactivity",
+      "Только при изменении counter.value через notifyListeners"
+    ],
+    "c": 3,
+    "e": "ValueListenable → Builder rebuild только при emit нового value; точечный rebuild без перерисовки соседей."
+  },
+  {
+    "type": "pattern",
+    "code": "Widget build(BuildContext c) {\n  return Scaffold(\n    body: Column(children: [\n      const Header(),\n      Expanded(child: Content(data: data)),\n      const Footer(),\n    ]),\n  );\n}",
+    "q": "Зачем const перед Header/Footer?",
+    "a": [
+      "Синтаксический sugar, не влияет на runtime",
+      "Canonicalised: Flutter пропускает rebuild при identical() == true",
+      "Делает widget thread-safe через immutable-гарантию",
+      "Ускоряет hot reload — const не переинициализируется"
+    ],
+    "c": 1,
+    "e": "const-widget — compile-time константа; identical() true при rebuild → Element может пропустить повторную сборку subtree."
+  },
+  {
+    "type": "pattern",
+    "code": "// регистрация\nGetIt.I.registerSingleton<Api>(RealApi());\n\n// использование где-то глубоко\nfinal api = GetIt.I<Api>();",
+    "q": "Какой паттерн?",
+    "a": [
+      "DI через constructor injection — Api передан через параметры",
+      "Service Locator — глобальный реестр, доступ по типу",
+      "Singleton сам по себе — RealApi управляет собственным instance",
+      "Factory Method — I<Api>() создаёт новый при каждом вызове"
+    ],
+    "c": 1,
+    "e": "GetIt — типичный service locator: регистрация в глобал, resolve по типу. Отличается от DI тем, что зависимость берётся явно, не передаётся."
+  },
+  {
+    "type": "lifecycle",
+    "code": "class _S extends State<Page> {\n  @override\n  void initState() {\n    super.initState();\n    print('init');\n  }\n  @override\n  void didChangeDependencies() {\n    super.didChangeDependencies();\n    print('deps');\n  }\n}",
+    "q": "Порядок вывода при первой вставке в дерево?",
+    "a": [
+      "deps, init — dependencies готовы раньше initState",
+      "Только deps — initState deprecated в новых Flutter",
+      "Только init — didChangeDependencies вызывается при изменении",
+      "init, deps — initState первый, затем didChangeDependencies"
+    ],
+    "c": 3,
+    "e": "При первой вставке: initState → didChangeDependencies → build. Затем deps повторяется, если изменился InheritedWidget-ancestor."
+  },
+  {
+    "type": "lifecycle",
+    "code": "// Widget использует Theme.of(context);\n// родитель обновляется с новой ThemeData",
+    "q": "Какой метод State сработает первым?",
+    "a": [
+      "build — Flutter пересобирает напрямую без lifecycle-калбэков",
+      "didUpdateWidget — виджет передаёт новую конфигурацию",
+      "didChangeDependencies — InheritedWidget изменился, подписчик оповещён",
+      "initState — при каждой смене Theme State переинициализируется"
+    ],
+    "c": 2,
+    "e": "Изменение InheritedWidget (Theme) → зависимые State получают didChangeDependencies → затем build."
+  },
+  {
+    "type": "lifecycle",
+    "code": "class _S extends State<MyWidget> {\n  @override\n  void didUpdateWidget(MyWidget old) {\n    super.didUpdateWidget(old);\n    if (widget.userId != old.userId) _reload();\n  }\n\n  void _reload() { /* ... */ }\n}",
+    "q": "Когда вызывается didUpdateWidget?",
+    "a": [
+      "Когда setState меняет состояние самого State",
+      "Родитель пересобрал дерево с новым widget (тот же type+key)",
+      "Когда InheritedWidget-зависимость изменяется",
+      "Раз при вставке — аналог componentDidMount из React"
+    ],
+    "c": 1,
+    "e": "Element получает новый Widget того же runtimeType+key → переиспользует State → вызывает didUpdateWidget(oldWidget)."
+  },
+  {
+    "type": "lifecycle",
+    "code": "FutureBuilder<int>(\n  future: api.count(),\n  builder: (c, snap) {\n    if (snap.connectionState == ConnectionState.waiting) return Loader();\n    if (snap.hasError) return ErrorView();\n    return Text('${snap.data}');\n  },\n)",
+    "q": "Какие поля AsyncSnapshot обычно проверяют?",
+    "a": [
+      "state / result / error — Dart's AsyncSnapshot structure",
+      "isReady / payload — обычный state-machine подход",
+      "connectionState + hasError + hasData/data",
+      "Только data — остальные auto-handled Flutter-ом"
+    ],
+    "c": 2,
+    "e": "AsyncSnapshot: connectionState (none/waiting/active/done), hasError/error, hasData/data — этот набор полей."
+  },
+  {
+    "type": "lifecycle",
+    "code": "class _S extends State<Page> {\n  Timer? _t;\n\n  @override\n  void initState() {\n    super.initState();\n    _t = Timer.periodic(Duration(seconds: 1), (_) => setState(() {}));\n  }\n\n  @override\n  void dispose() {\n    _t?.cancel();\n    super.dispose();\n  }\n}",
+    "q": "Что правильно в жизненном цикле?",
+    "a": [
+      "super.dispose() первый — базовый класс должен уборщик первым",
+      "Отмена своего ресурса до super.dispose() — safe-first convention",
+      "Timer не нужно явно отменять — dispose авто-очищает",
+      "dispose вообще не требуется — State сам освобождается GC"
+    ],
+    "c": 1,
+    "e": "Принятая конвенция: сначала свои ресурсы (timer.cancel, sub.cancel), потом super.dispose(). Оба порядка допустимы, но первый — норма."
+  },
+  {
+    "type": "lifecycle",
+    "code": "class TabPage extends StatefulWidget { /* ... */ }\n\nclass _S extends State<TabPage>\n    with AutomaticKeepAliveClientMixin {\n  @override\n  bool get wantKeepAlive => true;\n\n  @override\n  Widget build(BuildContext c) {\n    super.build(c);\n    return Scaffold(/* ... */);\n  }\n}",
+    "q": "Зачем AutomaticKeepAliveClientMixin?",
+    "a": [
+      "Синхронизирует scroll position между табами/экранами",
+      "Держит widget в RAM forever — бесконечное время жизни",
+      "Отключает dispose() — State не уничтожается никогда",
+      "Сохраняет State в lazy-контейнерах (TabBarView, ListView.builder)"
+    ],
+    "c": 3,
+    "e": "Lazy-контейнеры (TabBarView, ListView.builder) могут dispose'ить невидимые State; KeepAlive помечает их как keep → State переживает."
+  },
+  {
+    "type": "lifecycle",
+    "code": "class App extends StatefulWidget { /* ... */ }\n\nclass _S extends State<App> with WidgetsBindingObserver {\n  @override\n  void initState() {\n    super.initState();\n    WidgetsBinding.instance.addObserver(this);\n  }\n\n  @override\n  void didChangeAppLifecycleState(AppLifecycleState s) {\n    print(s);\n  }\n}",
+    "q": "Какие события ловит этот observer?",
+    "a": [
+      "Переходы app между resumed/inactive/paused/detached",
+      "Resize окна и изменения orientation",
+      "Клавиатура appear/disappear — показ/скрытие IME",
+      "Network changes — онлайн/оффлайн"
+    ],
+    "c": 0,
+    "e": "WidgetsBindingObserver.didChangeAppLifecycleState — системные переходы приложения (background/foreground/terminate)."
+  },
+  {
+    "type": "lifecycle",
+    "code": "// Родитель пересобрал дерево и передал новый ChildWidget;\n// тот же runtimeType, тот же Key (или оба без Key)",
+    "q": "Что произойдёт с State дочернего?",
+    "a": [
+      "State пересоздаётся с вызовом initState заново",
+      "Dispose + initState — полная переинициализация",
+      "Element переиспользует State, вызывается didUpdateWidget",
+      "Ничего — rebuild пропускается, didUpdateWidget игнорируется"
+    ],
+    "c": 2,
+    "e": "При совпадении runtimeType+key Element сохраняется, вместе с State; меняется только widget-конфиг, вызывается didUpdateWidget."
+  },
+  {
+    "type": "lifecycle",
+    "code": "// RouteAware mixin + RouteObserver в родителе;\n// экран push'ится поверх и потом возвращается",
+    "q": "Какие события ловит RouteAware?",
+    "a": [
+      "didChangeAppLifecycleState — lifecycle приложения",
+      "initState, dispose — lifecycle State",
+      "didPush, didPop, didPushNext, didPopNext — события навигации",
+      "setState, rebuild — события пересборки widget-tree"
+    ],
+    "c": 2,
+    "e": "RouteAware + RouteObserver: уведомления о push/pop/next-push/next-pop относительно этого экрана; полезно для analytics, refresh."
+  },
+  {
+    "type": "lifecycle",
+    "code": "// Два экрана с Hero(tag: 'avatar');\n// Navigator.push(ScreenB) — анимация",
+    "q": "Что делает Hero?",
+    "a": [
+      "Клонирует State между экранами через общий shared-tag",
+      "Передаёт данные через tag — аналог route arguments",
+      "Flight — выносит Hero в Overlay, анимирует size/position между Route",
+      "Optimizes rendering — Hero кеширует pixel snapshot"
+    ],
+    "c": 2,
+    "e": "Hero ищет пары с одинаковым tag на исходном и целевом Route; во время transition widget выносится в Overlay и анимируется."
+  },
+  {
+    "type": "lifecycle",
+    "code": "// Hot reload vs Hot restart",
+    "q": "Ключевое отличие?",
+    "a": [
+      "Reload — full rebuild с потерей State; restart — сохраняет",
+      "Reload работает только с UI; restart — с бизнес-логикой",
+      "Reload — injection + reassemble, сохраняет State; restart — полный рестарт",
+      "Они одинаковые — разные названия одной операции"
+    ],
+    "c": 2,
+    "e": "Hot reload инжектит изменённые классы и зовёт reassemble() — State живёт, widget-tree пересобирается. Hot restart = рестарт с нуля."
+  },
+  {
+    "type": "lifecycle",
+    "code": "class _S extends State<Page> {\n  @override\n  void reassemble() {\n    super.reassemble();\n    _reinitNonLocalState();\n  }\n\n  void _reinitNonLocalState() { /* ... */ }\n}",
+    "q": "Когда вызывается reassemble?",
+    "a": [
+      "При каждом rebuild в production",
+      "При Navigator.push на текущий экран",
+      "При смене orientation — resize триггер",
+      "В debug при hot reload — удобно для сброса caches"
+    ],
+    "c": 3,
+    "e": "reassemble вызывается только в dev/debug при hot reload; типичное применение — сброс кешей, переоткрытие БД, повторный подписки."
+  },
+  {
+    "type": "lifecycle",
+    "code": "StreamBuilder<Data>(\n  stream: repo.watch(),\n  builder: (c, snap) {\n    switch (snap.connectionState) {\n      case ConnectionState.none: return Empty();\n      case ConnectionState.waiting: return Loader();\n      case ConnectionState.active: return DataView(snap.data!);\n      case ConnectionState.done: return Summary(snap.data);\n    }\n  },\n)",
+    "q": "Что означает ConnectionState.active?",
+    "a": [
+      "Первый успешный emit с данными — далее стрим завершится",
+      "Идёт reconnect — данные кешируются до active-состояния",
+      "Сетевая ошибка — subscription восстанавливается",
+      "Подписка активна и emits приходят; stream ещё не закрыт"
+    ],
+    "c": 3,
+    "e": "active = есть активная подписка, данные эмитятся; done — stream закрыт (onDone). Между waiting→active — первое событие."
+  },
+  {
+    "type": "lifecycle",
+    "code": "class _S extends State<Page> {\n  final controller = PageController();\n  // ... используется в PageView\n}",
+    "q": "Чего не хватает в жизненном цикле?",
+    "a": [
+      "initState с controller.jumpToPage(0) для начальной позиции",
+      "Builder-метод для controller — PageView иначе не рендерится",
+      "dispose с controller.dispose() — иначе listeners и animations висят",
+      "Всё на месте — PageController сам очищается через ref-count"
+    ],
+    "c": 2,
+    "e": "Controllers (Page, Scroll, Animation, Text) требуют dispose() в State.dispose() — иначе leak listeners/animations."
+  },
+  {
+    "type": "lifecycle",
+    "code": "class Form extends StatefulWidget { /* ... */ }\n\nclass _S extends State<Form> {\n  final _key = PageStorageKey('form-1');\n  // ...\n}",
+    "q": "Что даёт PageStorageKey?",
+    "a": [
+      "Уникальный ID для поиска Form в widget-tree через context",
+      "Сохраняет small state (scroll offset) между push/pop экрана",
+      "Хранит последнюю orientation между rebuild'ами экрана",
+      "Альтернатива GlobalKey — работает быстрее при равенстве"
+    ],
+    "c": 1,
+    "e": "PageStorage + PageStorageKey позволяет автоматически сохранять небольшие значения (scroll position, etc.) при push/pop между экранами."
+  }
+]

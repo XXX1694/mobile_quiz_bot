@@ -1,0 +1,782 @@
+[
+  {
+    "type": "output",
+    "code": "func run() {\n    defer { print(\"A\") }\n    defer { print(\"B\") }\n    print(\"C\")\n}\nrun()",
+    "q": "Какой вывод?",
+    "a": [
+      "A B C — defer исполняется в порядке объявления",
+      "B A C — defer обгоняет print из-за оптимизации",
+      "C A B — первый defer планируется после print",
+      "C B A — defer работает как LIFO-стек после return"
+    ],
+    "c": 3,
+    "e": "defer помещается на стек и раскручивается в обратном порядке; print('C') выходит первым."
+  },
+  {
+    "type": "output",
+    "code": "let s = \"👨‍👩‍👧\"\nprint(s.count, s.unicodeScalars.count, s.utf8.count)",
+    "q": "Что напечатает (ZWJ-emoji семьи)?",
+    "a": [
+      "3 3 12 — по одному значению на каждую персону",
+      "1 3 9 — эмодзи считает как три объединённых",
+      "1 5 12 — grapheme, unicode scalars, utf8-байты",
+      "5 5 18 — ZWJ тоже считается графемой"
+    ],
+    "c": 2,
+    "e": "Один grapheme cluster; пять unicode scalars (три лица + два ZWJ); каждое лицо — 4 байта UTF-8 плюс ZWJ по 3."
+  },
+  {
+    "type": "output",
+    "code": "var log = [String]()\nfunc peek(_ s: String) -> Int? {\n    log.append(s); return nil\n}\nlet r = peek(\"A\") ?? peek(\"B\") ?? 0\nprint(log.joined(separator: \",\"), r)",
+    "q": "Что напечатает?",
+    "a": [
+      "A 0 — ?? short-circuits после первого nil",
+      "A,B nil — ?? не раскрывает Optional целиком",
+      "A,B 0 — обе левые части nil, ?? дошёл до дефолта",
+      "A,B,0 0 — дефолт тоже логируется"
+    ],
+    "c": 2,
+    "e": "?? вычисляет правую часть только при nil слева; обе функции вернули nil — обе залогированы."
+  },
+  {
+    "type": "output",
+    "code": "let a = [10, 20, 30, 40, 50]\nlet s = a.dropFirst(2)\nprint(s[0], s.first!)",
+    "q": "Что выведет?",
+    "a": [
+      "10 30 — s[0] — первый элемент slice, first — тот же",
+      "30 30 — оба доступа возвращают стартовый элемент slice",
+      "fatal error — s[0] индексация по исходному массиву",
+      "30 10 — first берёт из оригинала, s[0] — из копии"
+    ],
+    "c": 2,
+    "e": "ArraySlice наследует индексы базового массива; s.startIndex == 2 и s[0] — out of range. first-свойство безопасно."
+  },
+  {
+    "type": "output",
+    "code": "let x: Int? = 5\nprint(\"x = \\(x)\")",
+    "q": "Что напечатает (warning допустим)?",
+    "a": [
+      "x = 5 — интерполяция авто-разворачивает Optional",
+      "x = Optional(5) — интерполяция зовёт default description",
+      "x = nil — Optional требует явного force-unwrap",
+      "Не скомпилируется — Optional должен быть unwrapped"
+    ],
+    "c": 1,
+    "e": "String(describing: Optional) = \"Optional(...)\"; Swift выдаёт warning и предлагает либо ?? либо !."
+  },
+  {
+    "type": "output",
+    "code": "let x: Int8 = 127\nlet y = x &+ 1\nlet z = x &* 2\nprint(y, z)",
+    "q": "Что напечатает?",
+    "a": [
+      "128 254 — &-операторы отключают overflow check",
+      "-128 254 — overflow в &+, но &* уходит в Int16",
+      "-128 -2 — overflow wrap по двум дополнениям",
+      "fatal error — overflow trap срабатывает в обоих"
+    ],
+    "c": 2,
+    "e": "&+/&* — wrap-around арифметика по модулю 2^n: 127+1 = -128, 127*2 = 254 mod 256 = -2."
+  },
+  {
+    "type": "output",
+    "code": "var x = 10\nlet snap = { print(x) }\nx = 20\nlet later = { [x] in print(x) }\nx = 30\nsnap(); later()",
+    "q": "Что выведет snap(); later()?",
+    "a": [
+      "30 20 — snap видит актуальное, later замораживает при объявлении",
+      "10 20 — snap замораживает в момент создания, later захватывает список",
+      "30 30 — оба читают внешнюю переменную по ссылке",
+      "20 30 — snap берёт промежуточное, later идёт в scope"
+    ],
+    "c": 0,
+    "e": "Закрытие без capture list захватывает var по reference — snap видит x=30. [x] копирует значение на момент создания — later фиксирует 20."
+  },
+  {
+    "type": "output",
+    "code": "let arr = [1, 2, 3, 4, 5]\nlet r = arr.lazy\n    .map { print(\"m\", $0); return $0 * 2 }\n    .first { $0 > 4 }\nprint(\"=>\", r!)",
+    "q": "Что напечатает?",
+    "a": [
+      "m 1 m 2 m 3 => 6 — lazy map вычисляется до первого подходящего",
+      "m 1 m 2 m 3 m 4 m 5 => 6 — lazy материализуется при first",
+      "=> 6 — lazy не печатает ничего до финального use",
+      "m 3 => 6 — map вызывается только для победителя"
+    ],
+    "c": 0,
+    "e": "lazy тянет элементы по запросу; first требует map(1),map(2),map(3) — 6>4, цепочка останавливается."
+  },
+  {
+    "type": "output",
+    "code": "protocol Animal {\n    func sound() -> String\n}\nextension Animal {\n    func sound() -> String { \"generic\" }\n    func describe() -> String { sound() + \" animal\" }\n}\nstruct Dog: Animal {\n    func sound() -> String { \"woof\" }\n}\nprint(Dog().describe())",
+    "q": "Что напечатает?",
+    "a": [
+      "generic animal — describe зовёт default из extension",
+      "woof animal — sound — требование протокола, dynamic dispatch",
+      "generic — describe не вызывается напрямую",
+      "Ошибка: неоднозначный вызов sound()"
+    ],
+    "c": 1,
+    "e": "sound() объявлено в протоколе → witness table → динамический диспатч на Dog.sound() даже из extension."
+  },
+  {
+    "type": "output",
+    "code": "protocol Greeter {}\nextension Greeter {\n    func hi() -> String { \"ext\" }\n}\nstruct Kid: Greeter {\n    func hi() -> String { \"kid\" }\n}\nlet g: Greeter = Kid()\nlet k = Kid()\nprint(g.hi(), k.hi())",
+    "q": "Что напечатает?",
+    "a": [
+      "kid ext — k — value type, g — reference",
+      "kid kid — runtime polymorphism работает всегда",
+      "ext ext — extension-метод затеняет конкретный",
+      "ext kid — вне протокола: диспатч по типу переменной"
+    ],
+    "c": 3,
+    "e": "hi() НЕ требование протокола → статический диспатч по декларируемому типу: g: Greeter → extension; k: Kid → Kid.hi."
+  },
+  {
+    "type": "output",
+    "code": "var a = 1, b = 2\nfunc swap(_ x: inout Int, _ y: inout Int) {\n    x = y\n    y = x\n}\nswap(&a, &b)\nprint(a, b)",
+    "q": "Что напечатает?",
+    "a": [
+      "2 1 — inout корректно обменивает значения",
+      "1 2 — Swift запрещает двойной inout на разные переменные",
+      "1 1 — y=x пишет в b старое значение a",
+      "2 2 — после x=y обе переменные ссылаются на одну"
+    ],
+    "c": 3,
+    "e": "x=y: x становится 2. y=x: y становится 2. Оригинал a затирается до чтения — наивный swap всегда теряет одно значение."
+  },
+  {
+    "type": "output",
+    "code": "enum Token: Equatable {\n    case num(Int, raw: String)\n}\nlet a = Token.num(10, raw: \"10\")\nlet b = Token.num(10, raw: \"0xA\")\nprint(a == b)",
+    "q": "Что напечатает?",
+    "a": [
+      "true — Equatable сравнивает только первое associated value",
+      "Компилятор запретит: raw с именем не сравниваем",
+      "false — синтезированный == требует равенства всех payload",
+      "true — labels не входят в equality"
+    ],
+    "c": 2,
+    "e": "Auto-синтез Equatable для enum требует равенства всех associated values независимо от меток — 'raw' не совпадает."
+  },
+  {
+    "type": "output",
+    "code": "let s = stride(from: 0, through: 10, by: 3)\nprint(Array(s))\nlet p = stride(from: 0, to: 10, by: 3)\nprint(Array(p))",
+    "q": "Что напечатает?",
+    "a": [
+      "[0,3,6,9,10] [0,3,6,9] — through включает верхнюю границу",
+      "[0,3,6,9] [0,3,6] — to исключает последний, through включает если кратно",
+      "[0,3,6,9] [0,3,6,9] — 10 не делится на 3, в обоих пропускается",
+      "[0,3,6,9,10] [0,3,6] — through всегда включает, to — никогда"
+    ],
+    "c": 2,
+    "e": "through=10 включает 10 только если шаг попадает ровно; 9+3=12>10 — не входит. to исключает верхнюю границу всегда."
+  },
+  {
+    "type": "output",
+    "code": "let x = 2\nvar out = \"\"\nswitch x {\ncase 1: out += \"A\"\ncase 2: out += \"B\"; fallthrough\ncase 3: out += \"C\"; fallthrough\ncase 4: out += \"D\"\ndefault: out += \"?\"\n}\nprint(out)",
+    "q": "Что напечатает?",
+    "a": [
+      "B — case 2 обычно останавливается на break",
+      "ABCD — switch в Swift всегда исчерпывающий",
+      "BCD? — fallthrough достигает default",
+      "BCD — fallthrough проваливается без проверки условий"
+    ],
+    "c": 3,
+    "e": "fallthrough игнорирует следующие case-условия и исполняет их тела подряд; останавливается на первом без fallthrough (case 4)."
+  },
+  {
+    "type": "output",
+    "code": "let r: Result<Int, Error> = .success(42)\nswitch r {\ncase .success(let x) where x < 0: print(\"neg\")\ncase .success(let x) where x > 100: print(\"big\")\ncase .success: print(\"mid\")\ncase .failure: print(\"err\")\n}",
+    "q": "Что напечатает?",
+    "a": [
+      "big — 42 > 0 удовлетворяет первому where-guard матчера",
+      "mid — оба where-guard ложны, падает в .success без условия",
+      "neg — signed сравнение даёт overflow в отрицательную ветку",
+      "err — Result без явного matching падает в .failure-хэндлер"
+    ],
+    "c": 1,
+    "e": "where-guard превращает case в conditional match; 42 не <0 и не >100 → падает в .success без условия → mid."
+  },
+  {
+    "type": "bug",
+    "code": "final class VM {\n    var onUpdate: (() -> Void)?\n    var value = 0\n    func bind() {\n        onUpdate = { self.value += 1 }\n    }\n}",
+    "q": "Что не так с bind()?",
+    "a": [
+      "Retain cycle: VM владеет onUpdate, onUpdate захватывает self сильно",
+      "Нужен @escaping — без него closure нельзя хранить в stored property",
+      "value += 1 бросит data race — тип должен быть Atomic<Int>",
+      "Closure заморозит value=0 — capture by value на момент bind"
+    ],
+    "c": 0,
+    "e": "Stored property типа closure захват — всегда @escaping. Здесь проблема в цикле self↔closure; нужен [weak self]."
+  },
+  {
+    "type": "bug",
+    "code": "var arr = [10, 20, 30, 40]\nfor i in arr.indices {\n    if arr[i] == 20 {\n        arr.remove(at: i)\n    }\n}",
+    "q": "Что произойдёт при исполнении?",
+    "a": [
+      "Отработает: удалит 20, массив станет [10, 30, 40]",
+      "Trap: arr.indices зафиксирован до цикла, i выйдет за границу после remove",
+      "Бесконечный цикл — индекс не инкрементируется после remove",
+      "Compile error: нельзя мутировать коллекцию в её же for-in"
+    ],
+    "c": 1,
+    "e": "arr.indices — snapshot Range<Int> длиной 4; после remove arr.count=3, но i доходит до 3 и arr[3] падает."
+  },
+  {
+    "type": "bug",
+    "code": "// вызывается с main thread\nDispatchQueue.main.sync {\n    dataSource.reload()\n}",
+    "q": "Что случится?",
+    "a": [
+      "Выполнится немедленно — main.sync на main оптимизируется в no-op",
+      "Deadlock: sync на собственной serial queue вешает поток",
+      "Crash: нельзя sync на главную queue в DEBUG",
+      "Выполнится в фоне через дополнительный thread"
+    ],
+    "c": 1,
+    "e": "DispatchQueue.main — serial queue главного потока; sync ждёт освобождения очереди, которая занята текущим sync = deadlock."
+  },
+  {
+    "type": "bug",
+    "code": "struct User: Equatable {\n    let id: UUID\n    let onDelete: (() -> Void)?\n}",
+    "q": "Почему не скомпилируется?",
+    "a": [
+      "UUID не соответствует Hashable — Equatable нужен всем полям",
+      "Closure optional не Equatable — синтез отказывается",
+      "Struct с closure запрещён: stored closure требует class",
+      "Init для User должен быть явным — Equatable требует public"
+    ],
+    "c": 1,
+    "e": "Auto-синтез Equatable требует Equatable у всех stored properties; тип closure ни при каких условиях не Equatable."
+  },
+  {
+    "type": "bug",
+    "code": "func fetchSync() -> Data {\n    let sema = DispatchSemaphore(value: 0)\n    var out = Data()\n    DispatchQueue.main.async {\n        out = Data(count: 10)\n        sema.signal()\n    }\n    sema.wait()\n    return out\n}\n// вызывается из main thread",
+    "q": "Что случится, если вызвать с main?",
+    "a": [
+      "Вернёт Data(count: 10) после коротского switch-контекста",
+      "Deadlock: sema.wait занимает main, async-блок ждёт ту же queue",
+      "Crash: async → main из main вызывает assertion",
+      "Работает в 90% случаев, иногда дёт SIGSEGV из-за race"
+    ],
+    "c": 1,
+    "e": "Текущий поток main блокирован sema.wait; closure в main.async поставлен в ту же очередь, но очередь не освобождается — взаимный клинч."
+  },
+  {
+    "type": "bug",
+    "code": "final class HeavyStore {\n    lazy var data: [String] = load()\n    private func load() -> [String] { /* долгая работа */ [] }\n}\n// доступ к .data из нескольких потоков",
+    "q": "Что плохо при многопоточном доступе?",
+    "a": [
+      "load() залипнет в deadlock-е между двумя thread-ами",
+      "Компилятор пометит warning; lazy должен быть @Sendable-изолирован",
+      "lazy в Swift не потокобезопасен — load() может запуститься дважды",
+      "Nothing — Swift синхронизирует lazy через dispatch_once"
+    ],
+    "c": 2,
+    "e": "В отличие от static, обычный lazy не гарантирует единовременность инициализации — надо обёртывать в lock/actor."
+  },
+  {
+    "type": "bug",
+    "code": "let q = DispatchQueue(label: \"worker\")\nq.sync {\n    step1()\n    q.sync { step2() }\n}",
+    "q": "Что произойдёт при исполнении?",
+    "a": [
+      "Deadlock: внутренний sync ждёт освобождения той же serial queue",
+      "Step1 и step2 выполнятся строго последовательно на workerqueue",
+      "Step2 будет проигнорирован — nested sync — no-op",
+      "Swift runtime автоматически развернёт nested в async"
+    ],
+    "c": 0,
+    "e": "Serial queue обрабатывает по одному блоку; внешний sync держит queue занятой — внутренний sync никогда не дождётся."
+  },
+  {
+    "type": "bug",
+    "code": "struct Settings { var theme = \"light\" }\nvar dict: [String: Settings] = [\"me\": Settings()]\nfor (_, var s) in dict {\n    s.theme = \"dark\"\n}\nprint(dict[\"me\"]!.theme)",
+    "q": "Что напечатает?",
+    "a": [
+      "light — s — локальная копия value-type, dict не меняется",
+      "dark — var в pattern даёт mutable доступ к элементу dict",
+      "Compile error — var-binding запрещён для Dictionary",
+      "Optional(\"dark\") — Dictionary распаковал Settings в Optional"
+    ],
+    "c": 0,
+    "e": "Struct — value type; (_, var s) создаёт локальную изменяемую копию, оригинал в dict не трогается."
+  },
+  {
+    "type": "bug",
+    "code": "final class VC: UIViewController {\n    func fetch() {\n        URLSession.shared.dataTask(with: URL(string: \"https://api/x\")!) { _, _, _ in\n            self.title = \"OK\"\n        }.resume()\n    }\n}",
+    "q": "Главный баг при исполнении?",
+    "a": [
+      "Force-unwrap URL упадёт на некорректном базовом адресе",
+      "Retain cycle: dataTask удерживает self через closure",
+      "Completion вызовется не на main — мутация UIKit должна быть на main thread",
+      "title read-only до viewDidLoad — присвоение проигнорируется"
+    ],
+    "c": 2,
+    "e": "URLSession.shared callback приходит на background delegate queue; все UIKit-мутации обязаны быть в DispatchQueue.main."
+  },
+  {
+    "type": "bug",
+    "code": "final class Counter {\n    private var n = 0\n    func inc() { n += 1 }\n    func get() -> Int { n }\n}\nlet c = Counter()\nDispatchQueue.concurrentPerform(iterations: 1000) { _ in c.inc() }\nprint(c.get())",
+    "q": "Какой результат c.get()?",
+    "a": [
+      "Всегда 1000 — concurrentPerform сериализует вызовы",
+      "Runtime trap: read-write конфликт на n",
+      "Ровно 1 — ARC заморозил n на первой итерации",
+      "Меньше 1000 — n += 1 не атомарная, часть инкрементов теряется"
+    ],
+    "c": 3,
+    "e": "n += 1 — read-modify-write; одновременные параллельные модификации теряются, итог недетерминирован и < 1000."
+  },
+  {
+    "type": "bug",
+    "code": "protocol Repo {\n    associatedtype Item\n    func all() -> [Item]\n}\n\nvar repos: [Repo] = []",
+    "q": "Почему `[Repo]` не скомпилируется?",
+    "a": [
+      "Protocol с associatedtype не existential без any-constraint",
+      "Repo требует Hashable для индексации — несоответствие протокола",
+      "Array хранит concrete types — протокол через generic <T: Repo>",
+      "associatedtype Item должен иметь bound — добавить where Item:Any"
+    ],
+    "c": 0,
+    "e": "Self-/associatedtype-содержащие протоколы нельзя использовать как existential напрямую; нужен `[any Repo]` с ограничениями."
+  },
+  {
+    "type": "bug",
+    "code": "final class VM {\n    let api = Api()\n    var data: [Row] = []\n    func load() {\n        api.fetch { [unowned self] rows in\n            self.data = rows\n        }\n    }\n}",
+    "q": "Что наиболее вероятно сломается?",
+    "a": [
+      "load должен быть async — fetch внутри не suspend-точка",
+      "Retain cycle: api владеет closure, closure — self",
+      "rows имеет неверный тип — fetch обычно даёт Result",
+      "unowned self упадёт crash, если VM освободился до completion"
+    ],
+    "c": 3,
+    "e": "unowned не обнуляется; при cancel/race к моменту callback self может быть deallocated — trap. Безопаснее [weak self]+guard."
+  },
+  {
+    "type": "bug",
+    "code": "struct Node {\n    var value: Int\n    var next: Node?\n}",
+    "q": "Почему не компилируется?",
+    "a": [
+      "Optional требует Equatable для Node — нужно добавить соответствие",
+      "Recursive struct — размер Node включает размер Node, бесконечен",
+      "var запрещён в struct с Optional — нужен let",
+      "Value type не может быть nullable — только class"
+    ],
+    "c": 1,
+    "e": "Optional<Node> хранит Node по значению inline; layout недетерминирован. Решение: class или indirection через Array/Box."
+  },
+  {
+    "type": "bug",
+    "code": "final class Logger {\n    var lines: [String] = []\n    func write(_ s: String) { lines.append(s) }\n}\n\nlet log = Logger()\nTask.detached { log.write(\"A\") }\nTask.detached { log.write(\"B\") }",
+    "q": "Основная проблема в Swift 6 strict concurrency?",
+    "a": [
+      "Array.append атомарна — проблем нет",
+      "Требуется @MainActor на Logger — Task.detached иначе не запустится",
+      "Task.detached автоматически делает self Sendable",
+      "Logger не Sendable: shared mutable class между isolation-доменами запрещён"
+    ],
+    "c": 3,
+    "e": "final class с var — не Sendable; захват в detached Task-и из разных контекстов — compile error при strict concurrency."
+  },
+  {
+    "type": "bug",
+    "code": "func save() -> Result<Void, Error> {\n    /* ... */\n    return .success(())\n}\n\nsave()",
+    "q": "Что плохого в вызове `save()` без присваивания?",
+    "a": [
+      "save() должен быть async — Result используется как Promise",
+      "Result<Void> — невалидная параметризация, компилятор откажет",
+      "Warning про unused result; любая ошибка Result уйдёт молча",
+      "Без await Result не раскрывается, результат = nil"
+    ],
+    "c": 2,
+    "e": "Result — обычный тип, игнор результата теряет error-кейс. Нужно обрабатывать через switch/try или явно `_ = save()`."
+  },
+  {
+    "type": "pattern",
+    "code": "@propertyWrapper\nstruct UserDefault<T> {\n    let key: String\n    let defaultValue: T\n    var wrappedValue: T {\n        get { UserDefaults.standard.object(forKey: key) as? T ?? defaultValue }\n        set { UserDefaults.standard.set(newValue, forKey: key) }\n    }\n}\n\nstruct Settings {\n    @UserDefault(key: \"dark\", defaultValue: false) var isDark: Bool\n}",
+    "q": "Какая фича Swift используется?",
+    "a": [
+      "Property Wrapper — синтаксис привязки get/set-логики к свойству",
+      "Result Builder — преобразование тела функции в последовательность",
+      "Dynamic Member Lookup — произвольные имена через subscript",
+      "Macro — code generation на уровне компилятора"
+    ],
+    "c": 0,
+    "e": "@propertyWrapper с wrappedValue делает из Storage-обёртки прозрачное свойство."
+  },
+  {
+    "type": "pattern",
+    "code": "protocol Publisher {\n    associatedtype Output\n    func subscribe<S: Subscriber>(_ s: S) where S.Input == Output\n}\n\nstruct AnyPublisher<Output>: Publisher {\n    private let box: (Any) -> Void\n    init<P: Publisher>(_ p: P) where P.Output == Output {\n        self.box = { _ in /* ... */ }\n    }\n    func subscribe<S: Subscriber>(_ s: S) where S.Input == Output {\n        box(s)\n    }\n}",
+    "q": "Какой паттерн?",
+    "a": [
+      "Adapter — конвертирует один интерфейс в другой",
+      "Decorator — обёртка с расширенной функциональностью",
+      "Facade — упрощённый интерфейс к сложной подсистеме",
+      "Type Erasure — прячет concrete generic за non-generic обёрткой"
+    ],
+    "c": 3,
+    "e": "AnyPublisher<Output> — классический type erasure: конкретный тип публикатора скрыт, наружу — фиксированный non-generic протокол."
+  },
+  {
+    "type": "pattern",
+    "code": "actor ImageCache {\n    private var cache: [URL: UIImage] = [:]\n    func image(for url: URL) async -> UIImage? {\n        if let cached = cache[url] { return cached }\n        let data = try? await URLSession.shared.data(from: url).0\n        let img = data.flatMap(UIImage.init(data:))\n        if let img = img { cache[url] = img }\n        return img\n    }\n}",
+    "q": "Что особенного в reentrancy actor-а тут?",
+    "a": [
+      "Actor гарантирует atomic транзакцию — cache-check и write в одном шаге",
+      "await вне actor-а снимает изоляцию полностью",
+      "Между await и cache[url]=img другой вызов мог положить тот же url",
+      "cache должен быть weak — ImageCache течёт"
+    ],
+    "c": 2,
+    "e": "Actor сериализует выполнение, но await — suspension point: изоляция снимается, другой вызов может дойти до того же cache[url]=img."
+  },
+  {
+    "type": "pattern",
+    "code": "func makeCounter() -> some View {\n    VStack {\n        Text(\"Hi\")\n        Button(\"Tap\") { }\n    }\n}",
+    "q": "Что означает возврат `some View`?",
+    "a": [
+      "Opaque result — конкретный тип один, скрыт от вызывающего",
+      "Existential box — runtime type erasure с динамическим диспатчем",
+      "Syntax sugar для Array<View>, собирает всё в массив",
+      "Полностью эквивалент `any View` — взаимозаменяемы"
+    ],
+    "c": 0,
+    "e": "some — opaque: внутри функции тип конкретный (VStack<...>), но наружу не виден; важно для identity SwiftUI diff."
+  },
+  {
+    "type": "pattern",
+    "code": "struct Tagged<RawTag, Value> {\n    let value: Value\n}\nenum UserID {}\nenum PostID {}\n\ntypealias User = Tagged<UserID, Int>\ntypealias Post = Tagged<PostID, Int>\n\nlet u: User = .init(value: 1)\nlet p: Post = .init(value: 1)\n// u == p — compile error",
+    "q": "Какой приём используется для RawTag?",
+    "a": [
+      "Marker Protocol — пустой протокол для классификации типов",
+      "Associated Type — вычисляемый generic через where",
+      "Phantom Type — параметр-маркер без runtime-представления",
+      "Opaque Type — скрытый внутренний тип обёртки"
+    ],
+    "c": 2,
+    "e": "RawTag не хранится и не используется в runtime — только compile-time различие; User и Post — разные типы, путать нельзя."
+  },
+  {
+    "type": "pattern",
+    "code": "@resultBuilder\nstruct StringBuilder {\n    static func buildBlock(_ parts: String...) -> String {\n        parts.joined(separator: \" \")\n    }\n    static func buildEither(first: String) -> String { first }\n    static func buildEither(second: String) -> String { second }\n}\n\n@StringBuilder\nfunc hello(_ formal: Bool) -> String {\n    \"Hello,\"\n    if formal { \"Sir\" } else { \"mate\" }\n}",
+    "q": "Какая фича Swift?",
+    "a": [
+      "Result Builder — компилятор собирает тело из buildBlock-вызовов",
+      "Property Wrapper — прозрачная обёртка над свойством",
+      "DSL via operator overload — & и + строят выражение",
+      "Macro — compile-time code generation"
+    ],
+    "c": 0,
+    "e": "@resultBuilder переписывает выражения в теле функции как buildBlock/buildEither-вызовы; лежит в основе SwiftUI ViewBuilder."
+  },
+  {
+    "type": "pattern",
+    "code": "struct User { let name: String; let age: Int }\nlet xs = [User(name: \"A\", age: 20), User(name: \"B\", age: 30)]\nlet names = xs.map(\\.name)\nlet sorted = xs.sorted { $0.age < $1.age }",
+    "q": "`\\.name` преобразуется в что при передаче в map?",
+    "a": [
+      "Escape sequence внутри строки — экранирует имя для отражения",
+      "Reflection-запрос через Mirror(reflecting:)",
+      "Macro expansion — развёртывается в замыкание { $0.name }",
+      "KeyPath литерал, авто-конвертируется в функцию (Root) -> Value"
+    ],
+    "c": 3,
+    "e": "\\.name — KeyPath<User, String>; Swift приводит его к (User) -> String в местах, где ожидается функция."
+  },
+  {
+    "type": "pattern",
+    "code": "struct AnyEquatable: Equatable {\n    private let isEqual: (Any) -> Bool\n    private let value: Any\n    init<T: Equatable>(_ v: T) {\n        self.value = v\n        self.isEqual = { ($0 as? T) == v }\n    }\n    static func ==(l: AnyEquatable, r: AnyEquatable) -> Bool {\n        l.isEqual(r.value)\n    }\n}",
+    "q": "Какой паттерн решает задачу хранения heterogeneous Equatable?",
+    "a": [
+      "Visitor — обход через внешнюю функцию-диспетчер",
+      "Bridging — мост между Objective-C и Swift-типами",
+      "Type Erasure — конкретный T скрыт, API устойчив к generic",
+      "Proxy — подмена объекта с контролем доступа"
+    ],
+    "c": 2,
+    "e": "AnyEquatable стирает T до Any + closure-compare — classic type erasure поверх associatedtype-ограничения Equatable."
+  },
+  {
+    "type": "pattern",
+    "code": "@dynamicMemberLookup\nstruct Config {\n    private let storage: [String: String]\n    subscript(dynamicMember key: String) -> String? {\n        storage[key]\n    }\n}\n\nlet c = Config(storage: [\"host\": \"api\"])\nlet h = c.host",
+    "q": "Какая фича компилятора?",
+    "a": [
+      "Dynamic Member Lookup — dot-access перенаправляется в subscript",
+      "Key-Path Expression — путь к свойству, резолвится runtime",
+      "Reflection — Mirror перебирает свойства",
+      "Macro — генератор свойств на этапе типизации"
+    ],
+    "c": 0,
+    "e": "@dynamicMemberLookup + subscript(dynamicMember:) разрешает c.host без объявленного свойства; резолв в compile-time."
+  },
+  {
+    "type": "pattern",
+    "code": "protocol FeedDelegate: AnyObject {\n    func feed(_ feed: Feed, didSelect item: Item)\n    func feedDidRefresh(_ feed: Feed)\n}\n\nfinal class Feed {\n    weak var delegate: FeedDelegate?\n    func refresh() {\n        /* ... */\n        delegate?.feedDidRefresh(self)\n    }\n}",
+    "q": "Какой паттерн?",
+    "a": [
+      "Strategy — выбираемый алгоритм через одну точку интерфейса",
+      "Observer — 1:N рассылка через подписку на notification-центр",
+      "Mediator — центральный объект координирует взаимодействие участников",
+      "Delegate — weak-связь через протокол и callback-методы у владельца"
+    ],
+    "c": 3,
+    "e": "Delegate — один weak-владелец callback-ов; Observer/NotificationCenter обычно 1:N и без фиксированного протокола."
+  },
+  {
+    "type": "pattern",
+    "code": "@MainActor\nfinal class ListVM: ObservableObject {\n    @Published var items: [Row] = []\n    nonisolated let id = UUID()\n    func load() async {\n        items = try! await api.load()\n    }\n}",
+    "q": "Для чего помечать `id` как `nonisolated`?",
+    "a": [
+      "Запретить мутацию id после init — аналог let-over-actor",
+      "Убрать константу из actor-изоляции — доступ без hop на main",
+      "Разрешить доступ к id из фоновых очередей — main-actor иначе пропустит",
+      "Сделать id implicit weak — избежать retain cycle"
+    ],
+    "c": 1,
+    "e": "nonisolated — снимает actor-изоляцию для элементов, безопасных без синхронизации (let); иначе даже чтение требует await."
+  },
+  {
+    "type": "pattern",
+    "code": "publisher\n    .removeDuplicates()\n    .debounce(for: .milliseconds(300), scheduler: DispatchQueue.main)\n    .sink { /* ... */ }",
+    "q": "В чём типичный смысл этой связки?",
+    "a": [
+      "Пропускать только уникальные, после паузы 300мс — для search-input",
+      "Реагировать мгновенно, отфильтровав дубли по hashValue",
+      "Отписаться и переподписаться через 300мс после каждого emit",
+      "Накопить события за 300мс и сгруппировать уникальные в пакет"
+    ],
+    "c": 0,
+    "e": "removeDuplicates выкидывает повторы подряд; debounce ждёт тишины 300мс после последнего события — классика для поиска."
+  },
+  {
+    "type": "pattern",
+    "code": "protocol PaymentStrategy {\n    func charge(_ amount: Decimal) async throws\n}\nstruct ApplePay: PaymentStrategy { /* ... */ }\nstruct Card: PaymentStrategy { /* ... */ }\n\nfinal class Checkout {\n    let strategy: PaymentStrategy\n    init(strategy: PaymentStrategy) { self.strategy = strategy }\n    func pay(_ a: Decimal) async throws { try await strategy.charge(a) }\n}",
+    "q": "Какой паттерн?",
+    "a": [
+      "Template Method — базовый класс задаёт скелет, подклассы — шаги",
+      "Strategy — алгоритм подменяется через общий интерфейс в runtime",
+      "Factory Method — создание объектов отложено до подкласса",
+      "Command — действие завёрнуто в объект с execute()"
+    ],
+    "c": 1,
+    "e": "Checkout не знает конкретной реализации — PaymentStrategy передаётся снаружи и может меняться без изменений Checkout."
+  },
+  {
+    "type": "pattern",
+    "code": "protocol Logger {\n    func log(_ s: String)\n}\nstruct Console: Logger {\n    func log(_ s: String) { print(s) }\n}\nstruct Timestamped: Logger {\n    let base: Logger\n    func log(_ s: String) { base.log(\"[\\(Date())] \\(s)\") }\n}\nstruct Prefixed: Logger {\n    let base: Logger\n    let prefix: String\n    func log(_ s: String) { base.log(\"\\(prefix): \\(s)\") }\n}\n\nlet l = Prefixed(base: Timestamped(base: Console()), prefix: \"APP\")",
+    "q": "Какой паттерн?",
+    "a": [
+      "Composite — рекурсивная композиция объектов в tree-структуру",
+      "Decorator — обёртки того же интерфейса наращивают поведение",
+      "Chain of Responsibility — event проходит по цепочке обработчиков",
+      "Bridge — разделение абстракции и её реализации"
+    ],
+    "c": 1,
+    "e": "Timestamped/Prefixed оба реализуют Logger и делегируют base; последовательно оборачивают — Decorator."
+  },
+  {
+    "type": "pattern",
+    "code": "func makeInc() -> () -> Int {\n    var n = 0\n    return {\n        n += 1\n        return n\n    }\n}\n\nlet a = makeInc()\nprint(a(), a(), a())",
+    "q": "Что происходит с переменной n между вызовами a()?",
+    "a": [
+      "Сбрасывается при каждом вызове — locals не переживают return",
+      "Копируется в closure по значению — каждый a() со своим n",
+      "Захвачена closure-ом по ссылке, живёт пока жив closure",
+      "Становится глобальной — n разделяется всеми closure"
+    ],
+    "c": 2,
+    "e": "Swift захватывает `var n` по reference-семантике (через Box); n живёт в heap пока жив closure. Counters 1, 2, 3."
+  },
+  {
+    "type": "memory",
+    "code": "class Car { var engine: Engine? }\nclass Engine { var car: Car? }\n\nlet c = Car()\nlet e = Engine()\nc.engine = e\ne.car = c",
+    "q": "Что произойдёт с c и e при выходе из scope?",
+    "a": [
+      "Ни один не освободится: strong-strong cycle удерживает refcount>0",
+      "Оба освободятся: Swift отследит cycle и принудительно удалит",
+      "Освободится только Car — Engine удерживает старую ссылку",
+      "Crash в deinit — ARC не может решить порядок освобождения"
+    ],
+    "c": 0,
+    "e": "ARC не детектирует cycles; refcount обоих = 1 (друг на друга) после выхода scope. Один из концов должен быть weak/unowned."
+  },
+  {
+    "type": "memory",
+    "code": "class Parent { var child: Child? }\nclass Child {\n    weak var parent: Parent?\n    init(parent: Parent) { self.parent = parent }\n}\n\nvar p: Parent? = Parent()\np?.child = Child(parent: p!)\np = nil",
+    "q": "Что будет с памятью?",
+    "a": [
+      "Оба остаются — weak всё равно создаёт retain",
+      "Parent освободится, Child останется — weak ещё держит",
+      "Оба объекта освободятся: Child.parent weak, цикла сильных нет",
+      "Crash: weak parent обращается к nil во время deinit"
+    ],
+    "c": 2,
+    "e": "Единственная strong-дорога: внешний p → Child. После p=nil Parent освобождается; Child освобождается как дочерний объект."
+  },
+  {
+    "type": "memory",
+    "code": "final class VC {\n    var value = 0\n    func run() {\n        DispatchQueue.main.async { [value] in\n            print(value)\n        }\n        value = 99\n    }\n}\n\nVC().run()",
+    "q": "Что напечатает async-блок?",
+    "a": [
+      "0 — [value] скопировал значение в момент создания closure",
+      "99 — closure читает свойство self через implicit strong capture",
+      "nil — self deallocated до dispatch, value обнулён",
+      "Undefined — race между mutation и async reading"
+    ],
+    "c": 0,
+    "e": "[value] — value capture: Int копируется по значению в closure; последующее self.value=99 не влияет на замороженную копию."
+  },
+  {
+    "type": "memory",
+    "code": "class Host {\n    var friend: Friend!\n}\nclass Friend {\n    unowned let host: Host\n    init(host: Host) { self.host = host }\n    func ping() { _ = host }\n}\n\nvar h: Host? = Host()\nh!.friend = Friend(host: h!)\nh = nil\nh?.friend?.ping()",
+    "q": "Что произойдёт при ping()?",
+    "a": [
+      "Crash: unowned обращается к deallocated Host",
+      "Работает — ARC продлевает Host пока жив Friend",
+      "Ничего не выведет — h опционал уже nil, chain короткий",
+      "Компилятор запретит — unowned требует init-only"
+    ],
+    "c": 2,
+    "e": "h?.friend короткий по Optional chain — вообще не дойдёт до ping, весь выражение nil. Crash не произойдёт в этой строке."
+  },
+  {
+    "type": "memory",
+    "code": "final class Screen {\n    var timer: Timer?\n    func start() {\n        timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { _ in\n            self.tick()\n        }\n    }\n    func tick() {}\n}",
+    "q": "Основная проблема с точки зрения lifetime?",
+    "a": [
+      "Timer не знает о Screen — вызов tick не произойдёт",
+      "Cycle Screen↔Timer (через closure): Screen не освободится",
+      "Timer хранит weak на closure — очистится слишком рано",
+      "tick() должен быть @objc — иначе Timer его не вызовет"
+    ],
+    "c": 1,
+    "e": "Active Timer хранит closure strong; closure захватывает self strong — cycle. Нужен [weak self] + invalidate() в deinit/dispose."
+  },
+  {
+    "type": "memory",
+    "code": "final class Node {\n    var children: [String: Node] = [:]\n}\n\nlet root = Node()\nroot.children[\"self\"] = root\n// root выходит из scope",
+    "q": "Что с памятью root?",
+    "a": [
+      "Освобождается — Swift автоматически обнуляет self-ссылки в dict",
+      "Cycle — Array/Dict хранят strong, root.children держит root",
+      "Dictionary отклоняет self-ссылку в runtime",
+      "Живёт пока программа: static reference leak"
+    ],
+    "c": 1,
+    "e": "Контейнеры (Array/Dict/Set) хранят strong-ссылки на элементы; self-assign создаёт regular retain cycle."
+  },
+  {
+    "type": "memory",
+    "code": "class Observer {}\nfinal class Bus {\n    var xs: [Observer] = []\n    func add(_ o: Observer) { xs.append(o) }\n}\n\nlet bus = Bus()\ndo {\n    let o = Observer()\n    bus.add(o)\n}\nprint(bus.xs.count)",
+    "q": "Что напечатает?",
+    "a": [
+      "0 — ARC увидит что Observer вышел из scope и удалит из bus",
+      "Crash — bus.xs содержит dangling reference на Observer",
+      "1 — Array хранит strong, Observer выжил, count не меняется",
+      "Unpredictable — зависит от оптимизации компилятора"
+    ],
+    "c": 2,
+    "e": "Array хранит strong references; Observer выжил, пока живёт bus. Для weak-bag нужен wrapper-struct с weak var."
+  },
+  {
+    "type": "memory",
+    "code": "final class VM {\n    func run() {\n        Service.fetch { [self] data in\n            self.handle(data)\n        }\n    }\n    func handle(_ d: Data) {}\n}",
+    "q": "Чем [self] отличается от обычного захвата?",
+    "a": [
+      "Превращает strong capture в weak автоматически",
+      "Разрешает nested async без retain cycles",
+      "Документирует strong capture и разрешает опустить self. внутри",
+      "Синтаксис для Swift 5.7+ — до этого эквивалент [unowned]"
+    ],
+    "c": 2,
+    "e": "[self] — explicit strong capture; с ним можно писать handle(data) вместо self.handle(data). Семантика strong, как без списка."
+  },
+  {
+    "type": "memory",
+    "code": "final class Subject {\n    var completion: ((Data) -> Void)?\n}\n\nfinal class VM {\n    let subject = Subject()\n    func listen() {\n        subject.completion = { data in\n            self.process(data)\n        }\n    }\n    func process(_ d: Data) {}\n}",
+    "q": "Где retain cycle?",
+    "a": [
+      "Нет cycle — subject отдельный от VM, closure независим",
+      "subject → VM через Subject.init — неявный back-reference",
+      "VM → subject → completion → self (VM) — self закрывает петлю",
+      "process → data → subject — замыкание через параметр"
+    ],
+    "c": 2,
+    "e": "VM владеет Subject; Subject.completion закрывает self (VM) — strong→strong→strong возвращается. Нужен [weak self]."
+  },
+  {
+    "type": "memory",
+    "code": "final class Screen {\n    lazy var onClick: () -> Void = { [unowned self] in\n        self.handle()\n    }\n    func handle() {}\n}",
+    "q": "Когда [unowned self] безопасен в этом коде?",
+    "a": [
+      "Всегда — unowned быстрее weak и рекомендован для UI-handlers",
+      "Только если onClick marked @MainActor — иначе race",
+      "Если onClick не переживает Screen — lifetime closure ≤ lifetime self",
+      "Никогда — lazy + unowned = undefined behavior при rehydrate"
+    ],
+    "c": 2,
+    "e": "unowned безопасен когда мы уверены, что self жив к моменту вызова closure; типично для UI, где Button живёт в родителе."
+  },
+  {
+    "type": "memory",
+    "code": "class A {\n    let name: String\n    init(_ n: String) { name = n; print(\"+ \\(n)\") }\n    deinit { print(\"- \\(name)\") }\n}\n\nvar x: A? = A(\"X\")\nvar y: A? = A(\"Y\")\nx = nil\ny = nil",
+    "q": "В каком порядке напечатается?",
+    "a": [
+      "+ X, + Y, - Y, - X — deinit в обратном порядке создания",
+      "+ X, + Y, - X, - Y — deinit в порядке обнуления переменных",
+      "+ X, - X, + Y, - Y — deinit сразу после nil той же переменной",
+      "+ Y, + X, - X, - Y — инициализация RTL в Swift 5.9+"
+    ],
+    "c": 1,
+    "e": "x=nil освобождает A(\"X\") (deinit прямо сейчас); y=nil освобождает A(\"Y\"). Порядок обнуления = порядок deinit."
+  },
+  {
+    "type": "memory",
+    "code": "class Obj {\n    init() { print(\"init\") }\n    deinit { print(\"deinit\") }\n}\n\nvar x: Obj? = Obj()\nvar y = x\nx = nil\nprint(\"between\")\ny = nil",
+    "q": "Какой вывод?",
+    "a": [
+      "init, between — y сохраняет Obj, deinit не вызывается",
+      "init, deinit, between — x=nil сразу вызывает deinit",
+      "init, between, deinit — refcount Obj = 1 (y), освобождение на y=nil",
+      "init, deinit, between, deinit — двойное освобождение"
+    ],
+    "c": 2,
+    "e": "Obj() даёт refcount=1 (x); y=x делает refcount=2; x=nil уменьшает до 1; 'between'; y=nil → 0 → deinit."
+  },
+  {
+    "type": "memory",
+    "code": "final class View {\n    weak var delegate: AnyObject?\n    func notify() {\n        DispatchQueue.main.async { [delegate] in\n            print(delegate != nil)\n        }\n    }\n}",
+    "q": "Что попадает в closure как delegate?",
+    "a": [
+      "Strong-копия текущего значения weak, прочитанная в момент capture",
+      "Ссылка через KeyPath — читается каждый раз заново",
+      "Живая weak-ссылка, которая занулится если объект deallocated",
+      "Снимок UUID объекта — ARC восстанавливает ссылку по таблице"
+    ],
+    "c": 0,
+    "e": "[delegate] в capture list снимает weak-обёртку и копирует текущее значение Optional<AnyObject>; внутри closure это strong."
+  },
+  {
+    "type": "memory",
+    "code": "var a = [1, 2, 3]\nvar b = a\nb.append(4)\nprint(a, b)",
+    "q": "Почему a не изменился после b.append?",
+    "a": [
+      "Array — reference type, но Swift обёртывает его в value-wrapper",
+      "b — deep copy изначально: каждый присвоение копирует целиком",
+      "Copy-On-Write: storage общий до первой записи, затем b делает копию",
+      "append возвращает новый массив, оригинал b не меняется"
+    ],
+    "c": 2,
+    "e": "Array/Set/Dict — value-types с COW-оптимизацией: физическая копия storage происходит только при мутации."
+  },
+  {
+    "type": "memory",
+    "code": "indirect enum Expr {\n    case num(Int)\n    case add(Expr, Expr)\n    case mul(Expr, Expr)\n}",
+    "q": "Зачем ключевое слово `indirect`?",
+    "a": [
+      "Помечает enum как reference type — copy by reference",
+      "Включает exhaustive matching в switch",
+      "Добавляет heap-indirection для case-ов, разрешая рекурсию",
+      "Делает enum Codable через ассоциированное значение"
+    ],
+    "c": 2,
+    "e": "Обычный value-type enum не может рекурсивно содержать сам себя (бесконечный размер); indirect делает ассоциированное значение boxed."
+  }
+]
