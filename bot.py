@@ -4,21 +4,38 @@ import html
 import json
 import os
 import random
-import sys
 
 from aiogram import Bot
 
 TOKEN = os.getenv("BOT_TOKEN")
 CHAT_ID = -1003554574954
 TOPIC_ID = 559
-QUESTIONS_DIR = "questions"
+QUESTIONS_PATH = "questions/android.json"
 STATE_PATH = "state.json"
 
-LANG_BY_TAG = {
-    "Swift": "swift",
-    "Kotlin": "kotlin",
-    "Flutter": "dart",
+# Сколько последних тем избегать при выборе следующего вопроса.
+# 4 = в течение дня (5 постов) каждый раз будет новая тема.
+RECENT_TOPICS_WINDOW = 4
+
+# Префиксы для poll-вопроса по полю `type`.
+TOPIC_LABELS = {
+    "kotlin_advanced": "Kotlin Advanced",
+    "jvm": "JVM",
+    "compose": "Compose",
+    "kmp": "KMP",
+    "clean_arch": "Clean Arch",
+    "solid": "SOLID",
+    "di": "DI",
+    "gradle": "Gradle",
+    "build_variants": "Build",
+    "testing": "Testing",
+    "security": "Security",
+    "ai_ar": "AI/AR",
+    "ecosystem": "Ecosystem",
 }
+
+# Все code-сниппеты — Kotlin (или Gradle DSL — тоже подсветится как kotlin).
+LANG = "kotlin"
 
 
 def qid(question: dict) -> str:
@@ -40,45 +57,59 @@ def save_state(state: dict) -> None:
         f.write("\n")
 
 
-def pick_question(questions: list, seen: set) -> tuple[dict, str, bool]:
+def load_questions() -> list:
+    with open(QUESTIONS_PATH, "r", encoding="utf-8") as f:
+        return json.load(f)
+
+
+def pick_question(questions: list, seen: set, avoid_topics: list) -> tuple[dict, str, bool]:
+    # Сначала отсеиваем уже виденные.
     pool = [q for q in questions if qid(q) not in seen]
     reset = False
     if not pool:
+        # Полный цикл пройден — обнуляем seen и стартуем заново.
         pool = list(questions)
         seen.clear()
         reset = True
+
+    # Пытаемся избежать недавних тем для разнообразия в течение дня.
+    avoid = set(avoid_topics)
+    diverse_pool = [q for q in pool if q.get("type") not in avoid]
+    if diverse_pool:
+        pool = diverse_pool
+
     quiz = random.choice(pool)
     return quiz, qid(quiz), reset
 
 
-def load_questions(tag: str) -> list:
-    path = os.path.join(QUESTIONS_DIR, f"{tag.lower()}.json")
-    with open(path, "r", encoding="utf-8") as f:
-        return json.load(f)
-
-
 async def send_one_quiz() -> None:
-    tag = sys.argv[1] if len(sys.argv) > 1 else "Flutter"
-
-    questions = load_questions(tag)
+    questions = load_questions()
     if not questions:
-        raise SystemExit(f"No questions for tag {tag}")
+        raise SystemExit("questions/android.json пуст")
 
     state = load_state()
-    tag_state = state.setdefault(tag, {"seen": []})
-    seen = set(tag_state.get("seen", []))
+    seen = set(state.get("seen", []))
+    recent_topics = list(state.get("recent_topics", []))
 
-    quiz, hash_id, reset = pick_question(questions, seen)
+    quiz, hash_id, reset = pick_question(questions, seen, recent_topics[-RECENT_TOPICS_WINDOW:])
+
+    # Обновляем state: hash + скользящее окно тем.
     seen.add(hash_id)
-    tag_state["seen"] = sorted(seen)
+    topic = quiz.get("type", "")
+    recent_topics.append(topic)
+    recent_topics = recent_topics[-RECENT_TOPICS_WINDOW:]
+
+    state["seen"] = sorted(seen)
+    state["recent_topics"] = recent_topics
     save_state(state)
+
+    label = TOPIC_LABELS.get(topic, topic)
 
     bot = Bot(token=TOKEN)
     try:
         code = quiz.get("code")
         if code:
-            lang = LANG_BY_TAG.get(tag, "")
-            body = f'<pre><code class="language-{lang}">{html.escape(code)}</code></pre>'
+            body = f'<pre><code class="language-{LANG}">{html.escape(code)}</code></pre>'
             await bot.send_message(
                 chat_id=CHAT_ID,
                 message_thread_id=TOPIC_ID,
@@ -88,7 +119,7 @@ async def send_one_quiz() -> None:
         await bot.send_poll(
             chat_id=CHAT_ID,
             message_thread_id=TOPIC_ID,
-            question=f"[{tag}] {quiz['q']}",
+            question=f"[{label}] {quiz['q']}",
             options=quiz["a"],
             type="quiz",
             correct_option_id=quiz["c"],
@@ -99,7 +130,7 @@ async def send_one_quiz() -> None:
         await bot.session.close()
 
     if reset:
-        print(f"[{tag}] cycle complete — seen reset")
+        print("cycle complete — seen reset")
 
 
 if __name__ == "__main__":

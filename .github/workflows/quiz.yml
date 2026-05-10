@@ -2,13 +2,17 @@ name: Send Daily Quiz
 
 on:
   schedule:
-    # Время в UTC (Алматы -5 часов)
-    # 11:13 по Алматы (06:13 UTC)
-    - cron: '13 6 * * *'
-    # 14:27 по Алматы (09:27 UTC)
-    - cron: '27 9 * * *'
-    # 17:42 по Алматы (12:42 UTC)
-    - cron: '42 12 * * *'
+    # Время в UTC (Алматы = UTC+5). 5 постов в день, темы выбирает сам бот.
+    # 09:13 Алматы (04:13 UTC)
+    - cron: '13 4 * * *'
+    # 12:27 Алматы (07:27 UTC)
+    - cron: '27 7 * * *'
+    # 15:42 Алматы (10:42 UTC)
+    - cron: '42 10 * * *'
+    # 18:55 Алматы (13:55 UTC)
+    - cron: '55 13 * * *'
+    # 21:33 Алматы (16:33 UTC)
+    - cron: '33 16 * * *'
   workflow_dispatch: # Кнопка для ручного запуска
 
 permissions:
@@ -35,23 +39,7 @@ jobs:
       - name: Run bot
         env:
           BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
-        run: |
-          H=$(date -u +%H)
-          echo "Current UTC hour: $H"
-
-          # Логика выбора тега по интервалам (UTC):
-          if [ "$H" -ge 5 ] && [ "$H" -lt 9 ]; then
-            TAG="Swift"
-          elif [ "$H" -ge 9 ] && [ "$H" -lt 12 ]; then
-            TAG="Kotlin"
-          elif [ "$H" -ge 12 ] && [ "$H" -lt 16 ]; then
-            TAG="Flutter"
-          else
-            TAG="Flutter"
-          fi
-
-          echo "Selected TAG: $TAG"
-          python bot.py $TAG
+        run: python bot.py
 
       - name: Commit updated state
         run: |
