@@ -17,20 +17,24 @@ STATE_PATH = "state.json"
 # 4 = в течение дня (5 постов) каждый раз будет новая тема.
 RECENT_TOPICS_WINDOW = 4
 
-# Префиксы для poll-вопроса по полю `type`.
+# Префикс poll-вопроса: курс + конкретный модуль/тема.
+# Финальный вид в Telegram: "[Android · Compose] What ...".
+COURSE_PREFIX = "Android"
+
+# Подписи модулей для poll-префикса. Если type не в словаре, имя темы выводится как есть.
 TOPIC_LABELS = {
     "kotlin_advanced": "Kotlin Advanced",
-    "jvm": "JVM",
+    "jvm": "JVM & Memory",
     "compose": "Compose",
     "kmp": "KMP",
-    "clean_arch": "Clean Arch",
+    "clean_arch": "Clean Architecture",
     "solid": "SOLID",
     "di": "DI",
     "gradle": "Gradle",
-    "build_variants": "Build",
+    "build_variants": "Build Variants",
     "testing": "Testing",
     "security": "Security",
-    "ai_ar": "AI/AR",
+    "ai_ar": "AI & AR",
     "ecosystem": "Ecosystem",
 }
 
@@ -103,8 +107,6 @@ async def send_one_quiz() -> None:
     state["recent_topics"] = recent_topics
     save_state(state)
 
-    label = TOPIC_LABELS.get(topic, topic)
-
     bot = Bot(token=TOKEN)
     try:
         code = quiz.get("code")
@@ -119,7 +121,7 @@ async def send_one_quiz() -> None:
         await bot.send_poll(
             chat_id=CHAT_ID,
             message_thread_id=TOPIC_ID,
-            question=f"[{label}] {quiz['q']}",
+            question=f"[{COURSE_PREFIX} · {TOPIC_LABELS.get(topic, topic)}] {quiz['q']}",
             options=quiz["a"],
             type="quiz",
             correct_option_id=quiz["c"],
