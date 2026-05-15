@@ -1,9 +1,9 @@
 {
   "recent_topics": [
-    "kmp",
     "gradle",
     "clean_arch",
-    "kotlin_advanced"
+    "kotlin_advanced",
+    "build_variants"
   ],
   "seen": [
     "102ce97b12",
@@ -30,6 +30,7 @@
     "c7e73bb504",
     "c94b1907bd",
     "dfee8ac417",
+    "e58399fbcc",
     "e8e8cf6618",
     "f5dffd1d05",
     "f7b0642823",
