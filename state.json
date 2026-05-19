@@ -1,9 +1,9 @@
 {
   "recent_topics": [
-    "build_variants",
     "ecosystem",
     "security",
-    "clean_arch"
+    "clean_arch",
+    "compose"
   ],
   "seen": [
     "08346d7cea",
@@ -41,6 +41,7 @@
     "b0805dd69f",
     "b1f9cf8b3d",
     "b45fd4b6a0",
+    "b5c92b5de3",
     "b98edf6aa5",
     "bb02623ff0",
     "be4782adef",
