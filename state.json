@@ -1,9 +1,9 @@
 {
   "recent_topics": [
-    "gradle",
     "build_variants",
     "ecosystem",
-    "clean_arch"
+    "clean_arch",
+    "di"
   ],
   "seen": [
     "08346d7cea",
@@ -36,6 +36,7 @@
     "512bdb5638",
     "53102c5d5a",
     "53169f9ca9",
+    "5a91f43e35",
     "5b9773800a",
     "5c6c713da0",
     "5c822bd38d",
