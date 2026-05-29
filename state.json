@@ -1,9 +1,9 @@
 {
   "recent_topics": [
-    "build_variants",
     "security",
     "clean_arch",
-    "compose"
+    "compose",
+    "jvm"
   ],
   "seen": [
     "08346d7cea",
@@ -83,6 +83,7 @@
     "be4782adef",
     "c58b7d9dc0",
     "c603e07948",
+    "c61834f728",
     "c7e73bb504",
     "c94b1907bd",
     "cae7f02ca8",
