@@ -1,14 +1,26 @@
 {
   "android": {
-    "recent_topics": [],
-    "seen": []
+    "recent_topics": [
+      "null_safety"
+    ],
+    "seen": [
+      "81d4aa9a5e"
+    ]
   },
   "flutter": {
-    "recent_topics": [],
-    "seen": []
+    "recent_topics": [
+      "state_mgmt"
+    ],
+    "seen": [
+      "66bc1d1af8"
+    ]
   },
   "ios": {
-    "recent_topics": [],
-    "seen": []
+    "recent_topics": [
+      "control_flow"
+    ],
+    "seen": [
+      "71dc35e151"
+    ]
   }
 }
