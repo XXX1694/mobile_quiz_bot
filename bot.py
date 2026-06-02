@@ -22,13 +22,13 @@ RECENT_TOPICS_WINDOW = 4
 STACKS = {
     "flutter": {
         "questions": "questions/flutter.json",
-        "topic_id": None,   # TODO: проставить ID топика Flutter
+        "topic_id": 559,
         "prefix": "Flutter",
         "lang": "dart",
     },
     "ios": {
         "questions": "questions/ios.json",
-        "topic_id": None,   # TODO: проставить ID топика iOS
+        "topic_id": 559,
         "prefix": "iOS",
         "lang": "swift",
     },
