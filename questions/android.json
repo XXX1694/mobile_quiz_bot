@@ -1,1589 +1,184 @@
 [
   {
-    "q": "What will the code with `reified` print?",
-    "a": [
-      "Class String",
-      "Class Object value",
-      "Compilation error",
-      "Class Any value"
-    ],
-    "c": 0,
-    "e": "`reified` preserves the real type at runtime thanks to the inline function, so `T::class` is visible as String.",
-    "code": "inline fun <reified T> typeName(): String = T::class.simpleName ?: \"?\"\nfun main() {\n    println(\"Class ${typeName<String>()}\")\n}",
-    "type": "kotlin_advanced"
-  },
-  {
-    "q": "What is `crossinline` for?",
-    "a": [
-      "Forbid non-local return from a lambda",
-      "Force the inlined lambda to inline deeper",
-      "Make the captured lambda implicitly suspend",
-      "Allow `reified` type parameters in a function"
-    ],
-    "c": 0,
-    "e": "`crossinline` marks a lambda so a non-local return is forbidden — required when passing the lambda into another execution context.",
-    "type": "kotlin_advanced"
-  },
-  {
-    "q": "What will the code with the `observable` delegate print?",
-    "a": [
-      "only set",
-      "set then get",
-      "old=A new=B",
-      "Runtime error"
-    ],
+    "q": "What does the Elvis operator ?: do in Kotlin?",
+    "a": ["It safely calls a method on a nullable receiver and returns null if it was nil", "It throws an exception on null", "It returns the left operand if non-null, else the right one", "It compares two values for equality"],
     "c": 2,
-    "e": "`Delegates.observable` invokes the callback after the value is set, passing both the old and the new value of the property.",
-    "code": "import kotlin.properties.Delegates\nvar v: String by Delegates.observable(\"A\") { _, o, n ->\n    println(\"old=$o new=$n\")\n}\nfun main() { v = \"B\" }",
-    "type": "kotlin_advanced"
+    "e": "val name = input ?: \"default\" — if input is null, \"default\" is used. Handy for defaults and early returns.",
+    "topic": "null_safety",
+    "type": "keyword"
   },
   {
-    "q": "Which modifier lets you pass `MutableList<Dog>` where `List<Animal>` is expected?",
-    "a": [
-      "`in T` for contravariance",
-      "`out T`",
-      "`where T : Animal` upper bound",
-      "`reified T` parameter"
-    ],
+    "q": "What does this Kotlin code print?",
+    "a": ["3", "[1, 2, 3]", "1", "Error"],
+    "c": 0,
+    "e": "let passes the receiver as it and returns the lambda result. Here it.size is 3.",
+    "code": "val x = listOf(1, 2, 3).let { it.size }\nprintln(x)",
+    "topic": "scope_fn",
+    "type": "code-output"
+  },
+  {
+    "q": "launch vs async in coroutines — the difference?",
+    "a": ["launch is fully synchronous and blocks, while async runs the work on a new thread", "launch returns a Job; async returns a Deferred result you await", "async can't be cancelled", "There is no difference"],
     "c": 1,
-    "e": "`out` denotes covariance: `List<out T>` lets you pass `List<Dog>` as `List<Animal>`, since T appears only in the return position.",
-    "type": "kotlin_advanced"
+    "e": "launch is for work without a return value (fire-and-forget). async starts a computation whose result you get via .await() — great for parallel requests.",
+    "topic": "coroutines",
+    "type": "concept"
   },
   {
-    "q": "What happens during compilation?",
-    "a": [
-      "Prints List<String> at runtime fine",
-      "Prints List<Any?> after type widening",
-      "Error: cannot check erased type",
-      "Prints raw List with a warning only"
-    ],
+    "q": "What happens here?",
+    "a": ["a is reassigned to 6 because Kotlin silently promotes val to var on a second write", "Compilation error — val is read-only", "a becomes null", "A warning, but it compiles"],
+    "c": 1,
+    "e": "val is a read-only reference and can't be reassigned. Use var for a mutable variable.",
+    "code": "val a = 5\na = 6",
+    "topic": "null_safety",
+    "type": "code-output"
+  },
+  {
+    "q": "Why is data lost on screen rotation, and how do you keep it?",
+    "a": ["The OS clears the heap on rotation, so you must serialize everything to disk first", "The Activity is recreated; use a ViewModel or onSaveInstanceState", "It's a bug; wrap it in try/catch", "Disable rotation permanently"],
+    "c": 1,
+    "e": "Rotation is a config change → Activity destroy/recreate. A ViewModel survives recreation; use onSaveInstanceState (Bundle) for small data.",
+    "topic": "lifecycle",
+    "type": "concept"
+  },
+  {
+    "q": "What does this Kotlin code print?",
+    "a": ["true", "false", "Error", "null"],
+    "c": 0,
+    "e": "A data class auto-generates equals()/hashCode() from its properties. Two P(1) are value-equal → true (unlike a regular class).",
+    "code": "data class P(val x: Int)\nprintln(P(1) == P(1))",
+    "topic": "data_class",
+    "type": "code-output"
+  },
+  {
+    "q": "What is lateinit var for?",
+    "a": ["To schedule a property's initializer to run on a background dispatcher later", "To make a property nullable", "To declare a non-null property and assign it later (e.g. in onCreate)", "To create a lazy property"],
     "c": 2,
-    "e": "Due to type erasure the JVM does not know the generic parameter at runtime, so `is List<String>` without `reified` is a compile error.",
-    "code": "fun check(x: Any) {\n    if (x is List<String>) {\n        println(\"List<String>\")\n    }\n}",
-    "type": "kotlin_advanced"
+    "e": "lateinit defers init of a non-null var. Accessing it before assignment throws UninitializedPropertyAccessException. Not for primitives or val.",
+    "topic": "null_safety",
+    "type": "keyword"
   },
   {
-    "q": "What is the key difference between KSP and KAPT?",
-    "a": [
-      "KSP works with Java sources only, no Kotlin",
-      "KSP reads Kotlin AST without Java stubs",
-      "KAPT is significantly faster than KSP overall",
-      "KSP does not support annotation processing"
-    ],
+    "q": "Why use viewModelScope for coroutines in a ViewModel?",
+    "a": ["It pins every coroutine to the main thread and caches their results between rotations", "They are auto-cancelled when the ViewModel is cleared — no leaks", "It makes coroutines faster", "It retries failed coroutines automatically"],
     "c": 1,
-    "e": "KAPT generates Java stub files for javac, which is slow. KSP works with the Kotlin compiler API directly and is significantly faster.",
-    "type": "kotlin_advanced"
+    "e": "viewModelScope is tied to the ViewModel lifecycle: on onCleared() all its coroutines are cancelled, preventing leaks and wasted work.",
+    "topic": "coroutines",
+    "type": "concept"
   },
   {
-    "q": "What will the code with `sealed` print?",
-    "a": [
-      "Loading from the first branch",
-      "Error",
-      "Error: when is not exhaustive",
-      "Success from the default branch"
-    ],
-    "c": 1,
-    "e": "The compiler knows every subclass of a sealed class, the `when` is exhaustive, and the Error branch matches the Error instance.",
-    "code": "sealed class S { object Loading: S(); class Error(val m: String): S() }\nfun describe(s: S) = when (s) {\n    is S.Loading -> \"Loading\"\n    is S.Error -> \"Error\"\n}\nfun main() { println(describe(S.Error(\"x\"))) }",
-    "type": "kotlin_advanced"
-  },
-  {
-    "q": "What does `by lazy` do by default?",
-    "a": [
-      "Recomputes the value on every property read",
-      "Computes once, thread-safe (SYNCHRONIZED)",
-      "Initializes only on the main UI thread",
-      "Stores the value via a WeakReference holder"
-    ],
-    "c": 1,
-    "e": "The default mode is SYNCHRONIZED: a lock is taken on first access, later reads are lock-free. The value is cached forever.",
-    "type": "kotlin_advanced"
-  },
-  {
-    "q": "What will the program print?",
-    "a": [
-      "1",
-      "2",
-      "1, then 2",
-      "Compilation error"
-    ],
-    "c": 2,
-    "e": "Delegation via `by` plugs in the passed object as the interface implementation, so `hi()` from A is invoked on the supplied instance.",
-    "code": "interface A { fun hi(): Int }\nclass AImpl(val n: Int): A { override fun hi() = n }\nclass B(a: A): A by a\nfun main() {\n    println(B(AImpl(1)).hi())\n    println(B(AImpl(2)).hi())\n}",
-    "type": "kotlin_advanced"
-  },
-  {
-    "q": "What does `where T : Comparable<T>, T : Cloneable` mean?",
-    "a": [
-      "T must implement either interface",
-      "T must implement both interfaces",
-      "T must be a Kotlin data class",
-      "It is a syntax error in Kotlin"
-    ],
-    "c": 1,
-    "e": "`where` with commas declares multiple upper bounds for a generic parameter — T must satisfy all the listed constraints simultaneously.",
-    "type": "kotlin_advanced"
-  },
-  {
-    "q": "Which JVM region holds class metadata since Java 8?",
-    "a": [
-      "PermGen space",
-      "Metaspace",
-      "JIT Code Cache",
-      "Eden region"
-    ],
-    "c": 1,
-    "e": "PermGen was removed in Java 8; class metadata moved to Metaspace, which lives in native memory and grows dynamically.",
-    "type": "jvm"
-  },
-  {
-    "q": "Where does a freshly allocated object go in HotSpot?",
-    "a": [
-      "Old generation",
-      "Survivor space",
-      "Eden",
-      "Metaspace region"
-    ],
-    "c": 2,
-    "e": "New objects are allocated in Eden, part of the Young generation. After the first Minor GC survivors move to Survivor, then to Old.",
-    "type": "jvm"
-  },
-  {
-    "q": "Which GC was designed for low pauses on large heaps?",
-    "a": [
-      "Serial GC",
-      "ZGC",
-      "ParallelOld GC",
-      "CMS collector"
-    ],
-    "c": 1,
-    "e": "ZGC targets sub-10 ms pauses on heaps up to terabytes, using colored pointers and concurrent phases for marking and relocation.",
-    "type": "jvm"
-  },
-  {
-    "q": "What happens to the SoftReference?",
-    "a": [
-      "Will never be cleared by the GC at all",
-      "Cleared before OOM under memory pressure",
-      "Cleared at the very next GC pass always",
-      "Behaves exactly like a WeakReference would"
-    ],
-    "c": 1,
-    "e": "A SoftReference is a candidate for clearing only when the JVM is genuinely low on memory; it is commonly used for memory-sensitive caches.",
-    "code": "import java.lang.ref.SoftReference\nval ref = SoftReference(ByteArray(1024 * 1024))\nfun main() { println(ref.get()?.size) }",
-    "type": "jvm"
-  },
-  {
-    "q": "What is escape analysis in HotSpot?",
-    "a": [
-      "Static analysis of try/catch flow paths",
-      "Detects if an object escapes the method",
-      "A way to bypass the JVM security manager",
-      "Profiling of GC pause durations and counts"
-    ],
-    "c": 1,
-    "e": "Escape analysis lets the JIT prove an object does not leave the method, so it can be allocated on the stack or have its fields scalarized.",
-    "type": "jvm"
-  },
-  {
-    "q": "How does JIT differ from AOT?",
-    "a": [
-      "JIT compiles at runtime, AOT ahead",
-      "JIT runs only on Android ART devices",
-      "AOT is essentially a bytecode interpreter",
-      "There is no real practical difference"
-    ],
+    "q": "What does this Kotlin code print?",
+    "a": ["2", "hi", "Error: cast needed", "null"],
     "c": 0,
-    "e": "JIT compiles hot bytecode to native at runtime using profiling; AOT (e.g., Android ART) compiles ahead of time, typically at install time.",
-    "type": "jvm"
+    "e": "Smart cast: after the is String check the compiler casts s to String, so s.length is available directly → 2.",
+    "code": "val s: Any = \"hi\"\nif (s is String) println(s.length)",
+    "topic": "smart_cast",
+    "type": "code-output"
   },
   {
-    "q": "What happens with `finalize()`?",
-    "a": [
-      "Reliably prints 'gone'",
-      "May never be invoked",
-      "Throws OutOfMemoryError",
-      "Throws ClassCastException"
-    ],
-    "c": 1,
-    "e": "`finalize()` is not guaranteed to run and may never be called; do not rely on it — prefer Cleaner or try-with-resources for cleanup.",
-    "code": "class R {\n    protected fun finalize() { println(\"gone\") }\n}\nfun main() {\n    R()\n    System.gc()\n}",
-    "type": "jvm"
-  },
-  {
-    "q": "Where are primitive local variables of a method allocated?",
-    "a": [
-      "On the JVM managed heap region",
-      "Inside Metaspace native memory",
-      "Stack frame (locals)",
-      "JIT Code Cache native segment"
-    ],
-    "c": 2,
-    "e": "Local primitives and references live in the method's stack frame (operand stack / local slots); the objects themselves live on the heap.",
-    "type": "jvm"
-  },
-  {
-    "q": "Which classic mark-sweep phase marks reachable objects?",
-    "a": [
-      "Sweep phase",
-      "Compaction phase",
-      "Mark from GC roots",
-      "Promotion to Old gen"
-    ],
-    "c": 2,
-    "e": "The Mark phase walks the object graph from GC roots (threads, statics, JNI) and marks reachable nodes; Sweep then removes the unmarked ones.",
-    "type": "jvm"
-  },
-  {
-    "q": "What will be printed?",
-    "a": [
-      "true",
-      "false",
-      "NullPointerException",
-      "Compilation error"
-    ],
-    "c": 1,
-    "e": "WeakReference does not retain the object; after `System.gc()` it is most likely collected, so `get()` returns null and the comparison is false.",
-    "code": "import java.lang.ref.WeakReference\nfun main() {\n    var s: String? = String(charArrayOf('h','i'))\n    val w = WeakReference(s)\n    s = null\n    System.gc()\n    Thread.sleep(100)\n    println(w.get() == \"hi\")\n}",
-    "type": "jvm"
-  },
-  {
-    "q": "What triggers recomposition in Compose?",
-    "a": [
-      "Any call to a setState() method anywhere",
-      "A read of a State<T> that changed",
-      "Any user tap or touch on the screen",
-      "Launching a LaunchedEffect coroutine"
-    ],
-    "c": 1,
-    "e": "Compose tracks State reads inside the composition; when an observed value changes, only the functions that read it are re-invoked.",
-    "type": "compose"
-  },
-  {
-    "q": "What is the difference between `remember` and `rememberSaveable`?",
-    "a": [
-      "Saveable survives recreation via Bundle",
-      "Saveable is significantly faster at runtime",
-      "They are functionally identical in practice",
-      "`remember` persists state into DataStore"
-    ],
+    "q": "Where is a sealed class especially useful?",
+    "a": ["For closed state hierarchies (Loading/Success/Error) with an exhaustive when", "To create singletons", "To replace interfaces", "Only for defining a fixed set of enum-like integer constants shared across modules"],
     "c": 0,
-    "e": "`remember` lives only in the composition and is lost on recreation. `rememberSaveable` stores into a Bundle — survives rotation and process death.",
-    "type": "compose"
+    "e": "sealed restricts subclasses to one module. A when over a sealed type is checked for completeness — add a state, forget to handle it, get an error.",
+    "topic": "sealed",
+    "type": "keyword"
   },
   {
-    "q": "What is printed on the first composition?",
-    "a": [
-      "A",
-      "A then B",
-      "B",
-      "Nothing at all"
-    ],
+    "q": "StateFlow vs a plain Flow — the difference?",
+    "a": ["A plain Flow holds the latest value while StateFlow re-runs its block per collector", "StateFlow is hot, holds a current value, and replays it to new collectors", "StateFlow can't be collected", "StateFlow only works in the background"],
     "c": 1,
-    "e": "`SideEffect` runs after every successful composition/recomposition, so on the first run both println calls fire in order.",
-    "code": "@Composable\nfun Demo() {\n    println(\"A\")\n    SideEffect { println(\"B\") }\n}",
-    "type": "compose"
+    "e": "A plain Flow is cold (restarts per collector). StateFlow is hot, has .value, and emits the latest value to new subscribers — like LiveData.",
+    "topic": "flow",
+    "type": "concept"
   },
   {
-    "q": "What fits expensive computations derived from other State?",
-    "a": [
-      "LaunchedEffect block",
-      "DisposableEffect block",
-      "derivedStateOf",
-      "produceState builder"
-    ],
-    "c": 2,
-    "e": "`derivedStateOf` caches the result and triggers recomposition only when the result itself changes, not on every change of the source State.",
-    "type": "compose"
-  },
-  {
-    "q": "Why pass `key` to `items()` in a LazyColumn?",
-    "a": [
-      "To sort items in the rendered list",
-      "Stable identity for state and animations",
-      "To noticeably speed up rendering pipeline",
-      "It is a required parameter of items() API"
-    ],
-    "c": 1,
-    "e": "Without `key`, Compose matches items by index, so on reorders the per-item state and animations get attached to the wrong list elements.",
-    "type": "compose"
-  },
-  {
-    "q": "What is printed on each recomposition?",
-    "a": [
-      "'create' on every recomposition cycle",
-      "'create' once, 'dispose' on exit",
-      "Nothing is ever printed at all",
-      "Only 'dispose' is ever printed once"
-    ],
-    "c": 1,
-    "e": "DisposableEffect with a fixed key runs once; `onDispose` fires when the composable leaves the composition or when the key value changes.",
-    "code": "@Composable\nfun X() {\n    DisposableEffect(Unit) {\n        println(\"create\")\n        onDispose { println(\"dispose\") }\n    }\n}",
-    "type": "compose"
-  },
-  {
-    "q": "What are the three phases of a Compose frame?",
-    "a": [
-      "Composition, Layout, Drawing",
-      "Inflate, Measure, Draw phases",
-      "State, Render, Commit phases",
-      "Init, Update, Destroy phases"
-    ],
+    "q": "What happens here?",
+    "a": ["NullPointerException at runtime", "It prints 0", "It prints null", "Compilation error: the !! operator requires a non-null receiver type"],
     "c": 0,
-    "e": "Compose runs three phases: Composition (build the tree), Layout (measure+place), Drawing. Reading State in Layout/Drawing can skip Composition.",
-    "type": "compose"
+    "e": "The !! operator forces non-null. If the value is null it throws NPE. Use it only when you're certain it's not null.",
+    "code": "val s: String? = null\nprintln(s!!.length)",
+    "topic": "null_safety",
+    "type": "code-output"
   },
   {
-    "q": "What is required for a composable to be skippable?",
-    "a": [
-      "Just the @Composable annotation alone",
-      "All params stable and equal to prior",
-      "Use of `remember` inside the function body",
-      "Being launched inside a LaunchedEffect block"
-    ],
+    "q": "What is the ViewModel responsible for in MVVM?",
+    "a": ["Directly drawing UI widgets and handling their click and touch listeners itself", "Holding UI state without referencing the View, surviving its recreation", "Managing files on disk", "Running database migrations"],
     "c": 1,
-    "e": "Compose can skip a call only if all parameters are stable and equal to previous values; otherwise the function runs on every recomposition.",
-    "type": "compose"
+    "e": "The ViewModel holds UI state and presentation logic and exposes it via LiveData/StateFlow. It keeps no View reference — hence testability and rotation survival.",
+    "topic": "architecture",
+    "type": "pattern"
   },
   {
-    "q": "What does the first click display?",
-    "a": [
-      "count=0 stays on screen",
-      "count=1",
-      "count=2 after a single tap",
-      "Nothing visible changes"
-    ],
+    "q": "A suspend Retrofit call — which dispatcher should you run it on?",
+    "a": ["Always wrap it manually in withContext(Dispatchers.IO) or it will block the UI", "Retrofit moves off the main thread itself; calling from Main is fine", "Only Dispatchers.Default", "Only a new Thread"],
     "c": 1,
-    "e": "After the click `count` becomes 1, the Text triggers recomposition and reads the new state value — the UI shows count=1.",
-    "code": "@Composable\nfun C() {\n    var count by remember { mutableStateOf(0) }\n    Button(onClick = { count++ }) {\n        Text(\"count=$count\")\n    }\n}",
-    "type": "compose"
+    "e": "Modern Retrofit with suspend functions does IO in the background (enqueue). So calling it from viewModelScope (Main) is safe, no manual withContext(IO).",
+    "topic": "coroutines",
+    "type": "code-output"
   },
   {
-    "q": "What is a CompositionLocal?",
-    "a": [
-      "A local helper function in a composable",
-      "Implicitly passes a value down the tree",
-      "An alternative way to use a ViewModel",
-      "A drop-in replacement for `remember` API"
-    ],
-    "c": 1,
-    "e": "CompositionLocal lets you pass a value (theme, density, resources) down the composable tree implicitly, without threading it through parameters.",
-    "type": "compose"
-  },
-  {
-    "q": "What does the expect/actual pair do in Kotlin Multiplatform?",
-    "a": [
-      "Replaces interfaces and sealed hierarchies in shared code",
-      "Declares an API in common with platform-specific impl",
-      "Acts as an alias for sealed class with extra checks",
-      "Marks suspend functions visible across all platforms"
-    ],
-    "c": 1,
-    "e": "expect is a bodiless declaration in commonMain; actual is its implementation in a platform source set (jvm/ios/android).",
-    "type": "kmp"
-  },
-  {
-    "q": "Which KMP source set is used to share code between Android and iOS, but not Desktop?",
-    "a": [
-      "commonMain shared by every configured target",
-      "An intermediate source set, e.g. mobileMain",
-      "androidMain produced by the Android plugin",
-      "nativeMain shared by all native targets"
-    ],
-    "c": 1,
-    "e": "Code shared only by Android+iOS lives in an intermediate source set (mobileMain), wired via the hierarchy template.",
-    "type": "kmp"
-  },
-  {
-    "q": "Which Dispatcher historically could NOT be used directly on iOS in Kotlin/Native?",
-    "a": [
-      "Dispatchers.Default",
-      "Dispatchers.Main",
-      "Dispatchers.IO",
-      "Dispatchers.Unconfined"
-    ],
-    "c": 2,
-    "e": "Dispatchers.IO was missing in Kotlin/Native for a long time; on iOS people typically used Default or Main.immediate.",
-    "type": "kmp"
-  },
-  {
-    "q": "What is the 'new' Kotlin/Native memory model?",
-    "a": [
-      "GC is fully disabled at runtime for performance",
-      "Objects are mutable across threads without freeze",
-      "Only immutable objects are allowed across threads",
-      "Strict single-threaded model with main isolation"
-    ],
-    "c": 1,
-    "e": "The new memory model (since 1.7.20) removed freeze/InvalidMutabilityException, so objects can be shared across threads as on JVM.",
-    "type": "kmp"
-  },
-  {
-    "q": "How do you reference UIKit's UIView class from Kotlin/Native?",
-    "a": [
-      "import android.view.View",
-      "import platform.UIKit.UIView",
-      "import kotlin.native.UIView",
-      "import cocoapods.uikit.UIView"
-    ],
-    "c": 1,
-    "e": "iOS platform APIs are exposed under the platform.* package (UIKit, Foundation, posix, etc.) inside iosMain.",
-    "type": "kmp"
-  },
-  {
-    "q": "What is SQLDelight in KMP?",
-    "a": [
-      "An ORM layer built on top of Android Room",
-      "Generator of type-safe APIs from SQL",
-      "Alternative native SQLite backend driver",
-      "A drop-in replacement for Realm Mobile DB"
-    ],
-    "c": 1,
-    "e": "SQLDelight generates Kotlin code from .sq files and works on JVM/Android/iOS/JS via different drivers.",
-    "type": "kmp"
-  },
-  {
-    "q": "Compose Multiplatform doesn't talk to SwiftUI directly. How is interop done?",
-    "a": [
-      "It is simply not supported on iOS in any production setup at all",
-      "Wrap ComposeUIViewController via UIViewControllerRepresentable",
-      "By bridging through a custom JNI/native interop adapter glue layer",
-      "Rendering Compose content inside an embedded WKWebView host page"
-    ],
-    "c": 1,
-    "e": "Compose on iOS is exported as a UIViewController; in SwiftUI you wrap it with UIViewControllerRepresentable.",
-    "type": "kmp"
-  },
-  {
-    "q": "Which Ktor engine is typically used on iOS?",
-    "a": [
-      "OkHttp",
-      "Darwin",
-      "CIO",
-      "Jetty"
-    ],
-    "c": 1,
-    "e": "Ktor uses different engines: OkHttp/Android for Android, Darwin for iOS/macOS, and CIO as a coroutine-based multiplatform option.",
-    "type": "kmp"
-  },
-  {
-    "q": "Why declare an expect class Platform in commonMain?",
-    "a": [
-      "To hide implementation details from the compiler entirely",
-      "Declare a cross-platform contract with per-OS impls",
-      "It is just a syntactic alias for an interface declaration",
-      "To enable compile-time class name obfuscation per target"
-    ],
-    "c": 1,
-    "e": "expect class describes a contract in shared code; each platform provides its own actual class implementing it.",
-    "type": "kmp"
-  },
-  {
-    "q": "What happens if you declare only an actual in androidMain without an expect in commonMain?",
-    "a": [
-      "Compiles, treated as a regular Kotlin class",
-      "Compile error: actual without matching expect",
-      "Works at runtime, but only on the Android target",
-      "Only a warning is emitted, build still succeeds"
-    ],
-    "c": 1,
-    "e": "An actual declaration always requires a paired expect in the shared source set; without it the compiler reports an error.",
-    "type": "kmp"
-  },
-  {
-    "q": "What is the main dependency rule in Clean Architecture?",
-    "a": [
-      "Layers depend strictly top-down through the stack",
-      "Dependencies point inward toward the domain",
-      "All layers are completely independent of each other",
-      "The domain layer depends on the data layer impl"
-    ],
-    "c": 1,
-    "e": "Dependency Rule: inner layers know nothing about outer ones; dependencies always point toward the core (domain).",
-    "type": "clean_arch"
-  },
-  {
-    "q": "Where does the Repository interface live in Clean Architecture?",
-    "a": [
-      "In the data layer next to its concrete impl",
-      "In domain, with the impl in the data layer",
-      "In the presentation/UI layer near ViewModels",
-      "In the framework/platform integration layer"
-    ],
-    "c": 1,
-    "e": "The repository interface defines a contract in domain (use cases depend on it); the implementation sits in the data layer.",
-    "type": "clean_arch"
-  },
-  {
-    "q": "Why use case (interactor) classes?",
-    "a": [
-      "They replace ViewModels in MVVM architecture",
-      "Encapsulate a business rule, reusable, testable",
-      "They are essentially DTOs for transport between layers",
-      "They hold UI state across multiple screens"
-    ],
-    "c": 1,
-    "e": "A use case is one unit of business logic (a single scenario); it makes reuse and unit tests trivial without UI dependencies.",
-    "type": "clean_arch"
-  },
-  {
-    "q": "What is the difference between a domain Entity and a DTO/data model?",
-    "a": [
-      "Entity is a DB row, DTO is a JSON payload from network",
-      "Entity is framework-free domain object; DTO is transport",
-      "They are essentially synonyms in everyday Android practice",
-      "DTO is richer than the domain Entity by definition always"
-    ],
-    "c": 1,
-    "e": "A domain Entity describes a business concept; a DTO/data model is serialized and framework-bound, with mapping done in the data layer.",
-    "type": "clean_arch"
-  },
-  {
-    "q": "What is a Dynamic Feature Module (Play Feature Delivery)?",
-    "a": [
-      "Just a regular Gradle library module in the project",
-      "Module downloaded on demand via SplitInstallManager",
-      "An external Maven artifact dependency on the classpath",
-      "A specific Android Gradle build flavor configuration"
-    ],
-    "c": 1,
-    "e": "Dynamic features are loaded on demand through Play Core's SplitInstallManager, reducing the base APK/AAB size.",
-    "type": "clean_arch"
-  },
-  {
-    "q": "Why split a module into api and impl?",
-    "a": [
-      "Purely a stylistic preference of some Android teams",
-      "Hide impl, speed up incremental builds, loosen coupling",
-      "It is a hard requirement of the Gradle build tool itself",
-      "Just to produce more files in the overall project tree"
-    ],
-    "c": 1,
-    "e": "api exposes only contracts while impl holds the implementation; consumers depend on api, which shrinks the rebuild cascade.",
-    "type": "clean_arch"
-  },
-  {
-    "q": "Where should DTO -> Domain Entity mapping happen?",
-    "a": [
-      "Inside the ViewModel before exposing UI state",
-      "In the data layer (repository or mapper)",
-      "Inside the domain layer use case implementation",
-      "Directly in the UI/composable presentation layer"
-    ],
-    "c": 1,
-    "e": "Conversion happens at the data boundary: the repository takes DTOs and exposes pure domain models to the outside world.",
-    "type": "clean_arch"
-  },
-  {
-    "q": "Why does Clean Architecture make testing easier?",
-    "a": [
-      "It actually does not simplify testing in real practice",
-      "Domain has no Android deps, plain JVM tests work",
-      "It forces you to write only UI/Espresso tests on device",
-      "It strictly forbids the use of any mocks inside tests"
-    ],
-    "c": 1,
-    "e": "Business logic in domain is framework-free, so it can be tested without Robolectric or Instrumentation, fast and stable.",
-    "type": "clean_arch"
-  },
-  {
-    "q": "What is a feature module in a multi-module Android project?",
-    "a": [
-      "A module containing exactly a single Kotlin class file",
-      "Isolated module owning one feature with UI/data/domain",
-      "A module dedicated only to running instrumentation tests",
-      "A standard out-of-the-box Gradle template option choice"
-    ],
-    "c": 1,
-    "e": "A feature module encapsulates one product feature; it usually owns its layers and depends only on core/api modules.",
-    "type": "clean_arch"
-  },
-  {
-    "q": "Can the domain layer depend on the Android SDK (Context, View)?",
-    "a": [
-      "Yes, this is perfectly fine in everyday practice",
-      "No, it breaks the dependency rule and testability",
-      "Only when writing in Kotlin and not in plain Java",
-      "Only allowed inside large enterprise codebases"
-    ],
-    "c": 1,
-    "e": "Domain must stay pure Kotlin/Java; depending on the Android SDK makes the module non-portable and hard to unit-test.",
-    "type": "clean_arch"
-  },
-  {
-    "q": "Which SOLID principle is violated by this code?",
-    "a": [
-      "SRP",
-      "OCP",
-      "LSP",
-      "DIP"
-    ],
+    "q": "apply vs also — the difference?",
+    "a": ["apply: receiver this, returns object; also: receiver it, returns object", "They are identical", "apply returns Unit", "also returns the lambda's result while apply returns the receiver object itself"],
     "c": 0,
-    "e": "The class handles business logic, persistence and logging at once - multiple reasons to change, a clear SRP violation.",
-    "code": "class OrderService {\n    fun place(order: Order) {\n        validate(order)\n        save(order)\n        File(\"log.txt\").appendText(\"$order\\n\")\n    }\n}",
-    "type": "solid"
+    "e": "Both return the object itself. apply suits configuration (this.field = ...), also suits side effects with it (logging, validation).",
+    "topic": "scope_fn",
+    "type": "keyword"
   },
   {
-    "q": "Which SOLID principle does this code demonstrate?",
-    "a": [
-      "SRP",
-      "OCP",
-      "LSP",
-      "ISP"
-    ],
+    "q": "Classic cause of a memory leak on Android?",
+    "a": ["Declaring too many data classes, since each generates equals, hashCode and copy", "A long-lived object holding an Activity Context (static, singleton, stray thread)", "Using val instead of var", "Launching many coroutines in viewModelScope without ever cancelling the parent job"],
     "c": 1,
-    "e": "Behavior is extended via new Shape implementations without modifying AreaCalc - open for extension, closed for modification.",
-    "code": "interface Shape { fun area(): Double }\nclass Circle(val r: Double) : Shape {\n    override fun area() = r * r * PI\n}\nclass AreaCalc {\n    fun total(s: List<Shape>) = s.sumOf { it.area() }\n}",
-    "type": "solid"
+    "e": "If a singleton/static/anonymous thread holds an Activity Context, GC can't collect it after destruction. Use applicationContext or weak references.",
+    "topic": "memory",
+    "type": "concept"
   },
   {
-    "q": "Which SOLID principle is violated by this code?",
-    "a": [
-      "SRP",
-      "ISP",
-      "LSP",
-      "DIP"
-    ],
-    "c": 2,
-    "e": "Penguin extends Bird but cannot fly, so the subtype does not substitute the parent without surprises - a classic LSP violation.",
-    "code": "open class Bird {\n    open fun fly() { /* ... */ }\n}\nclass Penguin : Bird() {\n    override fun fly() = throw UnsupportedOperationException()\n}",
-    "type": "solid"
-  },
-  {
-    "q": "Which SOLID principle does this interface violate?",
-    "a": [
-      "SRP",
-      "OCP",
-      "ISP",
-      "DIP"
-    ],
-    "c": 2,
-    "e": "Clients are forced to implement methods they don't need - the interface is too fat and should be split (ISP).",
-    "code": "interface Worker {\n    fun work()\n    fun eat()\n    fun sleep()\n}\nclass Robot : Worker {\n    override fun work() {}\n    override fun eat() = error(\"n/a\")\n    override fun sleep() = error(\"n/a\")\n}",
-    "type": "solid"
-  },
-  {
-    "q": "Which SOLID principle is violated by this code?",
-    "a": [
-      "SRP",
-      "OCP",
-      "ISP",
-      "DIP"
-    ],
-    "c": 3,
-    "e": "A high-level ViewModel depends on a concrete Retrofit class; it should depend on an abstraction (Repository).",
-    "code": "class UserViewModel {\n    private val api = RetrofitClient.userApi\n    fun load() = api.getUser()\n}",
-    "type": "solid"
-  },
-  {
-    "q": "What does the Law of Demeter state?",
-    "a": [
-      "A class must have no more than N public methods",
-      "Talk only to immediate neighbors, no long chains",
-      "Inheritance is forbidden across feature modules",
-      "static fields and methods must not be used at all"
-    ],
-    "c": 1,
-    "e": "LoD: 'don't talk to strangers' - a.b().c().d() hints at a violation and indicates strong coupling.",
-    "type": "solid"
-  },
-  {
-    "q": "Which code smell: a class knows too much about another class and constantly pokes its fields?",
-    "a": [
-      "God object",
-      "Feature envy",
-      "Shotgun surgery",
-      "Primitive obsession"
-    ],
-    "c": 1,
-    "e": "Feature envy - a method works mostly with another class's data; usually the method should be moved to that class.",
-    "type": "solid"
-  },
-  {
-    "q": "What does 'composition over inheritance' prefer?",
-    "a": [
-      "Deep, multi-level inheritance class hierarchies",
-      "Delegation/composition over inheriting behavior",
-      "Multiple inheritance for additional flexibility",
-      "Always preferring an abstract class as the base"
-    ],
-    "c": 1,
-    "e": "Composition is more flexible: behavior is assembled from parts, easier to swap and test, with no rigid parent-child coupling.",
-    "type": "solid"
-  },
-  {
-    "q": "What does 'single source of truth' mean?",
-    "a": [
-      "One developer fully owns and maintains the codebase end-to-end",
-      "State lives in one place, the rest are derivations",
-      "The system uses exactly one shared physical database engine",
-      "There is exactly one Git branch in the project repository"
-    ],
-    "c": 1,
-    "e": "SSOT: data/state has one canonical source (DB, repository, store); UI and caches are derived from it.",
-    "type": "solid"
-  },
-  {
-    "q": "What is a God object?",
-    "a": [
-      "A regular Singleton instance with global mutable state",
-      "Class that knows and does too much, hoarding logic",
-      "Just a test mock object configured per test scenario",
-      "Any class that happens to be sufficiently large in lines"
-    ],
-    "c": 1,
-    "e": "God object is an antipattern: one class owns logic of several modules, violates SRP and is painful to test.",
-    "type": "solid"
-  },
-  {
-    "q": "What is the difference between IoC and DI?",
-    "a": [
-      "They are exact synonyms in everyday practice",
-      "IoC is the general principle; DI is one form",
-      "DI is broader than IoC and includes IoC entirely",
-      "IoC is a concept used mainly for database access"
-    ],
-    "c": 1,
-    "e": "Inversion of Control is a broad principle; Dependency Injection is one concrete IoC technique - passing deps from outside.",
-    "type": "di"
-  },
-  {
-    "q": "What does the @Inject annotation on a constructor do in Dagger?",
-    "a": [
-      "Automatically marks the class as an @Singleton in the graph",
-      "Tells Dagger how to create the object and resolve deps",
-      "Registers the class inside the AndroidManifest.xml entries",
-      "Enables ProGuard/R8 keep rules for the class automatically"
-    ],
-    "c": 1,
-    "e": "@Inject on a constructor is the main Dagger hint: the class is provided automatically and arguments are resolved from the graph.",
-    "code": "class UserRepository @Inject constructor(\n    private val api: UserApi,\n    private val db: UserDao\n)",
-    "type": "di"
-  },
-  {
-    "q": "What best describes @HiltAndroidApp?",
-    "a": [
-      "An annotation primarily used on ViewModel classes",
-      "Marks Application and generates Hilt's root component",
-      "Activates Jetpack Compose features for the app module",
-      "Replaces specific entries in AndroidManifest.xml file"
-    ],
-    "c": 1,
-    "e": "@HiltAndroidApp on the Application class triggers Hilt code generation and creates the SingletonComponent.",
-    "type": "di"
-  },
-  {
-    "q": "Which Hilt annotation is needed to inject into a ViewModel?",
-    "a": [
-      "@AndroidEntryPoint",
-      "@HiltViewModel",
-      "@Singleton",
-      "@ViewModelInject"
-    ],
-    "c": 1,
-    "e": "@HiltViewModel together with @Inject constructor lets you obtain the VM via hiltViewModel() or by viewModels().",
-    "type": "di"
-  },
-  {
-    "q": "What does Koin's binding scope mean here?",
-    "a": [
-      "It declares a Hilt module instead of a regular Koin one",
-      "single is one instance per scope, factory new each time",
-      "single and factory behave exactly the same in every case",
-      "single is fully lazy while factory is always eagerly built"
-    ],
-    "c": 1,
-    "e": "single { } creates one object per scope, factory { } returns a new one each time; viewModel { } is tied to the VM lifecycle.",
-    "code": "val appModule = module {\n    single { UserRepository(get()) }\n    factory { Mapper() }\n    viewModel { UserViewModel(get()) }\n}",
-    "type": "di"
-  },
-  {
-    "q": "What is the difference between Component and Subcomponent in Dagger?",
-    "a": [
-      "There is no real difference between them in practice",
-      "Subcomponent inherits parent graph, adds bindings",
-      "Subcomponent is fully isolated from any parent graph",
-      "A Component cannot be injected into anything at all"
-    ],
-    "c": 1,
-    "e": "A Subcomponent has access to all parent bindings and adds its own - useful for Activity/Fragment-level scopes.",
-    "type": "di"
-  },
-  {
-    "q": "What does @IntoSet do in Dagger?",
-    "a": [
-      "Adds the binding into a Set<T> from all providers",
-      "Marks the binding as a Singleton in the object graph",
-      "Acts as a qualifier annotation for binding disambiguation",
-      "Enables multibindings.Map collection from many modules"
-    ],
+    "q": "What does this Kotlin code print?",
+    "a": ["[20, 40]", "[2, 4]", "[10, 20, 30, 40]", "[20, 40, 60]"],
     "c": 0,
-    "e": "Multibindings: @IntoSet/@IntoMap collect implementations (e.g. a set of Interceptors) contributed from many modules.",
-    "type": "di"
+    "e": "filter keeps evens [2, 4], then map multiplies by 10 → [20, 40].",
+    "code": "val r = listOf(1, 2, 3, 4).filter { it % 2 == 0 }.map { it * 10 }\nprintln(r)",
+    "topic": "collections",
+    "type": "code-output"
   },
   {
-    "q": "Why are qualifiers (@Named, custom ones) needed?",
-    "a": [
-      "For richer logging output during graph creation",
-      "To distinguish multiple bindings of the same type",
-      "They serve as a full replacement for @Inject usage",
-      "They are used only inside the test source sets"
-    ],
+    "q": "Why mark a function inline?",
+    "a": ["The compiler caches its return value so repeated calls with same args are skipped", "Its body and lambdas are inlined at the call site, avoiding lambda overhead", "To make it private", "To run it asynchronously"],
     "c": 1,
-    "e": "When two OkHttpClients exist (auth and default), a qualifier picks between them; otherwise Dagger cannot decide which to inject.",
-    "code": "@Qualifier annotation class Auth\n@Qualifier annotation class Plain\n@Provides @Auth fun authClient(): OkHttpClient = ...\n@Provides @Plain fun plainClient(): OkHttpClient = ...",
-    "type": "di"
+    "e": "inline on a higher-order function avoids allocating Function objects and enables non-local return and reified types. Overuse bloats bytecode.",
+    "topic": "inline",
+    "type": "keyword"
   },
   {
-    "q": "Constructor injection vs field injection - which is preferred?",
-    "a": [
-      "Field injection is simpler and shorter to write in code",
-      "Constructor: explicit deps, immutable, easy to test",
-      "There is no real difference between the two injection styles",
-      "Field injection is significantly faster at runtime startup"
-    ],
-    "c": 1,
-    "e": "Constructor injection makes deps visible, prevents partially constructed objects and makes testing straightforward.",
-    "type": "di"
-  },
-  {
-    "q": "What is the key difference between Hilt and plain Dagger?",
-    "a": [
-      "Hilt is significantly slower at app runtime startup phase",
-      "Hilt wraps Dagger with Android components and scopes",
-      "Hilt does not rely on annotation processing at all internally",
-      "It is a completely different DI engine, not based on Dagger"
-    ],
-    "c": 1,
-    "e": "Hilt provides ready-made SingletonComponent/ActivityComponent and Android integrations, hiding most Dagger boilerplate.",
-    "type": "di"
-  },
-  {
-    "q": "How many phases does a Gradle build have, and in what order?",
-    "a": [
-      "Configuration, Initialization, Execution",
-      "Initialization, Configuration, Execution",
-      "Execution, Initialization, Configuration",
-      "Initialization, Execution, Configuration"
-    ],
-    "c": 1,
-    "e": "Three phases: Initialization (settings.gradle, which projects), Configuration (build scripts, task graph), Execution (selected tasks).",
-    "type": "gradle"
-  },
-  {
-    "q": "What does the Gradle Initialization phase determine?",
-    "a": [
-      "Final artifact assembly for modules",
-      "Which modules participate in build",
-      "Task dependency graph and ordering",
-      "Compilation of project source code"
-    ],
-    "c": 1,
-    "e": "The Initialization phase reads settings.gradle(.kts) and decides which projects participate in the build. Configuration and tasks come later.",
-    "type": "gradle"
-  },
-  {
-    "q": "What is the key advantage of KSP over KAPT?",
-    "a": [
-      "Only supports Java annotations now",
-      "Faster, no Java stub generation",
-      "Produces a finished APK artifact",
-      "Replaces the R8 minifier entirely"
-    ],
-    "c": 1,
-    "e": "KSP analyzes the Kotlin AST directly, without the Java stub generation KAPT requires. Result: roughly 2x faster builds and better incrementality.",
-    "type": "gradle"
-  },
-  {
-    "q": "What is stored in a version catalog (libs.versions.toml)?",
-    "a": [
-      "Only versions of Gradle plugins",
-      "Versions and dependency aliases",
-      "List of every project module",
-      "ProGuard and R8 keep rules"
-    ],
-    "c": 1,
-    "e": "libs.versions.toml centralizes versions, libraries, bundles and plugins. Accessed via the typesafe `libs.xxx` accessor in build scripts.",
-    "type": "gradle"
-  },
-  {
-    "q": "What does `dependsOn` do for a Gradle task?",
-    "a": [
-      "Always runs that task afterwards now",
-      "Declares another task is required",
-      "Removes the task from the build graph",
-      "Caches the task execution result"
-    ],
-    "c": 1,
-    "e": "`dependsOn` guarantees the listed task runs BEFORE the current one. To run a task AFTER, use `finalizedBy` instead.",
-    "type": "gradle"
-  },
-  {
-    "q": "What does the snippet below print on `./gradlew hello`?",
-    "a": [
-      "configure, then execute",
-      "execute, then configure",
-      "Only the line execute",
-      "Only the line configure"
-    ],
+    "q": "What is recomposition in Jetpack Compose?",
+    "a": ["Re-invoking Composable functions when observed state changes, to update the UI", "Rebuilding and recompiling the whole project whenever any Composable state changes", "Clearing memory", "Restarting the entire app"],
     "c": 0,
-    "e": "The `tasks.register {}` block runs in the Configuration phase; doLast runs in Execution. Configuration always precedes Execution.",
-    "code": "tasks.register(\"hello\") {\n    println(\"configure\")\n    doLast {\n        println(\"execute\")\n    }\n}",
-    "type": "gradle"
+    "e": "Compose is declarative: when state (e.g. MutableState) changes, the affected Composables are re-invoked, updating only the necessary UI parts.",
+    "topic": "compose",
+    "type": "concept"
   },
   {
-    "q": "What is the purpose of the Gradle configuration cache?",
-    "a": [
-      "Cache final APKs between runs",
-      "Skip the Configuration phase",
-      "Store ProGuard mapping files",
-      "Compress res/ assets at build"
-    ],
-    "c": 1,
-    "e": "The configuration cache serializes the Configuration phase result to disk, so subsequent builds skip it — a major incremental build speedup.",
-    "type": "gradle"
-  },
-  {
-    "q": "What is buildSrc in a Gradle project?",
-    "a": [
-      "Source folder of the app module",
-      "Module for shared build logic",
-      "Folder for generated APKs/AABs",
-      "Local cache at .gradle/caches/"
-    ],
-    "c": 1,
-    "e": "buildSrc is a special module Gradle builds first and adds to the classpath of every build script. Useful for shared conventions.",
-    "type": "gradle"
-  },
-  {
-    "q": "Why is a convention plugin better than buildSrc for shared logic?",
-    "a": [
-      "Better isolation and caching",
-      "Works only in the Groovy DSL",
-      "Needs no Kotlin compiler at all",
-      "Runs every task in parallel"
-    ],
+    "q": "SupervisorJob vs a regular Job — the point?",
+    "a": ["One child failing doesn't cancel its siblings or the parent scope", "With it, cancelling any child cancels all the others in the same scope", "It makes coroutines synchronous", "It forbids cancellation"],
     "c": 0,
-    "e": "A convention plugin is a separate plugin in an included build, with better isolation and caching. buildSrc invalidates the whole classpath on change.",
-    "type": "gradle"
+    "e": "With a regular Job a child's failure cancels the parent and siblings. SupervisorJob isolates failures — other coroutines keep running. Good for independent tasks.",
+    "topic": "coroutines",
+    "type": "code-output"
   },
   {
-    "q": "Where is the version catalog wired into the build?",
-    "a": [
-      "build.gradle.kts of app module",
-      "settings.gradle.kts at root",
-      "The gradle.properties file",
-      "The local.properties file"
-    ],
-    "c": 1,
-    "e": "libs.versions.toml is picked up automatically, or registered explicitly via `versionCatalogs {}` inside settings.gradle.kts at the project root.",
-    "type": "gradle"
-  },
-  {
-    "q": "How do buildTypes differ from product flavors?",
-    "a": [
-      "They are full DSL synonyms",
-      "Types are HOW, flavors are WHAT",
-      "Flavors only exist on iOS apps",
-      "Types set signingConfig, flavors not"
-    ],
-    "c": 1,
-    "e": "buildTypes (debug/release) describe HOW to build (minify, debuggable). Product flavors describe WHAT to build (free/paid, dev/prod).",
-    "type": "build_variants"
-  },
-  {
-    "q": "What is a flavor dimension in the Android Gradle Plugin?",
-    "a": [
-      "Size of the produced APK file",
-      "Group of mutually exclusive flavors",
-      "Unit-test coverage measurement axis",
-      "Minimum SDK level of the app"
-    ],
-    "c": 1,
-    "e": "A dimension is an axis of variation. The final variant is the product of one flavor per dimension and a buildType. Required when flavors exist.",
-    "type": "build_variants"
-  },
-  {
-    "q": "How many variants will Gradle generate from this code?",
-    "a": [
-      "4: free/paid, debug/release",
-      "Only the paidRelease variant",
-      "Only the freeDebug variant",
-      "freeDebug and paidRelease only"
-    ],
+    "q": "What is a companion object in Kotlin?",
+    "a": ["An object bound to a class giving member access without an instance (static-like)", "A nested class that holds per-instance mutable state for its outer class", "A default interface", "A special declaration used to create and launch a new coroutine scoped to the class"],
     "c": 0,
-    "e": "One dimension `tier` times two buildTypes (debug/release) equals 4 variants. Every combination is generated automatically by AGP.",
-    "code": "android {\n  flavorDimensions += \"tier\"\n  productFlavors {\n    create(\"free\") { dimension = \"tier\" }\n    create(\"paid\") { dimension = \"tier\" }\n  }\n}",
-    "type": "build_variants"
+    "e": "Kotlin has no static. A companion object inside a class holds class-level members (factories, constants), accessed as ClassName.member.",
+    "topic": "companion",
+    "type": "keyword"
   },
   {
-    "q": "Main advantage of AAB over APK on Google Play?",
-    "a": [
-      "AAB launches faster on a device",
-      "Play splits APKs per device",
-      "AAB does not require any signing",
-      "AAB ships Java bytecode directly"
-    ],
-    "c": 1,
-    "e": "AAB is a publishing format; Play generates minimal split APKs per device (ABI, density, language). Result: smaller download size for users.",
-    "type": "build_variants"
-  },
-  {
-    "q": "Where is the release signing key configured in the DSL?",
-    "a": [
-      "Inside buildTypes without declaration",
-      "In signingConfigs, linked in buildType",
-      "In gradle.properties or local.properties",
-      "Inside the root AndroidManifest.xml"
-    ],
-    "c": 1,
-    "e": "First declare `signingConfigs { release { ... } }`, then in buildTypes.release set `signingConfig = signingConfigs.getByName(\"release\")`.",
-    "type": "build_variants"
-  },
-  {
-    "q": "What does `buildConfigField` do in build.gradle.kts?",
-    "a": [
-      "Edits the AndroidManifest contents",
-      "Generates a field in BuildConfig",
-      "Adds a resource into the res/ tree",
-      "Overrides a ProGuard/R8 rule"
-    ],
-    "c": 1,
-    "e": "buildConfigField generates a constant in the BuildConfig class for a specific variant — useful for different API URLs on dev and prod.",
-    "code": "android {\n  buildTypes {\n    debug { buildConfigField(\"String\", \"API_URL\", \"\\\"https://dev.api\\\"\") }\n    release { buildConfigField(\"String\", \"API_URL\", \"\\\"https://api\\\"\") }\n  }\n}",
-    "type": "build_variants"
-  },
-  {
-    "q": "Why is proguard-rules.pro needed in a release buildType?",
-    "a": [
-      "Encrypts files in res/raw/",
-      "Declares keep rules for R8",
-      "Manages the signing config",
-      "Sets versionCode and versionName"
-    ],
-    "c": 1,
-    "e": "R8 (the ProGuard successor) minifies and obfuscates code. Keep rules preserve classes and methods accessed via reflection at runtime.",
-    "type": "build_variants"
-  },
-  {
-    "q": "Which resource file overrides the default for the `paid` flavor?",
-    "a": [
-      "src/main/res/values/strings.xml",
-      "src/paid/res/values/strings.xml",
-      "src/paidDebug/res/values/strings.xml",
-      "res/paid-strings.xml at the root"
-    ],
-    "c": 1,
-    "e": "The source set `src/<flavor>/res/...` overrides main for that flavor. For variant-specific overrides use `src/paidDebug/...` instead.",
-    "type": "build_variants"
-  },
-  {
-    "q": "Which Play track is used for a public beta release?",
-    "a": [
-      "Internal testing",
-      "Production release",
-      "Open testing",
-      "Closed testing"
-    ],
-    "c": 2,
-    "e": "Open testing is a public beta channel — anyone with the link can join. Closed uses email lists; Internal is up to 100 testers, instant rollout.",
-    "type": "build_variants"
-  },
-  {
-    "q": "What is Fastlane used for in an Android CI pipeline?",
-    "a": [
-      "Only signs a finished APK file",
-      "Automates deploys and metadata",
-      "Replaces the Gradle build system",
-      "Runs local unit tests of a module"
-    ],
-    "c": 1,
-    "e": "Fastlane is a Ruby tool that automates releases: uploads APK/AAB to tracks, screenshots, changelog, signing. Often paired with a CI runner.",
-    "type": "build_variants"
-  },
-  {
-    "q": "Why does Mockito without mockito-inline fail to mock Kotlin classes?",
-    "a": [
-      "Kotlin is not supported by Mockito",
-      "Kotlin classes are final by default",
-      "Mockito strictly requires the JUnit5 runner",
-      "Mockito breaks the coroutine execution"
-    ],
-    "c": 1,
-    "e": "mockito-core cannot mock final classes. Solutions: mockito-inline (bytecode manipulation), MockK, or the Kotlin `all-open` compiler plugin.",
-    "type": "testing"
-  },
-  {
-    "q": "What does `runTest {}` from kotlinx-coroutines-test provide?",
-    "a": [
-      "Runs the block on the UI dispatcher",
-      "TestScope with virtual time control",
-      "Disables every coroutine in the test",
-      "Runs the test inside Robolectric Runner"
-    ],
-    "c": 1,
-    "e": "runTest provides a TestScope with TestDispatcher — virtual time and delay; you advance it manually via advanceTimeBy or advanceUntilIdle.",
-    "type": "testing"
-  },
-  {
-    "q": "What will this test do?",
-    "a": [
-      "Hangs for one real second",
-      "Finishes instantly, value=1",
-      "Fails with a TimeoutException",
-      "value will remain equal to 0"
-    ],
-    "c": 1,
-    "e": "runTest uses a TestDispatcher whose delay is virtual, not real. The test completes instantly and the assertion on value succeeds.",
-    "code": "@Test\nfun delayTest() = runTest {\n    var value = 0\n    launch {\n        delay(1000)\n        value = 1\n    }\n    advanceUntilIdle()\n    assertEquals(1, value)\n}",
-    "type": "testing"
-  },
-  {
-    "q": "When do you reach for Robolectric instead of plain JUnit?",
-    "a": [
-      "To exercise Android APIs on JVM",
-      "To run UI tests with real taps",
-      "To shrink an APK via minifier",
-      "To replace MockK on final classes"
-    ],
+    "q": "What's special about a suspend function?",
+    "a": ["It can pause without blocking the thread and resume later", "It always starts a brand new thread for every call you make to it", "It can't return a value", "It blocks the thread until done"],
     "c": 0,
-    "e": "Robolectric simulates the Android Framework on the JVM — you can test Activity, Context, View without a device or emulator. Faster than instrumentation.",
-    "type": "testing"
-  },
-  {
-    "q": "What is semantics in Compose UI testing?",
-    "a": [
-      "Styling for text and UI elements",
-      "Description tree for finding nodes",
-      "The Compose animation subsystem",
-      "One of the built-in Modifier kinds"
-    ],
-    "c": 1,
-    "e": "Compose builds a SemanticsTree alongside the UI; tests find nodes via `onNodeWithText` and `onNodeWithTag`. Custom semantics use `Modifier.semantics{}`.",
-    "type": "testing"
-  },
-  {
-    "q": "What kind of test does this code define?",
-    "a": [
-      "Instrumentation test on a device",
-      "Local JVM test for Compose",
-      "Standard Espresso UI test on device",
-      "Screenshot test through Paparazzi"
-    ],
-    "c": 1,
-    "e": "createComposeRule() targets local tests under src/test/. For on-device runs use createAndroidComposeRule (instrumentation tests).",
-    "code": "@get:Rule\nval rule = createComposeRule()\n\n@Test\nfun btnClick() {\n    rule.setContent { MyButton() }\n    rule.onNodeWithText(\"OK\").performClick()\n}",
-    "type": "testing"
-  },
-  {
-    "q": "How does Paparazzi differ from Roborazzi?",
-    "a": [
-      "Same library shipped under two different names and APIs",
-      "Paparazzi has no Android, Roborazzi uses Robolectric",
-      "Roborazzi is intended exclusively for iOS UI testing",
-      "Paparazzi is just plain unit tests of public API"
-    ],
-    "c": 1,
-    "e": "Paparazzi renders Compose/View on the JVM without the Android Framework. Roborazzi uses Robolectric, supports more APIs, and is slower.",
-    "type": "testing"
-  },
-  {
-    "q": "What does LeakCanary detect in a debug build?",
-    "a": [
-      "ANR events on the main UI thread of the app",
-      "Memory leaks via retained objects",
-      "Network errors from the OkHttp/HTTP client",
-      "Crash reports inside the release build"
-    ],
-    "c": 1,
-    "e": "LeakCanary watches Activity, Fragment and View after destroy and uses WeakReference plus GC to find retained leaks, printing the chain to GC root.",
-    "type": "testing"
-  },
-  {
-    "q": "What does StrictMode do on Android?",
-    "a": [
-      "Forbids any release build at all",
-      "Catches I/O and leaks in debug",
-      "Encrypts SharedPreferences data",
-      "Forces the R8 minifier to run"
-    ],
-    "c": 1,
-    "e": "StrictMode is a debug tool: ThreadPolicy catches I/O on the main thread; VmPolicy catches leaked closeables, untagged sockets, etc. Disabled in release.",
-    "type": "testing"
-  },
-  {
-    "q": "What is the best way to debug HTTP traffic inside the app?",
-    "a": [
-      "LeakCanary inside a debug build",
-      "Chucker, an OkHttp interceptor",
-      "ProGuard rules for the reflection",
-      "MockK swapping out the services"
-    ],
-    "c": 1,
-    "e": "Chucker is an OkHttp interceptor that displays requests inside the app itself. Alternatives: Charles, Stetho, Flipper — but Chucker needs no proxy.",
-    "type": "testing"
-  },
-  {
-    "q": "How does R8 fundamentally differ from ProGuard in an Android build?",
-    "a": [
-      "Only renames classes and fields without doing any shrinking",
-      "Combines shrinking, obfuscation and dexing in one pass",
-      "Operates only on resources and asset folders during build",
-      "Replaces the D8 dexer step while still using ProGuard"
-    ],
-    "c": 1,
-    "e": "R8 is the successor to ProGuard: in a single pass it does tree-shaking, obfuscation and emits DEX directly, skipping the intermediate .class to .dex step.",
-    "type": "security"
-  },
-  {
-    "q": "What does resource shrinking in R8/AGP cover, and which flag enables it?",
-    "a": [
-      "Setting minifyEnabled true on its own is already enough",
-      "shrinkResources true together with minifyEnabled true",
-      "Toggling useProguard true and adding the right keep rules",
-      "Listing resConfigs en in the defaultConfig block of Gradle"
-    ],
-    "c": 1,
-    "e": "shrinkResources only works when minifyEnabled is on. R8 builds the graph of used resources and Gradle drops unreachable drawables, strings and layouts.",
-    "type": "security"
-  },
-  {
-    "q": "What happens if R8 keep rules omit @Keep for a class accessed only via reflection?",
-    "a": [
-      "The build fails immediately at the link step with a missing-symbol error",
-      "Class is renamed or stripped, reflection throws ClassNotFoundException",
-      "R8 detects the reflective access automatically and keeps the class intact",
-      "Only a build warning is emitted and runtime behaviour is unaffected"
-    ],
-    "c": 1,
-    "e": "R8 cannot see Class.forName/getDeclaredMethod usage, so without @Keep or a -keep rule the class is obfuscated or removed entirely.",
-    "type": "security"
-  },
-  {
-    "q": "What is the key advantage of Android Keystore over storing a key in a plain file?",
-    "a": [
-      "Keys are encrypted with a password derived from the app signing certificate",
-      "Private key never leaves secure storage (TEE/StrongBox), app gets a handle",
-      "Keys are backed up and synced across devices through the user's Google account",
-      "Keystore runs raw AES operations faster than equivalent userspace crypto code"
-    ],
-    "c": 1,
-    "e": "Crypto operations run inside TEE/StrongBox and the app holds an opaque handle, so raw key material cannot be extracted from process memory.",
-    "type": "security"
-  },
-  {
-    "q": "What does this code do on the first and on subsequent launches?",
-    "a": [
-      "Generates a brand new key on every launch and overwrites the old one",
-      "Creates the key once, then reuses the existing one by alias",
-      "Crashes on the second launch because the alias is already taken",
-      "Returns null until the previous alias is removed manually first"
-    ],
-    "c": 1,
-    "e": "KeyStore.getInstance(\"AndroidKeyStore\") persists keys across runs. If the alias already exists, KeyGenerator will not recreate it without an explicit delete.",
-    "code": "val ks = KeyStore.getInstance(\"AndroidKeyStore\").apply { load(null) }\nif (!ks.containsAlias(\"my_key\")) {\n    val kg = KeyGenerator.getInstance(KeyProperties.KEY_ALGORITHM_AES, \"AndroidKeyStore\")\n    kg.init(KeyGenParameterSpec.Builder(\"my_key\",\n        KeyProperties.PURPOSE_ENCRYPT or KeyProperties.PURPOSE_DECRYPT)\n        .setBlockModes(KeyProperties.BLOCK_MODE_GCM)\n        .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_NONE)\n        .build())\n    kg.generateKey()\n}",
-    "type": "security"
-  },
-  {
-    "q": "Which encryption schemes does EncryptedSharedPreferences use by default?",
-    "a": [
-      "AES128_SIV for keys and AES256_GCM for values",
-      "AES256_SIV for keys and AES256_GCM for values",
-      "RSA wrapping for keys and AES256_CBC for values",
-      "ChaCha20-Poly1305 applied to keys and to values"
-    ],
-    "c": 1,
-    "e": "Backed by Tink: AES256_SIV (deterministic, so lookups by key work) for pref names, and AES256_GCM (randomized) for values.",
-    "type": "security"
-  },
-  {
-    "q": "What is wrong with this way of obtaining encrypted SharedPreferences?",
-    "a": [
-      "Nothing is wrong, this is the recommended snippet today",
-      "MasterKeys.AES256_GCM_SPEC is deprecated, use MasterKey.Builder",
-      "It must pass context.applicationContext explicitly to avoid leaks",
-      "Pref file names are not allowed to contain underscore characters"
-    ],
-    "c": 1,
-    "e": "MasterKeys and AES256_GCM_SPEC are deprecated since security-crypto 1.1.0. Use MasterKey.Builder(context).setKeyScheme(AES256_GCM).build().",
-    "code": "val keyAlias = MasterKeys.getOrCreate(MasterKeys.AES256_GCM_SPEC)\nval prefs = EncryptedSharedPreferences.create(\n    \"secure_prefs\", keyAlias, context,\n    PrefKeyEncryptionScheme.AES256_SIV,\n    PrefValueEncryptionScheme.AES256_GCM\n)",
-    "type": "security"
-  },
-  {
-    "q": "Why is BiometricPrompt preferred over the legacy FingerprintManager?",
-    "a": [
-      "It only restyles the dialog's accent color and title typography",
-      "Unified across biometrics, supports CryptoObject and credential fallback",
-      "It runs noticeably faster than the older fingerprint API on every device",
-      "It needs no runtime permission and no manifest declaration of any kind"
-    ],
-    "c": 1,
-    "e": "BiometricPrompt abstracts face/fingerprint/iris, integrates with Keystore via CryptoObject and provides a system UI with PIN/pattern fallback.",
-    "type": "security"
-  },
-  {
-    "q": "What does network_security_config with cleartextTrafficPermitted=\"false\" plus pin-set enforce?",
-    "a": [
-      "Blocks plain HTTP and pins to a specific certificate SPKI hash",
-      "Disables TLS validation entirely so any server cert is accepted",
-      "Routes all application traffic through the system-managed VPN tunnel",
-      "Trusts any self-signed certificate presented by the remote endpoint"
-    ],
-    "c": 0,
-    "e": "Network Security Config declaratively blocks cleartext and enforces public-key pinning: the connection aborts if the server cert hash matches no pin.",
-    "type": "security"
-  },
-  {
-    "q": "Which API does Google currently recommend for device and app integrity attestation?",
-    "a": [
-      "SafetyNet Attestation API used with the legacy nonce flow",
-      "Play Integrity API with server-side token verification",
-      "RootBeer-style local heuristic library checks bundled in",
-      "DeviceAdmin policy API combined with custom integrity checks"
-    ],
-    "c": 1,
-    "e": "SafetyNet Attestation has been deprecated since 2023. The server should validate Play Integrity tokens, which cover device, app and licensing checks.",
-    "type": "security"
-  },
-  {
-    "q": "Which ML Kit detector runs fully on-device and needs no internet connection?",
-    "a": [
-      "Cloud Text Recognition routed through the Vision endpoint",
-      "Barcode Scanning, Face Detection, On-device Text Recognition",
-      "Smart Reply requested through the Cloud API gateway only",
-      "All ML Kit detectors require an active network link to function"
-    ],
-    "c": 1,
-    "e": "ML Kit splits into on-device APIs (barcode, face, pose, latin text recognition, smart reply) and cloud-based ones. On-device APIs work offline and are free.",
-    "type": "ai_ar"
-  },
-  {
-    "q": "Why quantize a TFLite model down to int8?",
-    "a": [
-      "It improves the model's overall accuracy on the held-out validation set",
-      "Shrinks size around 4x and speeds up CPU/NPU inference via integer math",
-      "Makes the model portable across runtimes without any conversion at all",
-      "It is mandatory for any GPU delegate to compile and execute the graph"
-    ],
-    "c": 1,
-    "e": "Post-training int8 quantization compresses weights float32 to int8 (around 4x) and uses SIMD/INT accelerators. The cost is a small accuracy drop, usually under 1%.",
-    "type": "ai_ar"
-  },
-  {
-    "q": "What happens if you call interpreter.run() on the main thread for a heavy model?",
-    "a": [
-      "Nothing bad happens, the TFLite runtime is fully asynchronous internally",
-      "Synchronous blocking inference on the UI thread triggers an ANR",
-      "It fails to compile against the published TFLite SDK on Android entirely",
-      "TFLite silently moves the call onto an internal background worker thread"
-    ],
-    "c": 1,
-    "e": "Interpreter.run() is a synchronous CPU/GPU call. For non-trivial models use Dispatchers.Default or a TaskRunner, otherwise you get jank or an ANR.",
-    "code": "val interpreter = Interpreter(loadModelFile(\"model.tflite\"),\n    Interpreter.Options().apply { setNumThreads(4) })\nval input = ByteBuffer.allocateDirect(1*224*224*3*4).order(ByteOrder.nativeOrder())\nval output = Array(1) { FloatArray(1000) }\ninterpreter.run(input, output)",
-    "type": "ai_ar"
-  },
-  {
-    "q": "Which TFLite delegate gives the best gains on modern Android devices with an NPU?",
-    "a": [
-      "GPU delegate built on top of OpenGL or OpenCL backends",
-      "NNAPI delegate (Android 8.1+) or a native NPU SDK",
-      "XNNPACK CPU delegate with multi-threaded fused ops",
-      "Hexagon delegate (Snapdragon-only, now deprecated)"
-    ],
-    "c": 1,
-    "e": "NNAPI dispatches ops to available accelerators (NPU/DSP/GPU) through the OS. On Pixel/Tensor and many SoCs it beats the pure GPU delegate.",
-    "type": "ai_ar"
-  },
-  {
-    "q": "What is an Anchor in ARCore?",
-    "a": [
-      "A texture atlas bound to a rendered model placed inside the scene",
-      "A fixed pose in the world, kept consistent as tracking refines",
-      "The currently active hardware camera component on the host device",
-      "A periodic light-estimation result attached to the current AR frame"
-    ],
-    "c": 1,
-    "e": "An Anchor is a stable attachment to a real-world point. ARCore corrects its coordinates as SLAM drifts so the virtual object does not slide away.",
-    "type": "ai_ar"
-  },
-  {
-    "q": "Which ARSession lifecycle step is required before every render frame?",
-    "a": [
-      "Calling session.pause() before drawing to flush internal state",
-      "session.update() returns a Frame with fresh tracking data",
-      "Calling session.close() to release the camera between frames",
-      "Reconfiguring HDR settings on the session for each new frame"
-    ],
-    "c": 1,
-    "e": "Each frame GLSurfaceView.onDrawFrame calls session.update(); the returned Frame exposes camera, planes and anchors. Without update the data goes stale.",
-    "type": "ai_ar"
-  },
-  {
-    "q": "Pose detection in ML Kit returns a PoseLandmark with which fields?",
-    "a": [
-      "Just the x and y screen coordinates of the landmark point",
-      "position3D (x,y,z), inFrameLikelihood and a landmark type",
-      "A 2D bounding box around the detected person in the frame",
-      "Only an overall confidence score for the whole pose result"
-    ],
-    "c": 1,
-    "e": "Each of the 33 landmarks carries a 3D position (z relative to the hips, in pixels), an in-frame likelihood and a type (NOSE, LEFT_SHOULDER, etc.).",
-    "type": "ai_ar"
-  },
-  {
-    "q": "When is on-device inference preferable to a cloud endpoint?",
-    "a": [
-      "Always, regardless of the model size, latency target or device constraints",
-      "When latency, privacy or offline matter; APK size and CPU pay the cost",
-      "Only for very small toy models embedded in tutorial code and demo apps",
-      "Only available to apps subscribed to a paid Google Cloud service tier plan"
-    ],
-    "c": 1,
-    "e": "On-device wins on privacy and latency but bundles the model and burns battery/CPU. Cloud is preferred for heavy models and centralized updates.",
-    "type": "ai_ar"
-  },
-  {
-    "q": "How do you correctly wire an ML Kit detector to CameraX in Compose or Views?",
-    "a": [
-      "Through the ImageCapture use case and its takePicture result callback",
-      "Via ImageAnalysis.Analyzer and InputImage.fromMediaImage with rotation",
-      "Only through the VideoCapture use case bound to the current lifecycle owner",
-      "ML Kit detectors are not compatible with the CameraX library on Android"
-    ],
-    "c": 1,
-    "e": "ImageAnalysis emits ImageProxy then InputImage.fromMediaImage(image, rotationDegrees). After detector.process() you must call imageProxy.close() or backpressure builds up.",
-    "type": "ai_ar"
-  },
-  {
-    "q": "What sets Yandex MapKit apart from the Google Maps SDK on Android?",
-    "a": [
-      "Yandex MapKit is built on top of OpenStreetMap raw tile data",
-      "Own engine and API, stronger RU coverage: traffic, transit, panoramas",
-      "Both SDKs are fully API-compatible and use the same MapView types",
-      "Yandex MapKit only works while the device has an active network connection"
-    ],
-    "c": 1,
-    "e": "MapKit is an independent SDK with MapView/MapObjectCollection. Its API is not Google Maps compatible; it has stronger RU/CIS coverage, traffic and transit data.",
-    "type": "ai_ar"
-  },
-  {
-    "q": "How does Android Auto fundamentally differ from Android Automotive OS?",
-    "a": [
-      "They are essentially the same Google product under two marketing names",
-      "Auto projects from the phone; Automotive OS is the car's own Android",
-      "Android Automotive OS is exclusive to Tesla-branded vehicles and prototypes",
-      "Android Auto runs entirely on the head unit without any paired phone link"
-    ],
-    "c": 1,
-    "e": "Android Auto projects the phone UI onto the IVI head unit. Android Automotive OS is the car's own OS (Polestar, Volvo); apps install directly via Play.",
-    "type": "ecosystem"
-  },
-  {
-    "q": "What is the Car App Library and what is it used for?",
-    "a": [
-      "A general-purpose Material UI kit aimed at phones and large tablets",
-      "Jetpack library for templated nav/POI/IOT screens on Auto and AAOS",
-      "An ORM and persistence layer tailored to live vehicle telemetry data",
-      "A Compose-based replacement for the legacy car projection UI runtime"
-    ],
-    "c": 1,
-    "e": "androidx.car.app exposes a limited set of templates (ListTemplate, NavigationTemplate) certified for driver safety. Arbitrary custom UI is forbidden.",
-    "type": "ecosystem"
-  },
-  {
-    "q": "Which library powered the classic 10-foot UI on Android TV before Compose?",
-    "a": [
-      "AndroidX Leanback (BrowseFragment, RowsSupportFragment)",
-      "Material Components for Android with TV-specific themes",
-      "AppCompat with a custom action bar and drawer styling",
-      "ConstraintLayout combined with manual D-pad focus handling"
-    ],
-    "c": 0,
-    "e": "Leanback is the standard for D-pad TV navigation: BrowseSupportFragment, HeadersFragment, Presenter/PresenterSelector. Compose for TV now sits alongside it.",
-    "type": "ecosystem"
-  },
-  {
-    "q": "What is a Tile in Wear OS 3+?",
-    "a": [
-      "A small interactive widget shown on the paired Android phone",
-      "A swipeable summary page next to the watch face, via ProtoLayout",
-      "A push-style notification variant designed for wearable devices",
-      "A long-running background service that polls user health metrics"
-    ],
-    "c": 1,
-    "e": "A Tile is a lightweight pre-rendered screen alongside the watch face. It is implemented through a TileService and declarative ProtoLayout, not the Compose runtime.",
-    "type": "ecosystem"
-  },
-  {
-    "q": "Why use the Health Services API on Wear OS instead of the raw Sensor API?",
-    "a": [
-      "They are essentially the same API exposed under two different package names",
-      "Battery-aware sensor aggregation with passive/active and unified metrics",
-      "Required by Google in order to upload any health data into the cloud backend",
-      "Available only to certified medical-grade watches and approved partner hardware"
-    ],
-    "c": 1,
-    "e": "Health Services abstracts heterogeneous sensors, exposes ExerciseClient/PassiveMonitoringClient and is battery-optimized. Sensor API gives raw data without aggregation.",
-    "type": "ecosystem"
-  },
-  {
-    "q": "Which API reports a foldable's posture (table-top, book, flat)?",
-    "a": [
-      "DisplayManager via display metrics and refresh-rate listener observers",
-      "Jetpack WindowManager: WindowInfoTracker plus FoldingFeature.State",
-      "Configuration.smallestScreenWidthDp checked at runtime on every frame",
-      "ActivityManager process info APIs combined with raw sensor heuristics"
-    ],
-    "c": 1,
-    "e": "WindowInfoTracker.windowLayoutInfo emits Flow<WindowLayoutInfo> with FoldingFeature: state (HALF_OPENED/FLAT), orientation (HORIZONTAL/VERTICAL) and bounds.",
-    "type": "ecosystem"
-  },
-  {
-    "q": "Which mechanism is used to exchange data between a Wear OS watch and the paired phone?",
-    "a": [
-      "A direct raw Bluetooth socket opened by the application itself",
-      "Wearable Data Layer API (DataClient, MessageClient, NodeClient)",
-      "REST round-trips routed through a backend server on the internet",
-      "A wired USB tether between the watch and the paired phone device"
-    ],
-    "c": 1,
-    "e": "Data Layer syncs DataItems (eventually consistent), sends MessageEvents (fire-and-forget) and discovers nodes via NodeClient. It runs over Bluetooth or Wi-Fi.",
-    "type": "ecosystem"
-  },
-  {
-    "q": "What is a Complication in Wear OS?",
-    "a": [
-      "A decorative animation effect rendered on the watch face surface",
-      "A data slot on the watch face fed by ComplicationDataSourceService",
-      "An error state of the watch-and-phone pairing reported to the user",
-      "A visual theme bundle with colors and typography for the watch face"
-    ],
-    "c": 1,
-    "e": "Complications are typed data sources (SHORT_TEXT, RANGED_VALUE, ICON and so on). The watch face declares slots and the user wires any app's source into them.",
-    "type": "ecosystem"
-  },
-  {
-    "q": "What is required to implement a watch face on modern Wear OS 3+?",
-    "a": [
-      "A static PNG resource bundled inside the watch face APK package itself",
-      "WatchFaceService (androidx.wear.watchface) with Renderer and UserStyle",
-      "A standard Activity packaged as the launcher entry of the watch app",
-      "A foreground Service combined with periodic AlarmManager wakeups per minute"
-    ],
-    "c": 1,
-    "e": "The modern API is androidx.wear.watchface: WatchFaceService then WatchFace(Renderer) supporting interactive/ambient modes, complication slots and user style.",
-    "type": "ecosystem"
-  },
-  {
-    "q": "Which API drives content output to both built-in and external displays (multi-display)?",
-    "a": [
-      "DisplayManager + ActivityOptions.setLaunchDisplayId / Presentation API",
-      "WindowManager on its own without any flags or extra configuration here",
-      "MediaRouter alone, intended only for screen casting and audio output routing",
-      "Direct calls into SurfaceFlinger from the application process itself at runtime"
-    ],
-    "c": 0,
-    "e": "DisplayManager enumerates displays; Presentation draws a separate root view on the second screen, and ActivityOptions.setLaunchDisplayId launches an Activity there.",
-    "type": "ecosystem"
+    "e": "suspend marks a suspension point. The compiler turns the function into a state machine; the thread is freed while waiting instead of blocking.",
+    "topic": "coroutines",
+    "type": "concept"
   }
 ]

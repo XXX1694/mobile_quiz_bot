@@ -9,37 +9,36 @@ from aiogram import Bot
 
 TOKEN = os.getenv("BOT_TOKEN")
 CHAT_ID = -1003554574954
-TOPIC_ID = 559
-QUESTIONS_PATH = "questions/android.json"
 STATE_PATH = "state.json"
 
-# Сколько последних тем избегать при выборе следующего вопроса.
-# 4 = в течение дня (5 постов) каждый раз будет новая тема.
+# Сколько последних тем избегать при выборе следующего вопроса в рамках одного стека.
 RECENT_TOPICS_WINDOW = 4
 
-# Префикс poll-вопроса: курс + конкретный модуль/тема.
-# Финальный вид в Telegram: "[Android · Compose] What ...".
-COURSE_PREFIX = "Android"
-
-# Подписи модулей для poll-префикса. Если type не в словаре, имя темы выводится как есть.
-TOPIC_LABELS = {
-    "kotlin_advanced": "Kotlin Advanced",
-    "jvm": "JVM & Memory",
-    "compose": "Compose",
-    "kmp": "KMP",
-    "clean_arch": "Clean Architecture",
-    "solid": "SOLID",
-    "di": "DI",
-    "gradle": "Gradle",
-    "build_variants": "Build Variants",
-    "testing": "Testing",
-    "security": "Security",
-    "ai_ar": "AI & AR",
-    "ecosystem": "Ecosystem",
+# Конфигурация стеков. По одному квизу на каждый стек за запуск = 3 квиза в день.
+#   questions  — путь к банку вопросов
+#   topic_id   — message_thread_id топика в группе (forum). ОБЯЗАТЕЛЬНО проставить реальные ID.
+#   prefix     — подпись в начале poll-вопроса: "[Flutter] ..."
+#   lang       — язык подсветки code-сниппета (dart / swift / kotlin)
+STACKS = {
+    "flutter": {
+        "questions": "questions/flutter.json",
+        "topic_id": None,   # TODO: проставить ID топика Flutter
+        "prefix": "Flutter",
+        "lang": "dart",
+    },
+    "ios": {
+        "questions": "questions/ios.json",
+        "topic_id": None,   # TODO: проставить ID топика iOS
+        "prefix": "iOS",
+        "lang": "swift",
+    },
+    "android": {
+        "questions": "questions/android.json",
+        "topic_id": 559,
+        "prefix": "Android",
+        "lang": "kotlin",
+    },
 }
-
-# Все code-сниппеты — Kotlin (или Gradle DSL — тоже подсветится как kotlin).
-LANG = "kotlin"
 
 
 def qid(question: dict) -> str:
@@ -61,8 +60,8 @@ def save_state(state: dict) -> None:
         f.write("\n")
 
 
-def load_questions() -> list:
-    with open(QUESTIONS_PATH, "r", encoding="utf-8") as f:
+def load_questions(path: str) -> list:
+    with open(path, "r", encoding="utf-8") as f:
         return json.load(f)
 
 
@@ -76,9 +75,9 @@ def pick_question(questions: list, seen: set, avoid_topics: list) -> tuple[dict,
         seen.clear()
         reset = True
 
-    # Пытаемся избежать недавних тем для разнообразия в течение дня.
+    # Пытаемся избежать недавних тем для разнообразия.
     avoid = set(avoid_topics)
-    diverse_pool = [q for q in pool if q.get("type") not in avoid]
+    diverse_pool = [q for q in pool if q.get("topic") not in avoid]
     if diverse_pool:
         pool = diverse_pool
 
@@ -86,54 +85,74 @@ def pick_question(questions: list, seen: set, avoid_topics: list) -> tuple[dict,
     return quiz, qid(quiz), reset
 
 
-async def send_one_quiz() -> None:
-    questions = load_questions()
+async def send_stack_quiz(bot: Bot, stack: str, cfg: dict, state: dict) -> None:
+    topic_id = cfg["topic_id"]
+    if topic_id is None:
+        print(f"[{stack}] topic_id не задан — пропускаю")
+        return
+
+    questions = load_questions(cfg["questions"])
     if not questions:
-        raise SystemExit("questions/android.json пуст")
+        print(f"[{stack}] банк {cfg['questions']} пуст — пропускаю")
+        return
+
+    stack_state = state.setdefault(stack, {})
+    seen = set(stack_state.get("seen", []))
+    recent_topics = list(stack_state.get("recent_topics", []))
+
+    quiz, hash_id, reset = pick_question(
+        questions, seen, recent_topics[-RECENT_TOPICS_WINDOW:]
+    )
+
+    # Обновляем state стека: hash + скользящее окно тем.
+    seen.add(hash_id)
+    recent_topics.append(quiz.get("topic", ""))
+    recent_topics = recent_topics[-RECENT_TOPICS_WINDOW:]
+    stack_state["seen"] = sorted(seen)
+    stack_state["recent_topics"] = recent_topics
+
+    code = quiz.get("code")
+    if code:
+        body = f'<pre><code class="language-{cfg["lang"]}">{html.escape(code)}</code></pre>'
+        await bot.send_message(
+            chat_id=CHAT_ID,
+            message_thread_id=topic_id,
+            text=body,
+            parse_mode="HTML",
+        )
+    await bot.send_poll(
+        chat_id=CHAT_ID,
+        message_thread_id=topic_id,
+        question=f"[{cfg['prefix']}] {quiz['q']}",
+        options=quiz["a"],
+        type="quiz",
+        correct_option_id=quiz["c"],
+        explanation=quiz.get("e", ""),
+        is_anonymous=False,
+    )
+
+    print(f"[{stack}] sent {hash_id}" + (" (cycle reset)" if reset else ""))
+
+
+async def main() -> None:
+    # STACK=flutter постит только один стек; без переменной — все три.
+    only = os.getenv("STACK")
+    stacks = [only] if only else list(STACKS.keys())
 
     state = load_state()
-    seen = set(state.get("seen", []))
-    recent_topics = list(state.get("recent_topics", []))
-
-    quiz, hash_id, reset = pick_question(questions, seen, recent_topics[-RECENT_TOPICS_WINDOW:])
-
-    # Обновляем state: hash + скользящее окно тем.
-    seen.add(hash_id)
-    topic = quiz.get("type", "")
-    recent_topics.append(topic)
-    recent_topics = recent_topics[-RECENT_TOPICS_WINDOW:]
-
-    state["seen"] = sorted(seen)
-    state["recent_topics"] = recent_topics
-    save_state(state)
-
     bot = Bot(token=TOKEN)
     try:
-        code = quiz.get("code")
-        if code:
-            body = f'<pre><code class="language-{LANG}">{html.escape(code)}</code></pre>'
-            await bot.send_message(
-                chat_id=CHAT_ID,
-                message_thread_id=TOPIC_ID,
-                text=body,
-                parse_mode="HTML",
-            )
-        await bot.send_poll(
-            chat_id=CHAT_ID,
-            message_thread_id=TOPIC_ID,
-            question=f"[{COURSE_PREFIX} · {TOPIC_LABELS.get(topic, topic)}] {quiz['q']}",
-            options=quiz["a"],
-            type="quiz",
-            correct_option_id=quiz["c"],
-            explanation=quiz.get("e", ""),
-            is_anonymous=False,
-        )
+        for stack in stacks:
+            cfg = STACKS.get(stack)
+            if not cfg:
+                print(f"неизвестный стек: {stack}")
+                continue
+            await send_stack_quiz(bot, stack, cfg, state)
     finally:
         await bot.session.close()
 
-    if reset:
-        print("cycle complete — seen reset")
+    save_state(state)
 
 
 if __name__ == "__main__":
-    asyncio.run(send_one_quiz())
+    asyncio.run(main())

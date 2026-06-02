@@ -1,0 +1,177 @@
+[
+  {
+    "q": "struct vs class in Swift — the main difference?",
+    "a": ["struct can't have methods, while class supports both methods and stored properties", "class is always faster than struct", "struct is a value type (copied); class is a reference type", "struct doesn't support stored properties"],
+    "c": 2,
+    "e": "struct is copied by value; class is a reference type with ARC and identity (===). Apple recommends struct by default.",
+    "topic": "value_types",
+    "type": "keyword"
+  },
+  {
+    "q": "What causes a retain cycle and how do you break it?",
+    "a": ["A force unwrap on a nil optional; you replace it with a guard let early-exit", "Two objects hold strong references to each other; use weak/unowned", "Global variables; make them private", "Too many structs; switch to class"],
+    "c": 1,
+    "e": "Mutual strong references keep ARC counts above zero, leaking memory. Make one reference weak (optional) or unowned (never nil).",
+    "topic": "memory",
+    "type": "concept"
+  },
+  {
+    "q": "What does this Swift code print?",
+    "a": ["10", "15", "nil", "Compilation error"],
+    "c": 1,
+    "e": "?? has low precedence: 10 + 5 evaluates first to 15, and since x is nil, 15 is printed.",
+    "code": "let x: Int? = nil\nprint(x ?? 10 + 5)",
+    "topic": "optionals",
+    "type": "code-output"
+  },
+  {
+    "q": "What is guard used for in Swift?",
+    "a": ["To protect a stored property from being mutated by other parts of the type", "To catch a thrown error", "To run code on a background thread", "Early exit on a failed condition, unwrapped values stay in scope"],
+    "c": 3,
+    "e": "guard let ... else { return } exits early and reduces nesting. Unlike if let, the unwrapped value stays available after the guard.",
+    "topic": "control_flow",
+    "type": "keyword"
+  },
+  {
+    "q": "You need to update a UILabel after a network call. The right way?",
+    "a": ["Update it directly on the background queue where the URLSession callback fires", "Use DispatchQueue.global().sync", "Refresh it via a Timer every second", "Hop back to main: DispatchQueue.main.async { ... }"],
+    "c": 3,
+    "e": "Any UIKit/SwiftUI update must run on the main thread. URLSession callbacks arrive on a background queue, so dispatch to DispatchQueue.main.",
+    "topic": "concurrency",
+    "type": "concept"
+  },
+  {
+    "q": "What does this Swift code print?",
+    "a": ["0 5", "5 5", "0 0", "5 0"],
+    "c": 0,
+    "e": "struct is a value type. b = a makes a copy, so changing b.x doesn't affect a. It prints 0 5.",
+    "code": "struct P { var x = 0 }\nvar a = P()\nvar b = a\nb.x = 5\nprint(a.x, b.x)",
+    "topic": "value_types",
+    "type": "code-output"
+  },
+  {
+    "q": "What does [weak self] do in a closure?",
+    "a": ["It copies self by value so the closure works on an independent snapshot of it", "It forbids access to self", "It makes self a constant", "It captures self weakly, avoiding a retain cycle"],
+    "c": 3,
+    "e": "The capture list [weak self] doesn't bump the ref count. Inside, self is Optional, often handled with guard let self = self else { return }.",
+    "topic": "closures",
+    "type": "keyword"
+  },
+  {
+    "q": "What is Protocol-Oriented Programming (POP) in Swift?",
+    "a": ["Composing behavior via protocols and their extensions, not class inheritance", "A way to write only classes", "Replacing every struct in the codebase with an equivalent enum-based representation", "A pattern only for UIKit"],
+    "c": 0,
+    "e": "Swift favors protocols with default implementations in extensions. This gives composition and reuse without rigid class hierarchies, and works on struct/enum.",
+    "topic": "protocols",
+    "type": "concept"
+  },
+  {
+    "q": "What does this Swift code print?",
+    "a": ["1 3", "0 0", "3 1", "nil nil"],
+    "c": 0,
+    "e": "first and last return Optionals (in case the array is empty). Here the array is non-empty, so 1 and 3.",
+    "code": "let arr = [1, 2, 3]\nprint(arr.first ?? 0, arr.last ?? 0)",
+    "topic": "optionals",
+    "type": "code-output"
+  },
+  {
+    "q": "Why is a lazy var useful?",
+    "a": ["It is recomputed on every access, caching the latest value for the next read", "It can no longer be changed", "It becomes thread-safe automatically", "It's initialized on first access, not at object creation"],
+    "c": 3,
+    "e": "lazy defers initialization until first use — handy for expensive setup. It is not thread-safe by default.",
+    "topic": "properties",
+    "type": "keyword"
+  },
+  {
+    "q": "Why use an actor in Swift?",
+    "a": ["It automatically creates a thread-safe singleton accessible from anywhere in the app", "It replaces protocols", "It runs UI animations", "It protects its mutable state from data races by serializing access"],
+    "c": 3,
+    "e": "An actor isolates mutable state: access goes through await, eliminating data races. It's a foundation of Swift's structured concurrency.",
+    "topic": "concurrency",
+    "type": "concept"
+  },
+  {
+    "q": "What does this Swift code print?",
+    "a": ["42", "1", "nil", "Error"],
+    "c": 0,
+    "e": "The closure captures the variable n by reference, not its value at creation time. By the call, n is 42.",
+    "code": "var n = 1\nlet f = { print(n) }\nn = 42\nf()",
+    "topic": "closures",
+    "type": "code-output"
+  },
+  {
+    "q": "Why is a delegate property usually declared weak?",
+    "a": ["So the delegate can be called faster without going through the responder chain", "The compiler requires it", "To make the delegate optional", "To avoid a retain cycle between an object and its delegate"],
+    "c": 3,
+    "e": "Often a view controller owns the object, which references it back. weak var delegate breaks that potential cycle.",
+    "topic": "patterns",
+    "type": "pattern"
+  },
+  {
+    "q": "What happens here?",
+    "a": ["a becomes 6 because integers in Swift are mutable value types by default", "Compilation error — let is an immutable constant", "a becomes nil", "A warning, but it compiles"],
+    "c": 1,
+    "e": "let is a constant and can't be reassigned. Use var for a mutable value.",
+    "code": "let a = 5\na = 6",
+    "topic": "control_flow",
+    "type": "code-output"
+  },
+  {
+    "q": "@State vs @Binding in SwiftUI — the difference?",
+    "a": ["@State is the source of truth; @Binding is a reference to someone else's @State", "They are synonyms", "@State is for classes only", "@Binding stores and owns the data, while @State can only read it without mutating"],
+    "c": 0,
+    "e": "@State owns local view state. @Binding doesn't own it but references a parent's @State (via $), letting a child mutate it.",
+    "topic": "swiftui",
+    "type": "concept"
+  },
+  {
+    "q": "Given enum D: CaseIterable { case a, b, c }, what does D.allCases.count print?",
+    "a": ["3", "0", "Error: allCases unavailable", "1"],
+    "c": 0,
+    "e": "Conforming to CaseIterable makes the compiler synthesize allCases with every case, so count is 3. Without it, this would be an error.",
+    "topic": "enums",
+    "type": "code-output"
+  },
+  {
+    "q": "Why mark a struct method as mutating?",
+    "a": ["To allow the method to spawn a background task that mutates shared global state", "To make the method static", "To allow it to modify the value type's own properties (self)", "To forbid inheritance"],
+    "c": 2,
+    "e": "struct/enum methods can't change properties by default since they're value types. mutating lets the method modify self.",
+    "topic": "value_types",
+    "type": "keyword"
+  },
+  {
+    "q": "async/await vs completion handlers — the main win?",
+    "a": ["Linear, readable code with no nested callbacks or forgotten completion calls", "It completely removes the need for Optionals and error handling throughout your code", "No threads are needed at all", "Code runs in parallel automatically"],
+    "c": 0,
+    "e": "async/await removes the pyramid of doom, the compiler enforces every path, and errors throw via try instead of a Result in a callback.",
+    "topic": "concurrency",
+    "type": "concept"
+  },
+  {
+    "q": "What does this print in Swift?",
+    "a": ["4", "5", "3", "Depends on the encoding"],
+    "c": 0,
+    "e": "Swift String counts by extended grapheme clusters: é is one user-perceived character, so count is 4 regardless of internal storage.",
+    "code": "let s = \"Café\"\nprint(s.count)",
+    "topic": "strings",
+    "type": "code-output"
+  },
+  {
+    "q": "What does @escaping mean on a closure parameter?",
+    "a": ["The closure may be stored and called after the function returns", "The closure runs synchronously", "The closure can never be stored anywhere outside of the enclosing function body", "The closure ignores captured self"],
+    "c": 0,
+    "e": "Closures are non-escaping by default (run before return). @escaping is needed when a closure is stored (a property) or called asynchronously later.",
+    "topic": "closures",
+    "type": "keyword"
+  },
+  {
+    "q": "What does this Swift code print?",
+    "a": ["B A", "A B", "B", "A"],
+    "c": 0,
+    "e": "defer postpones its block until the scope exits. B is printed first, then A on exit.",
+    "code": "func test() {\n  defer { print(\"A\") }\n  print(\"B\")\n}\ntest()",
+    "topic": "control_flow",
+    "type": "code-output"
+  }
+]
