@@ -2,29 +2,35 @@
   "android": {
     "recent_topics": [
       "null_safety",
-      "memory"
+      "memory",
+      "sealed"
     ],
     "seen": [
       "81d4aa9a5e",
+      "a28ecf5886",
       "e4763cc092"
     ]
   },
   "flutter": {
     "recent_topics": [
       "state_mgmt",
-      "async"
+      "async",
+      "dart_lang"
     ],
     "seen": [
       "4301644dfe",
+      "569d13a059",
       "66bc1d1af8"
     ]
   },
   "ios": {
     "recent_topics": [
       "control_flow",
-      "protocols"
+      "protocols",
+      "value_types"
     ],
     "seen": [
+      "2be7f8db7f",
       "71dc35e151",
       "846d07f7ee"
     ]
