@@ -3,9 +3,11 @@
     "recent_topics": [
       "null_safety",
       "memory",
-      "sealed"
+      "sealed",
+      "companion"
     ],
     "seen": [
+      "4b8a67963d",
       "81d4aa9a5e",
       "a28ecf5886",
       "e4763cc092"
@@ -15,23 +17,27 @@
     "recent_topics": [
       "state_mgmt",
       "async",
-      "dart_lang"
+      "dart_lang",
+      "perf"
     ],
     "seen": [
       "4301644dfe",
       "569d13a059",
-      "66bc1d1af8"
+      "66bc1d1af8",
+      "df574fda0b"
     ]
   },
   "ios": {
     "recent_topics": [
       "control_flow",
       "protocols",
-      "value_types"
+      "value_types",
+      "strings"
     ],
     "seen": [
       "2be7f8db7f",
       "71dc35e151",
+      "746c1250ec",
       "846d07f7ee"
     ]
   }
