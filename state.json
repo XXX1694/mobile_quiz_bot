@@ -1,14 +1,15 @@
 {
   "android": {
     "recent_topics": [
-      "sealed",
       "companion",
       "coroutines",
-      "flow"
+      "flow",
+      "data_class"
     ],
     "seen": [
       "2f70c2ed4e",
       "4b8a67963d",
+      "6d5eb2fb09",
       "81d4aa9a5e",
       "a28ecf5886",
       "cad285d606",
@@ -17,10 +18,10 @@
   },
   "flutter": {
     "recent_topics": [
-      "dart_lang",
       "perf",
       "lifecycle",
-      "layout"
+      "layout",
+      "async"
     ],
     "seen": [
       "4301644dfe",
@@ -28,18 +29,20 @@
       "66bc1d1af8",
       "8eabd5229c",
       "953feddf0c",
-      "df574fda0b"
+      "df574fda0b",
+      "fe0d49903a"
     ]
   },
   "ios": {
     "recent_topics": [
-      "value_types",
       "strings",
       "memory",
-      "enums"
+      "enums",
+      "swiftui"
     ],
     "seen": [
       "2be7f8db7f",
+      "347fab3b7a",
       "71dc35e151",
       "746c1250ec",
       "7dd2c3a579",
