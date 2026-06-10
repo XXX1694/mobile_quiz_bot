@@ -1,12 +1,13 @@
 {
   "android": {
     "recent_topics": [
-      "coroutines",
       "flow",
       "data_class",
-      "null_safety"
+      "null_safety",
+      "compose"
     ],
     "seen": [
+      "089d07878d",
       "2f70c2ed4e",
       "4b8a67963d",
       "6d5eb2fb09",
@@ -19,16 +20,17 @@
   },
   "flutter": {
     "recent_topics": [
-      "lifecycle",
       "layout",
       "async",
-      "null_safety"
+      "null_safety",
+      "dart_lang"
     ],
     "seen": [
       "4301644dfe",
       "569d13a059",
       "5933759df9",
       "66bc1d1af8",
+      "79b1da94c5",
       "8eabd5229c",
       "953feddf0c",
       "df574fda0b",
@@ -37,12 +39,13 @@
   },
   "ios": {
     "recent_topics": [
-      "memory",
       "enums",
       "swiftui",
-      "optionals"
+      "optionals",
+      "concurrency"
     ],
     "seen": [
+      "119341339d",
       "2be7f8db7f",
       "347fab3b7a",
       "462e183daf",
