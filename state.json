@@ -1,15 +1,16 @@
 {
   "android": {
     "recent_topics": [
-      "null_safety",
       "coroutines",
       "null_safety",
-      "scope_fn"
+      "scope_fn",
+      "coroutines"
     ],
     "seen": [
       "089d07878d",
       "0fee141848",
       "1c4851a41b",
+      "280630d3e8",
       "2f70c2ed4e",
       "3345a44c0e",
       "4b8a67963d",
@@ -34,42 +35,23 @@
     "recent_topics": [
       "dart_lang",
       "dart_lang",
-      "dart_lang",
-      "null_safety"
+      "null_safety",
+      "async"
     ],
     "seen": [
-      "5933759df9"
+      "5933759df9",
+      "fe0d49903a"
     ]
   },
   "ios": {
     "recent_topics": [
-      "control_flow",
       "value_types",
       "closures",
-      "concurrency"
+      "concurrency",
+      "patterns"
     ],
     "seen": [
-      "119341339d",
-      "2b3a4ad58d",
-      "2be7f8db7f",
-      "2c52938312",
-      "347fab3b7a",
-      "3708454aac",
-      "462e183daf",
-      "4d128665f9",
-      "644106f821",
-      "71dc35e151",
-      "746c1250ec",
-      "7dd2c3a579",
-      "846d07f7ee",
-      "9771c0350c",
-      "9b57644a75",
-      "9e37d8931a",
-      "9e8f00f2c9",
-      "b169c25627",
-      "c6817f6eca",
-      "edc7ad23e0",
-      "ee1d287ee4"
+      "9e8f00f2c9"
     ]
   }
 }
