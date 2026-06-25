@@ -1,36 +1,39 @@
 {
   "android": {
     "recent_topics": [
-      "null_safety",
       "scope_fn",
       "coroutines",
-      "sealed"
+      "sealed",
+      "inline"
     ],
     "seen": [
+      "9d37bca6f5",
       "a28ecf5886"
     ]
   },
   "flutter": {
     "recent_topics": [
-      "dart_lang",
       "null_safety",
       "async",
-      "perf"
+      "perf",
+      "lifecycle"
     ],
     "seen": [
       "5933759df9",
       "c7fc583069",
+      "e40df1d404",
       "fe0d49903a"
     ]
   },
   "ios": {
     "recent_topics": [
-      "closures",
       "concurrency",
       "patterns",
-      "control_flow"
+      "control_flow",
+      "optionals"
     ],
     "seen": [
+      "462e183daf",
       "644106f821",
       "9e8f00f2c9"
     ]
