@@ -1,10 +1,10 @@
 {
   "android": {
     "recent_topics": [
-      "smart_cast",
       "architecture",
       "scope_fn",
-      "coroutines"
+      "coroutines",
+      "null_safety"
     ],
     "seen": [
       "089d07878d",
@@ -12,16 +12,17 @@
       "98e0a1bebe",
       "9d37bca6f5",
       "a28ecf5886",
+      "ca0106a9be",
       "d2105c2986",
       "d38f45a942"
     ]
   },
   "flutter": {
     "recent_topics": [
-      "widgets",
       "async",
       "state_mgmt",
-      "layout"
+      "layout",
+      "dart_lang"
     ],
     "seen": [
       "4301644dfe",
@@ -31,22 +32,24 @@
       "8eabd5229c",
       "96e6851719",
       "c7fc583069",
+      "e145a034dc",
       "e40df1d404",
       "fe0d49903a"
     ]
   },
   "ios": {
     "recent_topics": [
-      "closures",
       "strings",
       "concurrency",
-      "enums"
+      "enums",
+      "memory"
     ],
     "seen": [
       "2b3a4ad58d",
       "462e183daf",
       "644106f821",
       "746c1250ec",
+      "7dd2c3a579",
       "9771c0350c",
       "9e8f00f2c9",
       "b169c25627",
