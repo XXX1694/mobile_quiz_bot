@@ -3,7 +3,7 @@ name: Send Daily Quiz
 on:
   schedule:
     # Время в UTC (Алматы = UTC+5). Один запуск постит по 1 квизу на стек
-    # (Flutter / iOS / Android) = 3 квиза в день. Тему внутри стека выбирает бот.
+    # (iOS / Android / Mobile) = 3 квиза в день. Показанные уходят в used_questions.json.
     # 10:13 Алматы (05:13 UTC)
     - cron: '13 5 * * *'
   workflow_dispatch: # Кнопка для ручного запуска
@@ -38,7 +38,7 @@ jobs:
         run: |
           git config user.name "quiz-bot"
           git config user.email "quiz-bot@users.noreply.github.com"
-          git add state.json
+          git add used_questions.json
           if git diff --cached --quiet; then
             echo "No state change to commit."
           else

@@ -4,28 +4,20 @@ import html
 import json
 import os
 import random
+from datetime import datetime, timezone
 
 from aiogram import Bot
 
 TOKEN = os.getenv("BOT_TOKEN")
 CHAT_ID = -1003554574954
-STATE_PATH = "state.json"
+USED_PATH = "used_questions.json"
 
 # Сколько последних тем избегать при выборе следующего вопроса в рамках одного стека.
 RECENT_TOPICS_WINDOW = 4
 
-# Конфигурация стеков. По одному квизу на каждый стек за запуск = 3 квиза в день.
-#   questions  — путь к банку вопросов
-#   topic_id   — message_thread_id топика в группе (forum). ОБЯЗАТЕЛЬНО проставить реальные ID.
-#   prefix     — подпись в начале poll-вопроса: "[Flutter] ..."
-#   lang       — язык подсветки code-сниппета (dart / swift / kotlin)
+# По одному квизу на каждый стек за запуск. Показанные вопросы уходят в used_questions.json
+# и больше не повторяются, пока не добавишь новые в банк.
 STACKS = {
-    "flutter": {
-        "questions": "questions/flutter.json",
-        "topic_id": 559,
-        "prefix": "Flutter",
-        "lang": "dart",
-    },
     "ios": {
         "questions": "questions/ios.json",
         "topic_id": 559,
@@ -38,6 +30,12 @@ STACKS = {
         "prefix": "Android",
         "lang": "kotlin",
     },
+    "general": {
+        "questions": "questions/general.json",
+        "topic_id": 559,
+        "prefix": "Mobile",
+        "lang": "kotlin",
+    },
 }
 
 
@@ -46,17 +44,23 @@ def qid(question: dict) -> str:
     return hashlib.md5(src.encode("utf-8")).hexdigest()[:10]
 
 
-def load_state() -> dict:
+def load_used() -> dict:
     try:
-        with open(STATE_PATH, "r", encoding="utf-8") as f:
-            return json.load(f)
+        with open(USED_PATH, "r", encoding="utf-8") as f:
+            data = json.load(f)
     except FileNotFoundError:
-        return {}
+        data = {}
+
+    data.setdefault("recent_topics", {})
+    for stack in STACKS:
+        data.setdefault(stack, [])
+        data["recent_topics"].setdefault(stack, [])
+    return data
 
 
-def save_state(state: dict) -> None:
-    with open(STATE_PATH, "w", encoding="utf-8") as f:
-        json.dump(state, f, ensure_ascii=False, indent=2, sort_keys=True)
+def save_used(data: dict) -> None:
+    with open(USED_PATH, "w", encoding="utf-8") as f:
+        json.dump(data, f, ensure_ascii=False, indent=2, sort_keys=True)
         f.write("\n")
 
 
@@ -65,27 +69,36 @@ def load_questions(path: str) -> list:
         return json.load(f)
 
 
-def pick_question(questions: list, seen: set, avoid_topics: list) -> tuple[dict, str, bool]:
-    # Сначала отсеиваем уже виденные.
-    pool = [q for q in questions if qid(q) not in seen]
-    reset = False
-    if not pool:
-        # Полный цикл пройден — обнуляем seen и стартуем заново.
-        pool = list(questions)
-        seen.clear()
-        reset = True
+def used_hashes(used: dict, stack: str) -> set:
+    return {entry["hash"] for entry in used.get(stack, []) if "hash" in entry}
 
-    # Пытаемся избежать недавних тем для разнообразия.
+
+def pick_question(
+    questions: list, seen: set, avoid_topics: list
+) -> tuple[dict, str] | tuple[None, None]:
+    pool = [q for q in questions if qid(q) not in seen]
+    if not pool:
+        return None, None
+
     avoid = set(avoid_topics)
     diverse_pool = [q for q in pool if q.get("topic") not in avoid]
     if diverse_pool:
         pool = diverse_pool
 
     quiz = random.choice(pool)
-    return quiz, qid(quiz), reset
+    return quiz, qid(quiz)
 
 
-async def send_stack_quiz(bot: Bot, stack: str, cfg: dict, state: dict) -> None:
+def archive_question(used: dict, stack: str, quiz: dict, hash_id: str) -> None:
+    entry = {
+        "hash": hash_id,
+        "posted_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+        **quiz,
+    }
+    used.setdefault(stack, []).append(entry)
+
+
+async def send_stack_quiz(bot: Bot, stack: str, cfg: dict, used: dict) -> None:
     topic_id = cfg["topic_id"]
     if topic_id is None:
         print(f"[{stack}] topic_id не задан — пропускаю")
@@ -96,20 +109,21 @@ async def send_stack_quiz(bot: Bot, stack: str, cfg: dict, state: dict) -> None:
         print(f"[{stack}] банк {cfg['questions']} пуст — пропускаю")
         return
 
-    stack_state = state.setdefault(stack, {})
-    seen = set(stack_state.get("seen", []))
-    recent_topics = list(stack_state.get("recent_topics", []))
+    seen = used_hashes(used, stack)
+    recent_topics = list(used["recent_topics"].get(stack, []))
 
-    quiz, hash_id, reset = pick_question(
-        questions, seen, recent_topics[-RECENT_TOPICS_WINDOW:]
-    )
+    quiz, hash_id = pick_question(questions, seen, recent_topics[-RECENT_TOPICS_WINDOW:])
+    if quiz is None:
+        remaining = len(questions) - len(seen)
+        print(
+            f"[{stack}] все {len(questions)} вопросов уже показаны "
+            f"(в архиве: {len(seen)}) — добавь новые в {cfg['questions']}"
+        )
+        return
 
-    # Обновляем state стека: hash + скользящее окно тем.
-    seen.add(hash_id)
+    archive_question(used, stack, quiz, hash_id)
     recent_topics.append(quiz.get("topic", ""))
-    recent_topics = recent_topics[-RECENT_TOPICS_WINDOW:]
-    stack_state["seen"] = sorted(seen)
-    stack_state["recent_topics"] = recent_topics
+    used["recent_topics"][stack] = recent_topics[-RECENT_TOPICS_WINDOW:]
 
     code = quiz.get("code")
     if code:
@@ -131,15 +145,16 @@ async def send_stack_quiz(bot: Bot, stack: str, cfg: dict, state: dict) -> None:
         is_anonymous=False,
     )
 
-    print(f"[{stack}] sent {hash_id}" + (" (cycle reset)" if reset else ""))
+    left = len(questions) - len(used_hashes(used, stack))
+    print(f"[{stack}] sent {hash_id} (осталось новых: {left})")
 
 
 async def main() -> None:
-    # STACK=flutter постит только один стек; без переменной — все три.
+    # STACK=ios постит только один стек; без переменной — все.
     only = os.getenv("STACK")
     stacks = [only] if only else list(STACKS.keys())
 
-    state = load_state()
+    used = load_used()
     bot = Bot(token=TOKEN)
     try:
         for stack in stacks:
@@ -147,11 +162,11 @@ async def main() -> None:
             if not cfg:
                 print(f"неизвестный стек: {stack}")
                 continue
-            await send_stack_quiz(bot, stack, cfg, state)
+            await send_stack_quiz(bot, stack, cfg, used)
     finally:
         await bot.session.close()
 
-    save_state(state)
+    save_used(used)
 
 
 if __name__ == "__main__":

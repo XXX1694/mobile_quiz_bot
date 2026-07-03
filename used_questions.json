@@ -1,0 +1,181 @@
+{
+  "questions": [
+    {
+      "a": [
+        "42",
+        "1",
+        "nil",
+        "Error"
+      ],
+      "c": 0,
+      "code": "var n = 1\nlet f = { print(n) }\nn = 42\nf()",
+      "e": "The closure captures the variable n by reference, not its value at creation time. By the call, n is 42.",
+      "hash": "2b3a4ad58d",
+      "posted_at": null,
+      "q": "What does this Swift code print?",
+      "topic": "closures",
+      "type": "code-output"
+    },
+    {
+      "a": [
+        "@State is the source of truth; @Binding is a reference to someone else's @State",
+        "They are synonyms",
+        "@State is for classes only",
+        "@Binding stores and owns the data, while @State can only read it without mutating"
+      ],
+      "c": 0,
+      "e": "@State owns local view state. @Binding doesn't own it but references a parent's @State (via $), letting a child mutate it.",
+      "hash": "347fab3b7a",
+      "posted_at": null,
+      "q": "@State vs @Binding in SwiftUI — the difference?",
+      "topic": "swiftui",
+      "type": "concept"
+    },
+    {
+      "a": [
+        "10",
+        "15",
+        "nil",
+        "Compilation error"
+      ],
+      "c": 1,
+      "code": "let x: Int? = nil\nprint(x ?? 10 + 5)",
+      "e": "?? has low precedence: 10 + 5 evaluates first to 15, and since x is nil, 15 is printed.",
+      "hash": "462e183daf",
+      "posted_at": null,
+      "q": "What does this Swift code print?",
+      "topic": "optionals",
+      "type": "code-output"
+    },
+    {
+      "a": [
+        "a becomes 6 because integers in Swift are mutable value types by default",
+        "Compilation error — let is an immutable constant",
+        "a becomes nil",
+        "A warning, but it compiles"
+      ],
+      "c": 1,
+      "code": "let a = 5\na = 6",
+      "e": "let is a constant and can't be reassigned. Use var for a mutable value.",
+      "hash": "644106f821",
+      "posted_at": null,
+      "q": "What happens here?",
+      "topic": "control_flow",
+      "type": "code-output"
+    },
+    {
+      "a": [
+        "B A",
+        "A B",
+        "B",
+        "A"
+      ],
+      "c": 0,
+      "code": "func test() {\n  defer { print(\"A\") }\n  print(\"B\")\n}\ntest()",
+      "e": "defer postpones its block until the scope exits. B is printed first, then A on exit.",
+      "hash": "71dc35e151",
+      "posted_at": null,
+      "q": "What does this Swift code print?",
+      "topic": "control_flow",
+      "type": "code-output"
+    },
+    {
+      "a": [
+        "4",
+        "5",
+        "3",
+        "Depends on the encoding"
+      ],
+      "c": 0,
+      "code": "let s = \"Café\"\nprint(s.count)",
+      "e": "Swift String counts by extended grapheme clusters: é is one user-perceived character, so count is 4 regardless of internal storage.",
+      "hash": "746c1250ec",
+      "posted_at": null,
+      "q": "What does this print in Swift?",
+      "topic": "strings",
+      "type": "code-output"
+    },
+    {
+      "a": [
+        "A force unwrap on a nil optional; you replace it with a guard let early-exit",
+        "Two objects hold strong references to each other; use weak/unowned",
+        "Global variables; make them private",
+        "Too many structs; switch to class"
+      ],
+      "c": 1,
+      "e": "Mutual strong references keep ARC counts above zero, leaking memory. Make one reference weak (optional) or unowned (never nil).",
+      "hash": "7dd2c3a579",
+      "posted_at": null,
+      "q": "What causes a retain cycle and how do you break it?",
+      "topic": "memory",
+      "type": "concept"
+    },
+    {
+      "a": [
+        "3",
+        "0",
+        "Error: allCases unavailable",
+        "1"
+      ],
+      "c": 0,
+      "e": "Conforming to CaseIterable makes the compiler synthesize allCases with every case, so count is 3. Without it, this would be an error.",
+      "hash": "9771c0350c",
+      "posted_at": null,
+      "q": "Given enum D: CaseIterable { case a, b, c }, what does D.allCases.count print?",
+      "topic": "enums",
+      "type": "code-output"
+    },
+    {
+      "a": [
+        "So the delegate can be called faster without going through the responder chain",
+        "The compiler requires it",
+        "To make the delegate optional",
+        "To avoid a retain cycle between an object and its delegate"
+      ],
+      "c": 3,
+      "e": "Often a view controller owns the object, which references it back. weak var delegate breaks that potential cycle.",
+      "hash": "9e8f00f2c9",
+      "posted_at": null,
+      "q": "Why is a delegate property usually declared weak?",
+      "topic": "patterns",
+      "type": "pattern"
+    },
+    {
+      "a": [
+        "Linear, readable code with no nested callbacks or forgotten completion calls",
+        "It completely removes the need for Optionals and error handling throughout your code",
+        "No threads are needed at all",
+        "Code runs in parallel automatically"
+      ],
+      "c": 0,
+      "e": "async/await removes the pyramid of doom, the compiler enforces every path, and errors throw via try instead of a Result in a callback.",
+      "hash": "b169c25627",
+      "posted_at": null,
+      "q": "async/await vs completion handlers — the main win?",
+      "topic": "concurrency",
+      "type": "concept"
+    },
+    {
+      "a": [
+        "0 5",
+        "5 5",
+        "0 0",
+        "5 0"
+      ],
+      "c": 0,
+      "code": "struct P { var x = 0 }\nvar a = P()\nvar b = a\nb.x = 5\nprint(a.x, b.x)",
+      "e": "struct is a value type. b = a makes a copy, so changing b.x doesn't affect a. It prints 0 5.",
+      "hash": "edc7ad23e0",
+      "posted_at": null,
+      "q": "What does this Swift code print?",
+      "topic": "value_types",
+      "type": "code-output"
+    }
+  ],
+  "recent_topics": [
+    "enums",
+    "memory",
+    "swiftui",
+    "control_flow"
+  ]
+}

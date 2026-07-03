@@ -1,7 +1,12 @@
 [
   {
     "q": "What does the Elvis operator ?: do in Kotlin?",
-    "a": ["It safely calls a method on a nullable receiver and returns null if it was nil", "It throws an exception on null", "It returns the left operand if non-null, else the right one", "It compares two values for equality"],
+    "a": [
+      "It safely calls a method on a nullable receiver and returns null if it was nil",
+      "It throws an exception on null",
+      "It returns the left operand if non-null, else the right one",
+      "It compares two values for equality"
+    ],
     "c": 2,
     "e": "val name = input ?: \"default\" — if input is null, \"default\" is used. Handy for defaults and early returns.",
     "topic": "null_safety",
@@ -9,7 +14,12 @@
   },
   {
     "q": "What does this Kotlin code print?",
-    "a": ["3", "[1, 2, 3]", "1", "Error"],
+    "a": [
+      "3",
+      "[1, 2, 3]",
+      "1",
+      "Error"
+    ],
     "c": 0,
     "e": "let passes the receiver as it and returns the lambda result. Here it.size is 3.",
     "code": "val x = listOf(1, 2, 3).let { it.size }\nprintln(x)",
@@ -18,7 +28,12 @@
   },
   {
     "q": "launch vs async in coroutines — the difference?",
-    "a": ["launch is fully synchronous and blocks, while async runs the work on a new thread", "launch returns a Job; async returns a Deferred result you await", "async can't be cancelled", "There is no difference"],
+    "a": [
+      "launch is fully synchronous and blocks, while async runs the work on a new thread",
+      "launch returns a Job; async returns a Deferred result you await",
+      "async can't be cancelled",
+      "There is no difference"
+    ],
     "c": 1,
     "e": "launch is for work without a return value (fire-and-forget). async starts a computation whose result you get via .await() — great for parallel requests.",
     "topic": "coroutines",
@@ -26,7 +41,12 @@
   },
   {
     "q": "What happens here?",
-    "a": ["a is reassigned to 6 because Kotlin silently promotes val to var on a second write", "Compilation error — val is read-only", "a becomes null", "A warning, but it compiles"],
+    "a": [
+      "a is reassigned to 6 because Kotlin silently promotes val to var on a second write",
+      "Compilation error — val is read-only",
+      "a becomes null",
+      "A warning, but it compiles"
+    ],
     "c": 1,
     "e": "val is a read-only reference and can't be reassigned. Use var for a mutable variable.",
     "code": "val a = 5\na = 6",
@@ -35,7 +55,12 @@
   },
   {
     "q": "Why is data lost on screen rotation, and how do you keep it?",
-    "a": ["The OS clears the heap on rotation, so you must serialize everything to disk first", "The Activity is recreated; use a ViewModel or onSaveInstanceState", "It's a bug; wrap it in try/catch", "Disable rotation permanently"],
+    "a": [
+      "The OS clears the heap on rotation, so you must serialize everything to disk first",
+      "The Activity is recreated; use a ViewModel or onSaveInstanceState",
+      "It's a bug; wrap it in try/catch",
+      "Disable rotation permanently"
+    ],
     "c": 1,
     "e": "Rotation is a config change → Activity destroy/recreate. A ViewModel survives recreation; use onSaveInstanceState (Bundle) for small data.",
     "topic": "lifecycle",
@@ -43,7 +68,12 @@
   },
   {
     "q": "What does this Kotlin code print?",
-    "a": ["true", "false", "Error", "null"],
+    "a": [
+      "true",
+      "false",
+      "Error",
+      "null"
+    ],
     "c": 0,
     "e": "A data class auto-generates equals()/hashCode() from its properties. Two P(1) are value-equal → true (unlike a regular class).",
     "code": "data class P(val x: Int)\nprintln(P(1) == P(1))",
@@ -52,7 +82,12 @@
   },
   {
     "q": "What is lateinit var for?",
-    "a": ["To schedule a property's initializer to run on a background dispatcher later", "To make a property nullable", "To declare a non-null property and assign it later (e.g. in onCreate)", "To create a lazy property"],
+    "a": [
+      "To schedule a property's initializer to run on a background dispatcher later",
+      "To make a property nullable",
+      "To declare a non-null property and assign it later (e.g. in onCreate)",
+      "To create a lazy property"
+    ],
     "c": 2,
     "e": "lateinit defers init of a non-null var. Accessing it before assignment throws UninitializedPropertyAccessException. Not for primitives or val.",
     "topic": "null_safety",
@@ -60,7 +95,12 @@
   },
   {
     "q": "Why use viewModelScope for coroutines in a ViewModel?",
-    "a": ["It pins every coroutine to the main thread and caches their results between rotations", "They are auto-cancelled when the ViewModel is cleared — no leaks", "It makes coroutines faster", "It retries failed coroutines automatically"],
+    "a": [
+      "It pins every coroutine to the main thread and caches their results between rotations",
+      "They are auto-cancelled when the ViewModel is cleared — no leaks",
+      "It makes coroutines faster",
+      "It retries failed coroutines automatically"
+    ],
     "c": 1,
     "e": "viewModelScope is tied to the ViewModel lifecycle: on onCleared() all its coroutines are cancelled, preventing leaks and wasted work.",
     "topic": "coroutines",
@@ -68,7 +108,12 @@
   },
   {
     "q": "What does this Kotlin code print?",
-    "a": ["2", "hi", "Error: cast needed", "null"],
+    "a": [
+      "2",
+      "hi",
+      "Error: cast needed",
+      "null"
+    ],
     "c": 0,
     "e": "Smart cast: after the is String check the compiler casts s to String, so s.length is available directly → 2.",
     "code": "val s: Any = \"hi\"\nif (s is String) println(s.length)",
@@ -77,7 +122,12 @@
   },
   {
     "q": "Where is a sealed class especially useful?",
-    "a": ["For closed state hierarchies (Loading/Success/Error) with an exhaustive when", "To create singletons", "To replace interfaces", "Only for defining a fixed set of enum-like integer constants shared across modules"],
+    "a": [
+      "For closed state hierarchies (Loading/Success/Error) with an exhaustive when",
+      "To create singletons",
+      "To replace interfaces",
+      "Only for defining a fixed set of enum-like integer constants shared across modules"
+    ],
     "c": 0,
     "e": "sealed restricts subclasses to one module. A when over a sealed type is checked for completeness — add a state, forget to handle it, get an error.",
     "topic": "sealed",
@@ -85,7 +135,12 @@
   },
   {
     "q": "StateFlow vs a plain Flow — the difference?",
-    "a": ["A plain Flow holds the latest value while StateFlow re-runs its block per collector", "StateFlow is hot, holds a current value, and replays it to new collectors", "StateFlow can't be collected", "StateFlow only works in the background"],
+    "a": [
+      "A plain Flow holds the latest value while StateFlow re-runs its block per collector",
+      "StateFlow is hot, holds a current value, and replays it to new collectors",
+      "StateFlow can't be collected",
+      "StateFlow only works in the background"
+    ],
     "c": 1,
     "e": "A plain Flow is cold (restarts per collector). StateFlow is hot, has .value, and emits the latest value to new subscribers — like LiveData.",
     "topic": "flow",
@@ -93,7 +148,12 @@
   },
   {
     "q": "What happens here?",
-    "a": ["NullPointerException at runtime", "It prints 0", "It prints null", "Compilation error: the !! operator requires a non-null receiver type"],
+    "a": [
+      "NullPointerException at runtime",
+      "It prints 0",
+      "It prints null",
+      "Compilation error: the !! operator requires a non-null receiver type"
+    ],
     "c": 0,
     "e": "The !! operator forces non-null. If the value is null it throws NPE. Use it only when you're certain it's not null.",
     "code": "val s: String? = null\nprintln(s!!.length)",
@@ -102,7 +162,12 @@
   },
   {
     "q": "What is the ViewModel responsible for in MVVM?",
-    "a": ["Directly drawing UI widgets and handling their click and touch listeners itself", "Holding UI state without referencing the View, surviving its recreation", "Managing files on disk", "Running database migrations"],
+    "a": [
+      "Directly drawing UI widgets and handling their click and touch listeners itself",
+      "Holding UI state without referencing the View, surviving its recreation",
+      "Managing files on disk",
+      "Running database migrations"
+    ],
     "c": 1,
     "e": "The ViewModel holds UI state and presentation logic and exposes it via LiveData/StateFlow. It keeps no View reference — hence testability and rotation survival.",
     "topic": "architecture",
@@ -110,7 +175,12 @@
   },
   {
     "q": "A suspend Retrofit call — which dispatcher should you run it on?",
-    "a": ["Always wrap it manually in withContext(Dispatchers.IO) or it will block the UI", "Retrofit moves off the main thread itself; calling from Main is fine", "Only Dispatchers.Default", "Only a new Thread"],
+    "a": [
+      "Always wrap it manually in withContext(Dispatchers.IO) or it will block the UI",
+      "Retrofit moves off the main thread itself; calling from Main is fine",
+      "Only Dispatchers.Default",
+      "Only a new Thread"
+    ],
     "c": 1,
     "e": "Modern Retrofit with suspend functions does IO in the background (enqueue). So calling it from viewModelScope (Main) is safe, no manual withContext(IO).",
     "topic": "coroutines",
@@ -118,7 +188,12 @@
   },
   {
     "q": "apply vs also — the difference?",
-    "a": ["apply: receiver this, returns object; also: receiver it, returns object", "They are identical", "apply returns Unit", "also returns the lambda's result while apply returns the receiver object itself"],
+    "a": [
+      "apply: receiver this, returns object; also: receiver it, returns object",
+      "They are identical",
+      "apply returns Unit",
+      "also returns the lambda's result while apply returns the receiver object itself"
+    ],
     "c": 0,
     "e": "Both return the object itself. apply suits configuration (this.field = ...), also suits side effects with it (logging, validation).",
     "topic": "scope_fn",
@@ -126,7 +201,12 @@
   },
   {
     "q": "Classic cause of a memory leak on Android?",
-    "a": ["Declaring too many data classes, since each generates equals, hashCode and copy", "A long-lived object holding an Activity Context (static, singleton, stray thread)", "Using val instead of var", "Launching many coroutines in viewModelScope without ever cancelling the parent job"],
+    "a": [
+      "Declaring too many data classes, since each generates equals, hashCode and copy",
+      "A long-lived object holding an Activity Context (static, singleton, stray thread)",
+      "Using val instead of var",
+      "Launching many coroutines in viewModelScope without ever cancelling the parent job"
+    ],
     "c": 1,
     "e": "If a singleton/static/anonymous thread holds an Activity Context, GC can't collect it after destruction. Use applicationContext or weak references.",
     "topic": "memory",
@@ -134,7 +214,12 @@
   },
   {
     "q": "What does this Kotlin code print?",
-    "a": ["[20, 40]", "[2, 4]", "[10, 20, 30, 40]", "[20, 40, 60]"],
+    "a": [
+      "[20, 40]",
+      "[2, 4]",
+      "[10, 20, 30, 40]",
+      "[20, 40, 60]"
+    ],
     "c": 0,
     "e": "filter keeps evens [2, 4], then map multiplies by 10 → [20, 40].",
     "code": "val r = listOf(1, 2, 3, 4).filter { it % 2 == 0 }.map { it * 10 }\nprintln(r)",
@@ -143,7 +228,12 @@
   },
   {
     "q": "Why mark a function inline?",
-    "a": ["The compiler caches its return value so repeated calls with same args are skipped", "Its body and lambdas are inlined at the call site, avoiding lambda overhead", "To make it private", "To run it asynchronously"],
+    "a": [
+      "The compiler caches its return value so repeated calls with same args are skipped",
+      "Its body and lambdas are inlined at the call site, avoiding lambda overhead",
+      "To make it private",
+      "To run it asynchronously"
+    ],
     "c": 1,
     "e": "inline on a higher-order function avoids allocating Function objects and enables non-local return and reified types. Overuse bloats bytecode.",
     "topic": "inline",
@@ -151,7 +241,12 @@
   },
   {
     "q": "What is recomposition in Jetpack Compose?",
-    "a": ["Re-invoking Composable functions when observed state changes, to update the UI", "Rebuilding and recompiling the whole project whenever any Composable state changes", "Clearing memory", "Restarting the entire app"],
+    "a": [
+      "Re-invoking Composable functions when observed state changes, to update the UI",
+      "Rebuilding and recompiling the whole project whenever any Composable state changes",
+      "Clearing memory",
+      "Restarting the entire app"
+    ],
     "c": 0,
     "e": "Compose is declarative: when state (e.g. MutableState) changes, the affected Composables are re-invoked, updating only the necessary UI parts.",
     "topic": "compose",
@@ -159,7 +254,12 @@
   },
   {
     "q": "SupervisorJob vs a regular Job — the point?",
-    "a": ["One child failing doesn't cancel its siblings or the parent scope", "With it, cancelling any child cancels all the others in the same scope", "It makes coroutines synchronous", "It forbids cancellation"],
+    "a": [
+      "One child failing doesn't cancel its siblings or the parent scope",
+      "With it, cancelling any child cancels all the others in the same scope",
+      "It makes coroutines synchronous",
+      "It forbids cancellation"
+    ],
     "c": 0,
     "e": "With a regular Job a child's failure cancels the parent and siblings. SupervisorJob isolates failures — other coroutines keep running. Good for independent tasks.",
     "topic": "coroutines",
@@ -167,7 +267,12 @@
   },
   {
     "q": "What is a companion object in Kotlin?",
-    "a": ["An object bound to a class giving member access without an instance (static-like)", "A nested class that holds per-instance mutable state for its outer class", "A default interface", "A special declaration used to create and launch a new coroutine scoped to the class"],
+    "a": [
+      "An object bound to a class giving member access without an instance (static-like)",
+      "A nested class that holds per-instance mutable state for its outer class",
+      "A default interface",
+      "A special declaration used to create and launch a new coroutine scoped to the class"
+    ],
     "c": 0,
     "e": "Kotlin has no static. A companion object inside a class holds class-level members (factories, constants), accessed as ClassName.member.",
     "topic": "companion",
@@ -175,10 +280,214 @@
   },
   {
     "q": "What's special about a suspend function?",
-    "a": ["It can pause without blocking the thread and resume later", "It always starts a brand new thread for every call you make to it", "It can't return a value", "It blocks the thread until done"],
+    "a": [
+      "It can pause without blocking the thread and resume later",
+      "It always starts a brand new thread for every call you make to it",
+      "It can't return a value",
+      "It blocks the thread until done"
+    ],
     "c": 0,
     "e": "suspend marks a suspension point. The compiler turns the function into a state machine; the thread is freed while waiting instead of blocking.",
     "topic": "coroutines",
     "type": "concept"
+  },
+  {
+    "q": "What does by lazy do on a Kotlin property?",
+    "a": [
+      "Initializes on first access; thread-safe by default for val",
+      "Runs at class load time — incorrect in typical mobile interview context",
+      "Makes the property nullable",
+      "Copies the value on every read"
+    ],
+    "c": 0,
+    "e": "lazy { expensive() } defers init until first read. Default LazyThreadSafetyMode.SYNCHRONIZED is thread-safe for val delegates.",
+    "topic": "properties",
+    "type": "keyword"
+  },
+  {
+    "q": "What does this Kotlin code print?",
+    "a": [
+      "abc",
+      "ABC",
+      "Error",
+      "null"
+    ],
+    "c": 0,
+    "e": "takeIf returns the receiver if the predicate is true, else null. \"abc\".takeIf { it.length > 2 } is still \"abc\".",
+    "code": "println(\"abc\".takeIf { it.length > 2 })",
+    "topic": "scope_fn",
+    "type": "code-output"
+  },
+  {
+    "q": "Room @Transaction — why use it?",
+    "a": [
+      "Group multiple DAO operations atomically in one DB transaction",
+      "Speed up network calls — incorrect in typical mobile interview context",
+      "Replace migrations",
+      "Make queries run on main thread"
+    ],
+    "c": 0,
+    "e": "@Transaction ensures all queries in the method succeed or roll back together — critical for consistent local data updates.",
+    "topic": "room",
+    "type": "concept"
+  },
+  {
+    "q": "Hilt @Singleton vs @ActivityRetainedScoped?",
+    "a": [
+      "Singleton lives for app process; ActivityRetained survives config change via ViewModel",
+      "They are identical scopes and always share the same instance lifetime in Hilt and ViewModels",
+      "Singleton is per-Activity",
+      "ActivityRetained is global static"
+    ],
+    "c": 0,
+    "e": "App-wide deps use @Singleton. @ActivityRetainedScoped ties to the retained component — survives rotation like a ViewModel.",
+    "topic": "di",
+    "type": "concept"
+  },
+  {
+    "q": "What does this Kotlin code print?",
+    "a": [
+      "[2, 3]",
+      "[1, 2, 3]",
+      "[3]",
+      "Error"
+    ],
+    "c": 0,
+    "e": "drop(1) skips the first element → [2, 3]. take/drop are cheap views on lists.",
+    "code": "println(listOf(1, 2, 3).drop(1))",
+    "topic": "collections",
+    "type": "code-output"
+  },
+  {
+    "q": "WorkManager vs a raw coroutine for background work?",
+    "a": [
+      "WorkManager persists and reschedules work with system constraints and Doze awareness",
+      "Coroutines always survive process death — incorrect in typical mobile interview context",
+      "WorkManager runs only on main thread",
+      "No difference"
+    ],
+    "c": 0,
+    "e": "WorkManager is for deferrable, guaranteed background work (sync, upload). Coroutines die with the process unless persisted elsewhere.",
+    "topic": "background",
+    "type": "concept"
+  },
+  {
+    "q": "What is a Flow cold stream?",
+    "a": [
+      "Code runs fresh for each collector; no emission until collected",
+      "Always emits cached values to new collectors (typical misconception)",
+      "Runs on main thread only",
+      "Cannot use operators"
+    ],
+    "c": 0,
+    "e": "A cold Flow (e.g. flow { emit(load()) }) restarts collection per subscriber. StateFlow/SharedFlow are hot.",
+    "topic": "flow",
+    "type": "keyword"
+  },
+  {
+    "q": "Why use Baseline Profiles on Android?",
+    "a": [
+      "AOT-compile critical paths to reduce startup and jank",
+      "Shrink APK icons — incorrect in typical mobile interview context",
+      "Replace ProGuard",
+      "Disable ART"
+    ],
+    "c": 0,
+    "e": "Baseline Profiles guide ART to pre-compile hot methods — measurable cold start and frame time improvements in production.",
+    "topic": "performance",
+    "type": "concept"
+  },
+  {
+    "q": "What does this Kotlin code print?",
+    "a": [
+      "true",
+      "false",
+      "Error",
+      "0"
+    ],
+    "c": 1,
+    "e": "=== checks referential equality for nullable Any. Two distinct boxed Int objects → false (unlike == which is structural for Int).",
+    "code": "val a: Any? = 1\nval b: Any? = 1\nprintln(a === b)",
+    "topic": "types",
+    "type": "code-output"
+  },
+  {
+    "q": "Navigation Component — why use a single NavHost?",
+    "a": [
+      "Central graph defines destinations, args, and back stack in one place",
+      "It removes the need for ViewModels — incorrect in typical mobile interview context",
+      "Only one Activity is allowed on Android",
+      "It disables deep links"
+    ],
+    "c": 0,
+    "e": "NavHost + nav graph gives type-safe routes, argument passing, and predictable back stack vs manual FragmentTransaction tags.",
+    "topic": "navigation",
+    "type": "pattern"
+  },
+  {
+    "q": "EncryptedSharedPreferences — when to use it?",
+    "a": [
+      "Store small sensitive tokens/keys encrypted on device",
+      "Replace Room database — incorrect in typical mobile interview context",
+      "Cache images",
+      "Log crash reports"
+    ],
+    "c": 0,
+    "e": "AndroidX Security encrypts keys/values with AES — suitable for refresh tokens or secrets too small for a full keystore wrapper.",
+    "topic": "security",
+    "type": "practical"
+  },
+  {
+    "q": "What is the difference between SharedFlow and StateFlow?",
+    "a": [
+      "StateFlow always has a current value; SharedFlow is for events without mandatory replay",
+      "SharedFlow is cold",
+      "StateFlow can't be collected",
+      "SharedFlow replaces LiveData only on API 30+ — incorrect in typical mobile interview context"
+    ],
+    "c": 0,
+    "e": "StateFlow holds .value and replays latest to collectors. SharedFlow suits one-shot events (snackbar, navigation) with configurable replay.",
+    "topic": "flow",
+    "type": "concept"
+  },
+  {
+    "q": "What does this Kotlin code print?",
+    "a": [
+      "Kotlin",
+      "Java (typical misconception)",
+      "Error",
+      "null"
+    ],
+    "c": 0,
+    "e": "When expression with smart cast: s is String after is check, so length branch returns Kotlin.",
+    "code": "val s: Any = \"Kotlin\"\nval r = when (s) {\n  is String -> s\n  else -> \"Java\"\n}\nprintln(r)",
+    "topic": "control_flow",
+    "type": "code-output"
+  },
+  {
+    "q": "ProGuard/R8 shrinking — main risk if misconfigured?",
+    "a": [
+      "Reflection/serialization classes get stripped — runtime ClassNotFound or broken JSON",
+      "APK becomes larger",
+      "App won't compile at all on every CI machine until you disable minify on all build types",
+      "Only debug builds affected"
+    ],
+    "c": 0,
+    "e": "R8 removes unused code but needs keep rules for Gson/Moshi models, Hilt, and JNI — otherwise release builds crash mysteriously.",
+    "topic": "build",
+    "type": "concept"
+  },
+  {
+    "q": "Why collect flows with lifecycle-aware repeatOnLifecycle?",
+    "a": [
+      "Stops collection when UI is stopped — avoids leaks and wasted work",
+      "Forces collection on a background thread only (typical misconception)",
+      "Replaces viewModelScope",
+      "Disables configuration changes"
+    ],
+    "c": 0,
+    "e": "Collecting in STARTED+ only prevents upstream work while the UI isn't visible — recommended over launchWhenStarted.",
+    "topic": "lifecycle",
+    "type": "practical"
   }
 ]
