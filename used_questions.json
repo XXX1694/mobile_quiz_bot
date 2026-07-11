@@ -1,6 +1,39 @@
 {
-  "android": [],
-  "general": [],
+  "android": [
+    {
+      "a": [
+        "2",
+        "hi",
+        "Error: cast needed",
+        "null"
+      ],
+      "c": 0,
+      "code": "val s: Any = \"hi\"\nif (s is String) println(s.length)",
+      "e": "Smart cast: after the is String check the compiler casts s to String, so s.length is available directly → 2.",
+      "hash": "8ef8d8aed3",
+      "posted_at": "2026-07-11T19:01:32Z",
+      "q": "What does this Kotlin code print?",
+      "topic": "smart_cast",
+      "type": "code-output"
+    }
+  ],
+  "general": [
+    {
+      "a": [
+        "About 44×44 pt — large enough to tap reliably",
+        "10×10 pt — incorrect in typical mobile interview context",
+        "Full screen width",
+        "No guideline exists"
+      ],
+      "c": 0,
+      "e": "Both Apple HIG and Material recommend ~44–48 dp/pt minimum touch targets and sufficient contrast — improves usability for everyone.",
+      "hash": "52c5bbf5bb",
+      "posted_at": "2026-07-11T19:01:33Z",
+      "q": "Accessibility: minimum touch target guideline (platform HIG)?",
+      "topic": "mobile_general",
+      "type": "keyword"
+    }
+  ],
   "ios": [
     {
       "a": [
@@ -172,16 +205,36 @@
       "q": "What does this Swift code print?",
       "topic": "value_types",
       "type": "code-output"
+    },
+    {
+      "a": [
+        "1 3",
+        "0 0",
+        "3 1",
+        "nil nil"
+      ],
+      "c": 0,
+      "code": "let arr = [1, 2, 3]\nprint(arr.first ?? 0, arr.last ?? 0)",
+      "e": "first and last return Optionals (in case the array is empty). Here the array is non-empty, so 1 and 3.",
+      "hash": "ee1d287ee4",
+      "posted_at": "2026-07-11T19:01:31Z",
+      "q": "What does this Swift code print?",
+      "topic": "optionals",
+      "type": "code-output"
     }
   ],
   "recent_topics": {
-    "android": [],
-    "general": [],
+    "android": [
+      "smart_cast"
+    ],
+    "general": [
+      "mobile_general"
+    ],
     "ios": [
-      "enums",
       "memory",
       "swiftui",
-      "control_flow"
+      "control_flow",
+      "optionals"
     ]
   }
 }
