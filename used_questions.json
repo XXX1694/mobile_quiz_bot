@@ -1,5 +1,7 @@
 {
-  "questions": [
+  "android": [],
+  "general": [],
+  "ios": [
     {
       "a": [
         "42",
@@ -172,10 +174,14 @@
       "type": "code-output"
     }
   ],
-  "recent_topics": [
-    "enums",
-    "memory",
-    "swiftui",
-    "control_flow"
-  ]
+  "recent_topics": {
+    "android": [],
+    "general": [],
+    "ios": [
+      "enums",
+      "memory",
+      "swiftui",
+      "control_flow"
+    ]
+  }
 }

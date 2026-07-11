@@ -45,16 +45,65 @@ def qid(question: dict) -> str:
 
 
 def load_used() -> dict:
+    """Загружает архив показанных вопросов.
+
+    Ожидаемый формат:
+      { "<stack>": [{hash, posted_at, ...q}, ...], "recent_topics": { "<stack>": [...] } }
+
+    Старый плоский формат { "questions": [...], "recent_topics": [...] } мигрируется
+    в per-stack структуру по совпадению hash с банками вопросов.
+    """
     try:
         with open(USED_PATH, "r", encoding="utf-8") as f:
             data = json.load(f)
     except FileNotFoundError:
         data = {}
 
-    data.setdefault("recent_topics", {})
+    if not isinstance(data, dict):
+        data = {}
+
+    # Нормализуем recent_topics: раньше мог быть list вместо dict по стекам.
+    recent = data.get("recent_topics")
+    if not isinstance(recent, dict):
+        legacy_topics = recent if isinstance(recent, list) else []
+        data["recent_topics"] = {}
+    else:
+        legacy_topics = []
+
     for stack in STACKS:
-        data.setdefault(stack, [])
-        data["recent_topics"].setdefault(stack, [])
+        if not isinstance(data.get(stack), list):
+            data[stack] = []
+        rt = data["recent_topics"].get(stack)
+        if not isinstance(rt, list):
+            data["recent_topics"][stack] = []
+
+    # Миграция legacy flat-архива {"questions": [...]} → раскладываем по стекам.
+    legacy_questions = data.pop("questions", None)
+    if isinstance(legacy_questions, list) and legacy_questions:
+        bank_hashes: dict[str, set[str]] = {}
+        for stack, cfg in STACKS.items():
+            try:
+                bank_hashes[stack] = {qid(q) for q in load_questions(cfg["questions"])}
+            except FileNotFoundError:
+                bank_hashes[stack] = set()
+
+        for entry in legacy_questions:
+            if not isinstance(entry, dict):
+                continue
+            h = entry.get("hash") or qid(entry)
+            entry = {**entry, "hash": h}
+            for stack, hashes in bank_hashes.items():
+                if h in hashes:
+                    # не дублируем, если уже есть
+                    if h not in used_hashes(data, stack):
+                        data[stack].append(entry)
+                    break
+
+        # Плоский recent_topics относился к единственному стеку (ios) до рефакторинга.
+        if legacy_topics and not any(data["recent_topics"][s] for s in STACKS):
+            first = next(iter(STACKS))
+            data["recent_topics"][first] = list(legacy_topics)[-RECENT_TOPICS_WINDOW:]
+
     return data
 
 
