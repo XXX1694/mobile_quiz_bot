@@ -15,6 +15,22 @@
       "q": "What does this Kotlin code print?",
       "topic": "smart_cast",
       "type": "code-output"
+    },
+    {
+      "a": [
+        "true",
+        "false",
+        "Error",
+        "null"
+      ],
+      "c": 0,
+      "code": "data class P(val x: Int)\nprintln(P(1) == P(1))",
+      "e": "A data class auto-generates equals()/hashCode() from its properties. Two P(1) are value-equal → true (unlike a regular class).",
+      "hash": "6d5eb2fb09",
+      "posted_at": "2026-07-12T07:37:24Z",
+      "q": "What does this Kotlin code print?",
+      "topic": "data_class",
+      "type": "code-output"
     }
   ],
   "general": [
@@ -32,6 +48,21 @@
       "q": "Accessibility: minimum touch target guideline (platform HIG)?",
       "topic": "mobile_general",
       "type": "keyword"
+    },
+    {
+      "a": [
+        "To replace code review entirely in most production setups",
+        "To auto-build and test every change before merge/release",
+        "To deploy directly to users without QA",
+        "To generate app icons"
+      ],
+      "c": 1,
+      "e": "CI runs build, lint, and tests on each push/PR — catching regressions early and keeping main releasable.",
+      "hash": "8f592662c6",
+      "posted_at": "2026-07-12T07:37:24Z",
+      "q": "What is the main purpose of CI in mobile development?",
+      "topic": "ci_cd",
+      "type": "concept"
     }
   ],
   "ios": [
@@ -221,20 +252,37 @@
       "q": "What does this Swift code print?",
       "topic": "optionals",
       "type": "code-output"
+    },
+    {
+      "a": [
+        "Type-safe reference to a property for KVO-like APIs and sorting",
+        "Encrypting strings — incorrect in typical mobile interview context",
+        "Replacing closures entirely",
+        "Only for @IBOutlet wiring"
+      ],
+      "c": 0,
+      "e": "\\Person.name is a KeyPath<Person, String> — used in sorted(by:), SwiftUI bindings, and reactive frameworks type-safely.",
+      "hash": "7d1a360ffe",
+      "posted_at": "2026-07-12T07:37:23Z",
+      "q": "KeyPath — typical use case?",
+      "topic": "properties",
+      "type": "keyword"
     }
   ],
   "recent_topics": {
     "android": [
-      "smart_cast"
+      "smart_cast",
+      "data_class"
     ],
     "general": [
-      "mobile_general"
+      "mobile_general",
+      "ci_cd"
     ],
     "ios": [
-      "memory",
       "swiftui",
       "control_flow",
-      "optionals"
+      "optionals",
+      "properties"
     ]
   }
 }
