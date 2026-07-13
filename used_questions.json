@@ -31,6 +31,21 @@
       "q": "What does this Kotlin code print?",
       "topic": "data_class",
       "type": "code-output"
+    },
+    {
+      "a": [
+        "To schedule a property's initializer to run on a background dispatcher later",
+        "To make a property nullable",
+        "To declare a non-null property and assign it later (e.g. in onCreate)",
+        "To create a lazy property"
+      ],
+      "c": 2,
+      "e": "lateinit defers init of a non-null var. Accessing it before assignment throws UninitializedPropertyAccessException. Not for primitives or val.",
+      "hash": "0fee141848",
+      "posted_at": "2026-07-13T08:27:22Z",
+      "q": "What is lateinit var for?",
+      "topic": "null_safety",
+      "type": "keyword"
     }
   ],
   "general": [
@@ -63,6 +78,21 @@
       "q": "What is the main purpose of CI in mobile development?",
       "topic": "ci_cd",
       "type": "concept"
+    },
+    {
+      "a": [
+        "To reduce memory, parse time, and initial load latency",
+        "Because SQLite forbids full tables (typical misconception)",
+        "To disable scrolling",
+        "Only for compliance"
+      ],
+      "c": 0,
+      "e": "Loading thousands of rows at once hurts memory and scroll performance. Cursor/keyset pagination keeps payloads small and UI responsive.",
+      "hash": "a4202504e8",
+      "posted_at": "2026-07-13T08:27:22Z",
+      "q": "Why paginate large lists in mobile apps?",
+      "topic": "performance",
+      "type": "practical"
     }
   ],
   "ios": [
@@ -267,22 +297,39 @@
       "q": "KeyPath — typical use case?",
       "topic": "properties",
       "type": "keyword"
+    },
+    {
+      "a": [
+        "Composing behavior via protocols and their extensions, not class inheritance",
+        "A way to write only classes",
+        "Replacing every struct in the codebase with an equivalent enum-based representation",
+        "A pattern only for UIKit"
+      ],
+      "c": 0,
+      "e": "Swift favors protocols with default implementations in extensions. This gives composition and reuse without rigid class hierarchies, and works on struct/enum.",
+      "hash": "846d07f7ee",
+      "posted_at": "2026-07-13T08:27:21Z",
+      "q": "What is Protocol-Oriented Programming (POP) in Swift?",
+      "topic": "protocols",
+      "type": "concept"
     }
   ],
   "recent_topics": {
     "android": [
       "smart_cast",
-      "data_class"
+      "data_class",
+      "null_safety"
     ],
     "general": [
       "mobile_general",
-      "ci_cd"
+      "ci_cd",
+      "performance"
     ],
     "ios": [
-      "swiftui",
       "control_flow",
       "optionals",
-      "properties"
+      "properties",
+      "protocols"
     ]
   }
 }
