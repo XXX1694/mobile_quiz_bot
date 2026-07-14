@@ -46,6 +46,22 @@
       "q": "What is lateinit var for?",
       "topic": "null_safety",
       "type": "keyword"
+    },
+    {
+      "a": [
+        "abc",
+        "ABC",
+        "Error",
+        "null"
+      ],
+      "c": 0,
+      "code": "println(\"abc\".takeIf { it.length > 2 })",
+      "e": "takeIf returns the receiver if the predicate is true, else null. \"abc\".takeIf { it.length > 2 } is still \"abc\".",
+      "hash": "27cac25945",
+      "posted_at": "2026-07-14T07:20:05Z",
+      "q": "What does this Kotlin code print?",
+      "topic": "scope_fn",
+      "type": "code-output"
     }
   ],
   "general": [
@@ -93,6 +109,21 @@
       "q": "Why paginate large lists in mobile apps?",
       "topic": "performance",
       "type": "practical"
+    },
+    {
+      "a": [
+        "A test that sometimes passes and sometimes fails without code changes",
+        "A test that always fails — incorrect in typical mobile interview context",
+        "A test written in the wrong language",
+        "A test that runs only on device"
+      ],
+      "c": 0,
+      "e": "Flaky tests erode trust in CI. Common causes: timing, shared state, network, animation. Fix or quarantine — don't ignore.",
+      "hash": "9535d5a8aa",
+      "posted_at": "2026-07-14T07:20:06Z",
+      "q": "What is a flaky test?",
+      "topic": "testing",
+      "type": "keyword"
     }
   ],
   "ios": [
@@ -312,24 +343,41 @@
       "q": "What is Protocol-Oriented Programming (POP) in Swift?",
       "topic": "protocols",
       "type": "concept"
+    },
+    {
+      "a": [
+        "It copies self by value so the closure works on an independent snapshot of it",
+        "It forbids access to self",
+        "It makes self a constant",
+        "It captures self weakly, avoiding a retain cycle"
+      ],
+      "c": 3,
+      "e": "The capture list [weak self] doesn't bump the ref count. Inside, self is Optional, often handled with guard let self = self else { return }.",
+      "hash": "2c52938312",
+      "posted_at": "2026-07-14T07:20:04Z",
+      "q": "What does [weak self] do in a closure?",
+      "topic": "closures",
+      "type": "keyword"
     }
   ],
   "recent_topics": {
     "android": [
       "smart_cast",
       "data_class",
-      "null_safety"
+      "null_safety",
+      "scope_fn"
     ],
     "general": [
       "mobile_general",
       "ci_cd",
-      "performance"
+      "performance",
+      "testing"
     ],
     "ios": [
-      "control_flow",
       "optionals",
       "properties",
-      "protocols"
+      "protocols",
+      "closures"
     ]
   }
 }
