@@ -62,6 +62,21 @@
       "q": "What does this Kotlin code print?",
       "topic": "scope_fn",
       "type": "code-output"
+    },
+    {
+      "a": [
+        "The OS clears the heap on rotation, so you must serialize everything to disk first",
+        "The Activity is recreated; use a ViewModel or onSaveInstanceState",
+        "It's a bug; wrap it in try/catch",
+        "Disable rotation permanently"
+      ],
+      "c": 1,
+      "e": "Rotation is a config change → Activity destroy/recreate. A ViewModel survives recreation; use onSaveInstanceState (Bundle) for small data.",
+      "hash": "7af268ac8a",
+      "posted_at": "2026-07-15T07:23:13Z",
+      "q": "Why is data lost on screen rotation, and how do you keep it?",
+      "topic": "lifecycle",
+      "type": "concept"
     }
   ],
   "general": [
@@ -123,6 +138,21 @@
       "posted_at": "2026-07-14T07:20:06Z",
       "q": "What is a flaky test?",
       "topic": "testing",
+      "type": "keyword"
+    },
+    {
+      "a": [
+        "Calling an operation multiple times has the same effect as once",
+        "Every request must return 200 OK — incorrect in typical mobile interview context",
+        "Requests are encrypted end-to-end",
+        "The server stores no logs"
+      ],
+      "c": 0,
+      "e": "GET/PUT/DELETE are idempotent by HTTP semantics. POST usually isn't — retries can duplicate side effects unless designed carefully.",
+      "hash": "f10af09a64",
+      "posted_at": "2026-07-15T07:23:13Z",
+      "q": "What is idempotency in API design?",
+      "topic": "api",
       "type": "keyword"
     }
   ],
@@ -358,26 +388,41 @@
       "q": "What does [weak self] do in a closure?",
       "topic": "closures",
       "type": "keyword"
+    },
+    {
+      "a": [
+        "Emits a new value to subscribers when the property changes",
+        "Makes the property thread-safe automatically (typical misconception)",
+        "Persists to UserDefaults",
+        "Converts it to a constant"
+      ],
+      "c": 0,
+      "e": "@Published wraps changes in objectWillChange so SwiftUI/ObservableObject views update when the value mutates.",
+      "hash": "03867e3a17",
+      "posted_at": "2026-07-15T07:23:12Z",
+      "q": "Combine: what does @Published do on a property?",
+      "topic": "combine",
+      "type": "keyword"
     }
   ],
   "recent_topics": {
     "android": [
-      "smart_cast",
       "data_class",
       "null_safety",
-      "scope_fn"
+      "scope_fn",
+      "lifecycle"
     ],
     "general": [
-      "mobile_general",
       "ci_cd",
       "performance",
-      "testing"
+      "testing",
+      "api"
     ],
     "ios": [
-      "optionals",
       "properties",
       "protocols",
-      "closures"
+      "closures",
+      "combine"
     ]
   }
 }
