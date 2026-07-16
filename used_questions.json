@@ -77,6 +77,21 @@
       "q": "Why is data lost on screen rotation, and how do you keep it?",
       "topic": "lifecycle",
       "type": "concept"
+    },
+    {
+      "a": [
+        "Reflection/serialization classes get stripped — runtime ClassNotFound or broken JSON",
+        "APK becomes larger",
+        "App won't compile at all on every CI machine until you disable minify on all build types",
+        "Only debug builds affected"
+      ],
+      "c": 0,
+      "e": "R8 removes unused code but needs keep rules for Gson/Moshi models, Hilt, and JNI — otherwise release builds crash mysteriously.",
+      "hash": "8922857595",
+      "posted_at": "2026-07-16T07:31:29Z",
+      "q": "ProGuard/R8 shrinking — main risk if misconfigured?",
+      "topic": "build",
+      "type": "concept"
     }
   ],
   "general": [
@@ -153,6 +168,21 @@
       "posted_at": "2026-07-15T07:23:13Z",
       "q": "What is idempotency in API design?",
       "topic": "api",
+      "type": "keyword"
+    },
+    {
+      "a": [
+        "Reject invalid input early before expensive network or business logic",
+        "Crash the app on any error — incorrect in typical mobile interview context",
+        "Skip all validation for speed",
+        "Retry forever on 400"
+      ],
+      "c": 0,
+      "e": "Validate forms and payloads locally first — saves battery, gives instant feedback, and avoids pointless API calls.",
+      "hash": "91218a5baf",
+      "posted_at": "2026-07-16T07:31:29Z",
+      "q": "What does 'fail fast' mean in client validation?",
+      "topic": "mobile_general",
       "type": "keyword"
     }
   ],
@@ -403,26 +433,42 @@
       "q": "Combine: what does @Published do on a property?",
       "topic": "combine",
       "type": "keyword"
+    },
+    {
+      "a": [
+        "Hello",
+        "nil",
+        "Optional",
+        "Compilation error"
+      ],
+      "c": 0,
+      "code": "let s: String? = \"Hello\"\nif let v = s { print(v) }",
+      "e": "if let unwraps the optional string and prints Hello. The else branch runs only when s is nil.",
+      "hash": "2c4d118bea",
+      "posted_at": "2026-07-16T07:31:29Z",
+      "q": "What does this Swift code print?",
+      "topic": "optionals",
+      "type": "code-output"
     }
   ],
   "recent_topics": {
     "android": [
-      "data_class",
       "null_safety",
       "scope_fn",
-      "lifecycle"
+      "lifecycle",
+      "build"
     ],
     "general": [
-      "ci_cd",
       "performance",
       "testing",
-      "api"
+      "api",
+      "mobile_general"
     ],
     "ios": [
-      "properties",
       "protocols",
       "closures",
-      "combine"
+      "combine",
+      "optionals"
     ]
   }
 }
