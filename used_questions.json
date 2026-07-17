@@ -92,6 +92,21 @@
       "q": "ProGuard/R8 shrinking — main risk if misconfigured?",
       "topic": "build",
       "type": "concept"
+    },
+    {
+      "a": [
+        "Initializes on first access; thread-safe by default for val",
+        "Runs at class load time — incorrect in typical mobile interview context",
+        "Makes the property nullable",
+        "Copies the value on every read"
+      ],
+      "c": 0,
+      "e": "lazy { expensive() } defers init until first read. Default LazyThreadSafetyMode.SYNCHRONIZED is thread-safe for val delegates.",
+      "hash": "477f0ae4ed",
+      "posted_at": "2026-07-17T07:28:35Z",
+      "q": "What does by lazy do on a Kotlin property?",
+      "topic": "properties",
+      "type": "keyword"
     }
   ],
   "general": [
@@ -184,6 +199,21 @@
       "q": "What does 'fail fast' mean in client validation?",
       "topic": "mobile_general",
       "type": "keyword"
+    },
+    {
+      "a": [
+        "Test integrations safely without touching real user data",
+        "Staging must be faster than prod in most production setups",
+        "Production is read-only",
+        "Apple requires it"
+      ],
+      "c": 0,
+      "e": "Separate environments prevent QA/test traffic from polluting analytics, billing, or live data — and reduce accidental prod incidents.",
+      "hash": "b099d1f234",
+      "posted_at": "2026-07-17T07:28:35Z",
+      "q": "Staging vs production backend — why keep them separate?",
+      "topic": "ci_cd",
+      "type": "practical"
     }
   ],
   "ios": [
@@ -449,26 +479,42 @@
       "q": "What does this Swift code print?",
       "topic": "optionals",
       "type": "code-output"
+    },
+    {
+      "a": [
+        "2",
+        "3",
+        "1",
+        "Compilation error"
+      ],
+      "c": 0,
+      "code": "let d = [\"a\": 1, \"b\": 2]\nprint(d[\"b\"] ?? 0)",
+      "e": "Dictionary subscript returns Optional. d[\"b\"] is 2; nil coalescing to 0 isn't needed here — prints Optional unwrapped as 2.",
+      "hash": "fba318fdf8",
+      "posted_at": "2026-07-17T07:28:34Z",
+      "q": "What does this Swift code print?",
+      "topic": "collections",
+      "type": "code-output"
     }
   ],
   "recent_topics": {
     "android": [
-      "null_safety",
       "scope_fn",
       "lifecycle",
-      "build"
+      "build",
+      "properties"
     ],
     "general": [
-      "performance",
       "testing",
       "api",
-      "mobile_general"
+      "mobile_general",
+      "ci_cd"
     ],
     "ios": [
-      "protocols",
       "closures",
       "combine",
-      "optionals"
+      "optionals",
+      "collections"
     ]
   }
 }
