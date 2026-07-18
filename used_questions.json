@@ -107,6 +107,22 @@
       "q": "What does by lazy do on a Kotlin property?",
       "topic": "properties",
       "type": "keyword"
+    },
+    {
+      "a": [
+        "a is reassigned to 6 because Kotlin silently promotes val to var on a second write",
+        "Compilation error — val is read-only",
+        "a becomes null",
+        "A warning, but it compiles"
+      ],
+      "c": 1,
+      "code": "val a = 5\na = 6",
+      "e": "val is a read-only reference and can't be reassigned. Use var for a mutable variable.",
+      "hash": "a0028230e8",
+      "posted_at": "2026-07-18T07:07:02Z",
+      "q": "What happens here?",
+      "topic": "null_safety",
+      "type": "code-output"
     }
   ],
   "general": [
@@ -214,6 +230,21 @@
       "q": "Staging vs production backend — why keep them separate?",
       "topic": "ci_cd",
       "type": "practical"
+    },
+    {
+      "a": [
+        "One list request plus N per-item requests instead of one batched call",
+        "Using N threads for one request — incorrect in typical mobile interview context",
+        "Having N apps in the monorepo",
+        "N failed retries"
+      ],
+      "c": 0,
+      "e": "Loading a feed then fetching each avatar/details separately causes N+1 round trips. Batch endpoints or GraphQL fields reduce latency and battery drain.",
+      "hash": "3c40e49d44",
+      "posted_at": "2026-07-18T07:07:02Z",
+      "q": "What is the N+1 problem in mobile networking?",
+      "topic": "performance",
+      "type": "concept"
     }
   ],
   "ios": [
@@ -495,26 +526,41 @@
       "q": "What does this Swift code print?",
       "topic": "collections",
       "type": "code-output"
+    },
+    {
+      "a": [
+        "Update it directly on the background queue where the URLSession callback fires",
+        "Use DispatchQueue.global().sync",
+        "Refresh it via a Timer every second",
+        "Hop back to main: DispatchQueue.main.async { ... }"
+      ],
+      "c": 3,
+      "e": "Any UIKit/SwiftUI update must run on the main thread. URLSession callbacks arrive on a background queue, so dispatch to DispatchQueue.main.",
+      "hash": "119341339d",
+      "posted_at": "2026-07-18T07:07:01Z",
+      "q": "You need to update a UILabel after a network call. The right way?",
+      "topic": "concurrency",
+      "type": "concept"
     }
   ],
   "recent_topics": {
     "android": [
-      "scope_fn",
       "lifecycle",
       "build",
-      "properties"
+      "properties",
+      "null_safety"
     ],
     "general": [
-      "testing",
       "api",
       "mobile_general",
-      "ci_cd"
+      "ci_cd",
+      "performance"
     ],
     "ios": [
-      "closures",
       "combine",
       "optionals",
-      "collections"
+      "collections",
+      "concurrency"
     ]
   }
 }
