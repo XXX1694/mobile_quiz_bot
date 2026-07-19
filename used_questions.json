@@ -123,6 +123,21 @@
       "q": "What happens here?",
       "topic": "null_safety",
       "type": "code-output"
+    },
+    {
+      "a": [
+        "Store small sensitive tokens/keys encrypted on device",
+        "Replace Room database — incorrect in typical mobile interview context",
+        "Cache images",
+        "Log crash reports"
+      ],
+      "c": 0,
+      "e": "AndroidX Security encrypts keys/values with AES — suitable for refresh tokens or secrets too small for a full keystore wrapper.",
+      "hash": "3281dcc9b7",
+      "posted_at": "2026-07-19T07:35:32Z",
+      "q": "EncryptedSharedPreferences — when to use it?",
+      "topic": "security",
+      "type": "practical"
     }
   ],
   "general": [
@@ -245,6 +260,21 @@
       "q": "What is the N+1 problem in mobile networking?",
       "topic": "performance",
       "type": "concept"
+    },
+    {
+      "a": [
+        "Hides data sources (API, DB, cache) behind one API for the domain layer",
+        "Stores Git repositories on device — incorrect in typical mobile interview context",
+        "Replaces ViewModels",
+        "Eliminates networking"
+      ],
+      "c": 0,
+      "e": "ViewModels/UseCases call Repository.getUser() without caring if data comes from Room, Core Data, or Retrofit — easier tests and caching policy.",
+      "hash": "0412703390",
+      "posted_at": "2026-07-19T07:35:33Z",
+      "q": "Repository pattern — what problem does it solve?",
+      "topic": "architecture",
+      "type": "pattern"
     }
   ],
   "ios": [
@@ -541,26 +571,41 @@
       "q": "You need to update a UILabel after a network call. The right way?",
       "topic": "concurrency",
       "type": "concept"
+    },
+    {
+      "a": [
+        "The closure may be stored and called after the function returns",
+        "The closure runs synchronously",
+        "The closure can never be stored anywhere outside of the enclosing function body",
+        "The closure ignores captured self"
+      ],
+      "c": 0,
+      "e": "Closures are non-escaping by default (run before return). @escaping is needed when a closure is stored (a property) or called asynchronously later.",
+      "hash": "9b57644a75",
+      "posted_at": "2026-07-19T07:35:32Z",
+      "q": "What does @escaping mean on a closure parameter?",
+      "topic": "closures",
+      "type": "keyword"
     }
   ],
   "recent_topics": {
     "android": [
-      "lifecycle",
       "build",
       "properties",
-      "null_safety"
+      "null_safety",
+      "security"
     ],
     "general": [
-      "api",
       "mobile_general",
       "ci_cd",
-      "performance"
+      "performance",
+      "architecture"
     ],
     "ios": [
-      "combine",
       "optionals",
       "collections",
-      "concurrency"
+      "concurrency",
+      "closures"
     ]
   }
 }
