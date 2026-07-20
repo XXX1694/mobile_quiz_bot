@@ -138,6 +138,21 @@
       "q": "EncryptedSharedPreferences — when to use it?",
       "topic": "security",
       "type": "practical"
+    },
+    {
+      "a": [
+        "It can pause without blocking the thread and resume later",
+        "It always starts a brand new thread for every call you make to it",
+        "It can't return a value",
+        "It blocks the thread until done"
+      ],
+      "c": 0,
+      "e": "suspend marks a suspension point. The compiler turns the function into a state machine; the thread is freed while waiting instead of blocking.",
+      "hash": "280630d3e8",
+      "posted_at": "2026-07-20T08:17:21Z",
+      "q": "What's special about a suspend function?",
+      "topic": "coroutines",
+      "type": "concept"
     }
   ],
   "general": [
@@ -275,6 +290,21 @@
       "q": "Repository pattern — what problem does it solve?",
       "topic": "architecture",
       "type": "pattern"
+    },
+    {
+      "a": [
+        "Logs, metrics, and traces to understand performance and user flows",
+        "Only unit test coverage — incorrect in typical mobile interview context",
+        "Screenshot tests only",
+        "Deleting old logs weekly"
+      ],
+      "c": 0,
+      "e": "Crashes are one signal. Structured logs, ANR/jank metrics, network error rates, and session replays help diagnose production issues.",
+      "hash": "e332f53081",
+      "posted_at": "2026-07-20T08:17:21Z",
+      "q": "What is observability beyond crash reporting?",
+      "topic": "monitoring",
+      "type": "concept"
     }
   ],
   "ios": [
@@ -586,26 +616,41 @@
       "q": "What does @escaping mean on a closure parameter?",
       "topic": "closures",
       "type": "keyword"
+    },
+    {
+      "a": [
+        "throws marks a function that can throw; throw actually throws an error",
+        "They are the same keyword — incorrect in typical mobile interview context",
+        "throw is for async only",
+        "throws returns Optional"
+      ],
+      "c": 0,
+      "e": "func load() throws declares error propagation. throw NetworkError.timeout exits with that error — callers use try/try?/try!.",
+      "hash": "90c2fb8ab9",
+      "posted_at": "2026-07-20T08:17:20Z",
+      "q": "Difference between throw and throws?",
+      "topic": "errors",
+      "type": "keyword"
     }
   ],
   "recent_topics": {
     "android": [
-      "build",
       "properties",
       "null_safety",
-      "security"
+      "security",
+      "coroutines"
     ],
     "general": [
-      "mobile_general",
       "ci_cd",
       "performance",
-      "architecture"
+      "architecture",
+      "monitoring"
     ],
     "ios": [
-      "optionals",
       "collections",
       "concurrency",
-      "closures"
+      "closures",
+      "errors"
     ]
   }
 }
