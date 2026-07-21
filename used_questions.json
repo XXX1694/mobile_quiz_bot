@@ -153,6 +153,21 @@
       "q": "What's special about a suspend function?",
       "topic": "coroutines",
       "type": "concept"
+    },
+    {
+      "a": [
+        "Stops collection when UI is stopped — avoids leaks and wasted work",
+        "Forces collection on a background thread only (typical misconception)",
+        "Replaces viewModelScope",
+        "Disables configuration changes"
+      ],
+      "c": 0,
+      "e": "Collecting in STARTED+ only prevents upstream work while the UI isn't visible — recommended over launchWhenStarted.",
+      "hash": "e2733bafd7",
+      "posted_at": "2026-07-21T07:42:11Z",
+      "q": "Why collect flows with lifecycle-aware repeatOnLifecycle?",
+      "topic": "lifecycle",
+      "type": "practical"
     }
   ],
   "general": [
@@ -305,6 +320,21 @@
       "q": "What is observability beyond crash reporting?",
       "topic": "monitoring",
       "type": "concept"
+    },
+    {
+      "a": [
+        "Discard all local changes in most production setups",
+        "Sync queued local changes and reconcile conflicts",
+        "Force logout",
+        "Show a full-screen error forever"
+      ],
+      "c": 1,
+      "e": "Queue writes locally, show optimistic UI, then sync with conflict resolution (last-write-wins, merge, or server authority) when online.",
+      "hash": "af1e473175",
+      "posted_at": "2026-07-21T07:42:12Z",
+      "q": "Offline-first UX — what should the app do when the network is back?",
+      "topic": "mobile_general",
+      "type": "practical"
     }
   ],
   "ios": [
@@ -631,26 +661,41 @@
       "q": "Difference between throw and throws?",
       "topic": "errors",
       "type": "keyword"
+    },
+    {
+      "a": [
+        "To allow the method to spawn a background task that mutates shared global state",
+        "To make the method static",
+        "To allow it to modify the value type's own properties (self)",
+        "To forbid inheritance"
+      ],
+      "c": 2,
+      "e": "struct/enum methods can't change properties by default since they're value types. mutating lets the method modify self.",
+      "hash": "2be7f8db7f",
+      "posted_at": "2026-07-21T07:42:11Z",
+      "q": "Why mark a struct method as mutating?",
+      "topic": "value_types",
+      "type": "keyword"
     }
   ],
   "recent_topics": {
     "android": [
-      "properties",
       "null_safety",
       "security",
-      "coroutines"
+      "coroutines",
+      "lifecycle"
     ],
     "general": [
-      "ci_cd",
       "performance",
       "architecture",
-      "monitoring"
+      "monitoring",
+      "mobile_general"
     ],
     "ios": [
-      "collections",
       "concurrency",
       "closures",
-      "errors"
+      "errors",
+      "value_types"
     ]
   }
 }
