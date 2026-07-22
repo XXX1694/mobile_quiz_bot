@@ -168,6 +168,21 @@
       "q": "Why collect flows with lifecycle-aware repeatOnLifecycle?",
       "topic": "lifecycle",
       "type": "practical"
+    },
+    {
+      "a": [
+        "Singleton lives for app process; ActivityRetained survives config change via ViewModel",
+        "They are identical scopes and always share the same instance lifetime in Hilt and ViewModels",
+        "Singleton is per-Activity",
+        "ActivityRetained is global static"
+      ],
+      "c": 0,
+      "e": "App-wide deps use @Singleton. @ActivityRetainedScoped ties to the retained component — survives rotation like a ViewModel.",
+      "hash": "cbb412686e",
+      "posted_at": "2026-07-22T07:42:18Z",
+      "q": "Hilt @Singleton vs @ActivityRetainedScoped?",
+      "topic": "di",
+      "type": "concept"
     }
   ],
   "general": [
@@ -335,6 +350,21 @@
       "q": "Offline-first UX — what should the app do when the network is back?",
       "topic": "mobile_general",
       "type": "practical"
+    },
+    {
+      "a": [
+        "When clients need flexible, nested data shapes without over-fetching",
+        "When you want zero server-side logic",
+        "When caching at CDN is the top priority",
+        "When every endpoint must be a single flat resource (typical misconception)"
+      ],
+      "c": 0,
+      "e": "GraphQL lets clients request exactly the fields they need in one round trip. REST shines with simple CRUD and aggressive HTTP caching.",
+      "hash": "9871ae332f",
+      "posted_at": "2026-07-22T07:42:18Z",
+      "q": "REST vs GraphQL — when is GraphQL a better fit?",
+      "topic": "api",
+      "type": "concept"
     }
   ],
   "ios": [
@@ -676,26 +706,41 @@
       "q": "Why mark a struct method as mutating?",
       "topic": "value_types",
       "type": "keyword"
+    },
+    {
+      "a": [
+        "It is recomputed on every access, caching the latest value for the next read",
+        "It can no longer be changed",
+        "It becomes thread-safe automatically",
+        "It's initialized on first access, not at object creation"
+      ],
+      "c": 3,
+      "e": "lazy defers initialization until first use — handy for expensive setup. It is not thread-safe by default.",
+      "hash": "9e37d8931a",
+      "posted_at": "2026-07-22T07:42:17Z",
+      "q": "Why is a lazy var useful?",
+      "topic": "properties",
+      "type": "keyword"
     }
   ],
   "recent_topics": {
     "android": [
-      "null_safety",
       "security",
       "coroutines",
-      "lifecycle"
+      "lifecycle",
+      "di"
     ],
     "general": [
-      "performance",
       "architecture",
       "monitoring",
-      "mobile_general"
+      "mobile_general",
+      "api"
     ],
     "ios": [
-      "concurrency",
       "closures",
       "errors",
-      "value_types"
+      "value_types",
+      "properties"
     ]
   }
 }
