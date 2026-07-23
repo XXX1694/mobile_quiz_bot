@@ -183,6 +183,22 @@
       "q": "Hilt @Singleton vs @ActivityRetainedScoped?",
       "topic": "di",
       "type": "concept"
+    },
+    {
+      "a": [
+        "true",
+        "false",
+        "Error",
+        "0"
+      ],
+      "c": 1,
+      "code": "val a: Any? = 1\nval b: Any? = 1\nprintln(a === b)",
+      "e": "=== checks referential equality for nullable Any. Two distinct boxed Int objects → false (unlike == which is structural for Int).",
+      "hash": "5f9201a570",
+      "posted_at": "2026-07-23T07:43:51Z",
+      "q": "What does this Kotlin code print?",
+      "topic": "types",
+      "type": "code-output"
     }
   ],
   "general": [
@@ -365,6 +381,21 @@
       "q": "REST vs GraphQL — when is GraphQL a better fit?",
       "topic": "api",
       "type": "concept"
+    },
+    {
+      "a": [
+        "Patch: bug fixes only (typical misconception)",
+        "Major: breaking changes",
+        "Minor: backward-compatible new features",
+        "Build number for the store"
+      ],
+      "c": 2,
+      "e": "MAJOR.MINOR.PATCH — minor adds functionality in a backward-compatible way; major breaks compatibility; patch is bug fixes.",
+      "hash": "1457a4446d",
+      "posted_at": "2026-07-23T07:43:51Z",
+      "q": "Semantic versioning 2.1.0 — what does the middle number usually mean?",
+      "topic": "release",
+      "type": "keyword"
     }
   ],
   "ios": [
@@ -721,26 +752,41 @@
       "q": "Why is a lazy var useful?",
       "topic": "properties",
       "type": "keyword"
+    },
+    {
+      "a": [
+        "To protect a stored property from being mutated by other parts of the type",
+        "To catch a thrown error",
+        "To run code on a background thread",
+        "Early exit on a failed condition, unwrapped values stay in scope"
+      ],
+      "c": 3,
+      "e": "guard let ... else { return } exits early and reduces nesting. Unlike if let, the unwrapped value stays available after the guard.",
+      "hash": "c6817f6eca",
+      "posted_at": "2026-07-23T07:43:50Z",
+      "q": "What is guard used for in Swift?",
+      "topic": "control_flow",
+      "type": "keyword"
     }
   ],
   "recent_topics": {
     "android": [
-      "security",
       "coroutines",
       "lifecycle",
-      "di"
+      "di",
+      "types"
     ],
     "general": [
-      "architecture",
       "monitoring",
       "mobile_general",
-      "api"
+      "api",
+      "release"
     ],
     "ios": [
-      "closures",
       "errors",
       "value_types",
-      "properties"
+      "properties",
+      "control_flow"
     ]
   }
 }
