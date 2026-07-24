@@ -199,6 +199,22 @@
       "q": "What does this Kotlin code print?",
       "topic": "types",
       "type": "code-output"
+    },
+    {
+      "a": [
+        "NullPointerException at runtime",
+        "It prints 0",
+        "It prints null",
+        "Compilation error: the !! operator requires a non-null receiver type"
+      ],
+      "c": 0,
+      "code": "val s: String? = null\nprintln(s!!.length)",
+      "e": "The !! operator forces non-null. If the value is null it throws NPE. Use it only when you're certain it's not null.",
+      "hash": "81d4aa9a5e",
+      "posted_at": "2026-07-24T07:41:30Z",
+      "q": "What happens here?",
+      "topic": "null_safety",
+      "type": "code-output"
     }
   ],
   "general": [
@@ -396,6 +412,21 @@
       "q": "Semantic versioning 2.1.0 — what does the middle number usually mean?",
       "topic": "release",
       "type": "keyword"
+    },
+    {
+      "a": [
+        "High-level modules depend on abstractions, not concrete implementations",
+        "All dependencies must be singletons — incorrect in typical mobile interview context",
+        "Invert the call stack with recursion",
+        "Never use interfaces"
+      ],
+      "c": 0,
+      "e": "Business logic depends on interfaces (Repository, UseCase). Concrete DB/network implementations are injected — easier testing and swapping.",
+      "hash": "50fa2e98b9",
+      "posted_at": "2026-07-24T07:41:30Z",
+      "q": "What does SOLID's Dependency Inversion mean in practice?",
+      "topic": "patterns",
+      "type": "concept"
     }
   ],
   "ios": [
@@ -767,26 +798,41 @@
       "q": "What is guard used for in Swift?",
       "topic": "control_flow",
       "type": "keyword"
+    },
+    {
+      "a": [
+        "It automatically creates a thread-safe singleton accessible from anywhere in the app",
+        "It replaces protocols",
+        "It runs UI animations",
+        "It protects its mutable state from data races by serializing access"
+      ],
+      "c": 3,
+      "e": "An actor isolates mutable state: access goes through await, eliminating data races. It's a foundation of Swift's structured concurrency.",
+      "hash": "3708454aac",
+      "posted_at": "2026-07-24T07:41:29Z",
+      "q": "Why use an actor in Swift?",
+      "topic": "concurrency",
+      "type": "concept"
     }
   ],
   "recent_topics": {
     "android": [
-      "coroutines",
       "lifecycle",
       "di",
-      "types"
+      "types",
+      "null_safety"
     ],
     "general": [
-      "monitoring",
       "mobile_general",
       "api",
-      "release"
+      "release",
+      "patterns"
     ],
     "ios": [
-      "errors",
       "value_types",
       "properties",
-      "control_flow"
+      "control_flow",
+      "concurrency"
     ]
   }
 }
