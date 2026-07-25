@@ -215,6 +215,21 @@
       "q": "What happens here?",
       "topic": "null_safety",
       "type": "code-output"
+    },
+    {
+      "a": [
+        "A plain Flow holds the latest value while StateFlow re-runs its block per collector",
+        "StateFlow is hot, holds a current value, and replays it to new collectors",
+        "StateFlow can't be collected",
+        "StateFlow only works in the background"
+      ],
+      "c": 1,
+      "e": "A plain Flow is cold (restarts per collector). StateFlow is hot, has .value, and emits the latest value to new subscribers — like LiveData.",
+      "hash": "cad285d606",
+      "posted_at": "2026-07-25T07:27:49Z",
+      "q": "StateFlow vs a plain Flow — the difference?",
+      "topic": "flow",
+      "type": "concept"
     }
   ],
   "general": [
@@ -426,6 +441,21 @@
       "posted_at": "2026-07-24T07:41:30Z",
       "q": "What does SOLID's Dependency Inversion mean in practice?",
       "topic": "patterns",
+      "type": "concept"
+    },
+    {
+      "a": [
+        "One canonical place owns each piece of state; UI derives from it",
+        "All data lives only on the server",
+        "Every screen keeps its own copy of truth in most production setups",
+        "State must never change after first render"
+      ],
+      "c": 0,
+      "e": "SSOT avoids duplicated, diverging state. Update one owner (ViewModel, store, reducer) and the UI reflects it consistently.",
+      "hash": "8f6299cae0",
+      "posted_at": "2026-07-25T07:27:49Z",
+      "q": "Single Source of Truth (SSOT) in UI — what does it mean?",
+      "topic": "architecture",
       "type": "concept"
     }
   ],
@@ -813,26 +843,41 @@
       "q": "Why use an actor in Swift?",
       "topic": "concurrency",
       "type": "concept"
+    },
+    {
+      "a": [
+        "Giving an existing type an alternate name for readability",
+        "Creating a new distinct runtime type (typical misconception)",
+        "Inlining functions",
+        "Marking a class final"
+      ],
+      "c": 0,
+      "e": "typealias Node = BinaryTree<Element> improves readability without a new type. Common for callbacks and complex generics.",
+      "hash": "fc7cfccc47",
+      "posted_at": "2026-07-25T07:27:49Z",
+      "q": "What is a typealias used for?",
+      "topic": "types",
+      "type": "keyword"
     }
   ],
   "recent_topics": {
     "android": [
-      "lifecycle",
       "di",
       "types",
-      "null_safety"
+      "null_safety",
+      "flow"
     ],
     "general": [
-      "mobile_general",
       "api",
       "release",
-      "patterns"
+      "patterns",
+      "architecture"
     ],
     "ios": [
-      "value_types",
       "properties",
       "control_flow",
-      "concurrency"
+      "concurrency",
+      "types"
     ]
   }
 }
