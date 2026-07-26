@@ -230,6 +230,21 @@
       "q": "StateFlow vs a plain Flow — the difference?",
       "topic": "flow",
       "type": "concept"
+    },
+    {
+      "a": [
+        "AOT-compile critical paths to reduce startup and jank",
+        "Shrink APK icons — incorrect in typical mobile interview context",
+        "Replace ProGuard",
+        "Disable ART"
+      ],
+      "c": 0,
+      "e": "Baseline Profiles guide ART to pre-compile hot methods — measurable cold start and frame time improvements in production.",
+      "hash": "8edc27ed72",
+      "posted_at": "2026-07-26T07:45:18Z",
+      "q": "Why use Baseline Profiles on Android?",
+      "topic": "performance",
+      "type": "concept"
     }
   ],
   "general": [
@@ -456,6 +471,21 @@
       "posted_at": "2026-07-25T07:27:49Z",
       "q": "Single Source of Truth (SSOT) in UI — what does it mean?",
       "topic": "architecture",
+      "type": "concept"
+    },
+    {
+      "a": [
+        "Outcome depends on timing of concurrent async operations",
+        "A type of memory leak only on iOS (typical misconception)",
+        "When GPS is disabled",
+        "A UI animation bug"
+      ],
+      "c": 0,
+      "e": "Two async tasks updating the same state without coordination — e.g. stale search results overwriting newer ones. Serialize, cancel, or use structured concurrency.",
+      "hash": "431781d97a",
+      "posted_at": "2026-07-26T07:45:18Z",
+      "q": "What is a race condition in mobile apps?",
+      "topic": "concurrency",
       "type": "concept"
     }
   ],
@@ -858,26 +888,41 @@
       "q": "What is a typealias used for?",
       "topic": "types",
       "type": "keyword"
+    },
+    {
+      "a": [
+        "When all stored properties are themselves Codable",
+        "Only for classes",
+        "Never — you always write encode/decode (typical misconception)",
+        "Only for enums without associated values"
+      ],
+      "c": 0,
+      "e": "Swift synthesizes Codable for structs/enums whose stored properties conform. Custom keys or nested types may need manual CodingKeys.",
+      "hash": "84e02b7d71",
+      "posted_at": "2026-07-26T07:45:17Z",
+      "q": "Codable synthesis — when does the compiler auto-generate it?",
+      "topic": "codable",
+      "type": "concept"
     }
   ],
   "recent_topics": {
     "android": [
-      "di",
       "types",
       "null_safety",
-      "flow"
+      "flow",
+      "performance"
     ],
     "general": [
-      "api",
       "release",
       "patterns",
-      "architecture"
+      "architecture",
+      "concurrency"
     ],
     "ios": [
-      "properties",
       "control_flow",
       "concurrency",
-      "types"
+      "types",
+      "codable"
     ]
   }
 }
