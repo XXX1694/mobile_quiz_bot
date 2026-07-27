@@ -245,6 +245,21 @@
       "q": "Why use Baseline Profiles on Android?",
       "topic": "performance",
       "type": "concept"
+    },
+    {
+      "a": [
+        "An object bound to a class giving member access without an instance (static-like)",
+        "A nested class that holds per-instance mutable state for its outer class",
+        "A default interface",
+        "A special declaration used to create and launch a new coroutine scoped to the class"
+      ],
+      "c": 0,
+      "e": "Kotlin has no static. A companion object inside a class holds class-level members (factories, constants), accessed as ClassName.member.",
+      "hash": "4b8a67963d",
+      "posted_at": "2026-07-27T08:46:44Z",
+      "q": "What is a companion object in Kotlin?",
+      "topic": "companion",
+      "type": "keyword"
     }
   ],
   "general": [
@@ -486,6 +501,21 @@
       "posted_at": "2026-07-26T07:45:18Z",
       "q": "What is a race condition in mobile apps?",
       "topic": "concurrency",
+      "type": "concept"
+    },
+    {
+      "a": [
+        "Refresh tokens are short-lived in most production setups",
+        "Refresh tokens grant new access tokens and live longer",
+        "Access tokens are never sent over the network",
+        "Refresh tokens are only used in debug builds"
+      ],
+      "c": 1,
+      "e": "A stolen refresh token can mint many access tokens. Store it in Keychain/EncryptedSharedPreferences, rotate on use, bind to device when possible.",
+      "hash": "727cda2385",
+      "posted_at": "2026-07-27T08:46:44Z",
+      "q": "Why store refresh tokens more securely than access tokens?",
+      "topic": "security",
       "type": "concept"
     }
   ],
@@ -903,26 +933,41 @@
       "q": "Codable synthesis — when does the compiler auto-generate it?",
       "topic": "codable",
       "type": "concept"
+    },
+    {
+      "a": [
+        "Transforming multiple view statements into one composed View",
+        "Building SQL queries — incorrect in typical mobile interview context",
+        "Compiling storyboards",
+        "Creating JSON"
+      ],
+      "c": 0,
+      "e": "Result builders convert a DSL block (multiple Text/Button) into a single TupleView or conditional view tree at compile time.",
+      "hash": "8758849a0f",
+      "posted_at": "2026-07-27T08:46:43Z",
+      "q": "What is the result builder (@ViewBuilder) doing in SwiftUI?",
+      "topic": "swiftui",
+      "type": "concept"
     }
   ],
   "recent_topics": {
     "android": [
-      "types",
       "null_safety",
       "flow",
-      "performance"
+      "performance",
+      "companion"
     ],
     "general": [
-      "release",
       "patterns",
       "architecture",
-      "concurrency"
+      "concurrency",
+      "security"
     ],
     "ios": [
-      "control_flow",
       "concurrency",
       "types",
-      "codable"
+      "codable",
+      "swiftui"
     ]
   }
 }
