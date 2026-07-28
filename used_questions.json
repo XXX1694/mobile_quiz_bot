@@ -260,6 +260,22 @@
       "q": "What is a companion object in Kotlin?",
       "topic": "companion",
       "type": "keyword"
+    },
+    {
+      "a": [
+        "[20, 40]",
+        "[2, 4]",
+        "[10, 20, 30, 40]",
+        "[20, 40, 60]"
+      ],
+      "c": 0,
+      "code": "val r = listOf(1, 2, 3, 4).filter { it % 2 == 0 }.map { it * 10 }\nprintln(r)",
+      "e": "filter keeps evens [2, 4], then map multiplies by 10 → [20, 40].",
+      "hash": "3345a44c0e",
+      "posted_at": "2026-07-28T07:46:49Z",
+      "q": "What does this Kotlin code print?",
+      "topic": "collections",
+      "type": "code-output"
     }
   ],
   "general": [
@@ -516,6 +532,21 @@
       "posted_at": "2026-07-27T08:46:44Z",
       "q": "Why store refresh tokens more securely than access tokens?",
       "topic": "security",
+      "type": "concept"
+    },
+    {
+      "a": [
+        "Ship code disabled and enable remotely without a store release",
+        "Remove the need for QA — incorrect in typical mobile interview context",
+        "Guarantee zero crashes",
+        "Replace A/B testing entirely"
+      ],
+      "c": 0,
+      "e": "Flags decouple deploy from release: dark-launch features, gradual rollout, and kill switches without waiting for store review.",
+      "hash": "90ddf4d929",
+      "posted_at": "2026-07-28T07:46:49Z",
+      "q": "Feature flags — primary benefit for mobile teams?",
+      "topic": "release",
       "type": "concept"
     }
   ],
@@ -948,26 +979,41 @@
       "q": "What is the result builder (@ViewBuilder) doing in SwiftUI?",
       "topic": "swiftui",
       "type": "concept"
+    },
+    {
+      "a": [
+        "Find hot code paths and main-thread work causing jank",
+        "Measure App Store download size only (typical misconception)",
+        "Replace unit tests",
+        "Profile battery hardware voltage"
+      ],
+      "c": 0,
+      "e": "Time Profiler samples stack traces on CPU — reveals slow functions, lock contention, and main-thread blocking during scroll.",
+      "hash": "b43e74b7bc",
+      "posted_at": "2026-07-28T07:46:48Z",
+      "q": "Why use Instruments Time Profiler?",
+      "topic": "performance",
+      "type": "practical"
     }
   ],
   "recent_topics": {
     "android": [
-      "null_safety",
       "flow",
       "performance",
-      "companion"
+      "companion",
+      "collections"
     ],
     "general": [
-      "patterns",
       "architecture",
       "concurrency",
-      "security"
+      "security",
+      "release"
     ],
     "ios": [
-      "concurrency",
       "types",
       "codable",
-      "swiftui"
+      "swiftui",
+      "performance"
     ]
   }
 }
