@@ -276,6 +276,21 @@
       "q": "What does this Kotlin code print?",
       "topic": "collections",
       "type": "code-output"
+    },
+    {
+      "a": [
+        "One child failing doesn't cancel its siblings or the parent scope",
+        "With it, cancelling any child cancels all the others in the same scope",
+        "It makes coroutines synchronous",
+        "It forbids cancellation"
+      ],
+      "c": 0,
+      "e": "With a regular Job a child's failure cancels the parent and siblings. SupervisorJob isolates failures — other coroutines keep running. Good for independent tasks.",
+      "hash": "d2105c2986",
+      "posted_at": "2026-07-29T07:58:42Z",
+      "q": "SupervisorJob vs a regular Job — the point?",
+      "topic": "coroutines",
+      "type": "code-output"
     }
   ],
   "general": [
@@ -547,6 +562,21 @@
       "posted_at": "2026-07-28T07:46:49Z",
       "q": "Feature flags — primary benefit for mobile teams?",
       "topic": "release",
+      "type": "concept"
+    },
+    {
+      "a": [
+        "Deep links always open the browser first — incorrect in typical mobile interview context",
+        "App/universal links verify domain ownership and can open the app directly",
+        "Deep links require iOS only",
+        "There is no difference"
+      ],
+      "c": 1,
+      "e": "Custom scheme deep links are easy but hijackable. Verified HTTPS links (AASA/assetlinks) open the app when installed with domain trust.",
+      "hash": "adbdfbf54b",
+      "posted_at": "2026-07-29T07:58:42Z",
+      "q": "Deep link vs universal link / app link — key difference?",
+      "topic": "mobile_general",
       "type": "concept"
     }
   ],
@@ -994,26 +1024,41 @@
       "q": "Why use Instruments Time Profiler?",
       "topic": "performance",
       "type": "practical"
+    },
+    {
+      "a": [
+        "Code runs on the main thread/isolated for UI-safe access",
+        "It makes all code async",
+        "It replaces DispatchQueue entirely on older OS versions (typical misconception)",
+        "It prevents all crashes"
+      ],
+      "c": 0,
+      "e": "@MainActor isolates mutable state and UI work to the main actor — the compiler helps prevent data races with UI.",
+      "hash": "c6df7aa4a2",
+      "posted_at": "2026-07-29T07:58:41Z",
+      "q": "MainActor — what guarantee does it provide?",
+      "topic": "concurrency",
+      "type": "concept"
     }
   ],
   "recent_topics": {
     "android": [
-      "flow",
       "performance",
       "companion",
-      "collections"
+      "collections",
+      "coroutines"
     ],
     "general": [
-      "architecture",
       "concurrency",
       "security",
-      "release"
+      "release",
+      "mobile_general"
     ],
     "ios": [
-      "types",
       "codable",
       "swiftui",
-      "performance"
+      "performance",
+      "concurrency"
     ]
   }
 }
