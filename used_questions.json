@@ -291,6 +291,22 @@
       "q": "SupervisorJob vs a regular Job — the point?",
       "topic": "coroutines",
       "type": "code-output"
+    },
+    {
+      "a": [
+        "3",
+        "[1, 2, 3]",
+        "1",
+        "Error"
+      ],
+      "c": 0,
+      "code": "val x = listOf(1, 2, 3).let { it.size }\nprintln(x)",
+      "e": "let passes the receiver as it and returns the lambda result. Here it.size is 3.",
+      "hash": "98e0a1bebe",
+      "posted_at": "2026-07-30T07:42:26Z",
+      "q": "What does this Kotlin code print?",
+      "topic": "scope_fn",
+      "type": "code-output"
     }
   ],
   "general": [
@@ -577,6 +593,21 @@
       "posted_at": "2026-07-29T07:58:42Z",
       "q": "Deep link vs universal link / app link — key difference?",
       "topic": "mobile_general",
+      "type": "concept"
+    },
+    {
+      "a": [
+        "Harder MITM attacks but rotation/pin updates need app releases or backup pins",
+        "Free unlimited bandwidth and zero maintenance when certs rotate automatically",
+        "Removes need for HTTPS",
+        "Works only on Android"
+      ],
+      "c": 0,
+      "e": "Pinning trusts only specific certs/keys. If the server cert rotates without updating pins, the app breaks — plan rotation and backup pins.",
+      "hash": "13d34bd585",
+      "posted_at": "2026-07-30T07:42:27Z",
+      "q": "Certificate pinning — trade-off?",
+      "topic": "security",
       "type": "concept"
     }
   ],
@@ -1039,26 +1070,41 @@
       "q": "MainActor — what guarantee does it provide?",
       "topic": "concurrency",
       "type": "concept"
+    },
+    {
+      "a": [
+        "Any is any type; AnyObject is any class instance (reference type)",
+        "They are identical aliases — incorrect in typical mobile interview context",
+        "AnyObject includes structs",
+        "Any is only for numbers"
+      ],
+      "c": 0,
+      "e": "Any boxes any value. AnyObject is for class instances only — useful when bridging to Objective-C APIs expecting id.",
+      "hash": "abaaa3b660",
+      "posted_at": "2026-07-30T07:42:26Z",
+      "q": "What is the difference between Any and AnyObject?",
+      "topic": "types",
+      "type": "keyword"
     }
   ],
   "recent_topics": {
     "android": [
-      "performance",
       "companion",
       "collections",
-      "coroutines"
+      "coroutines",
+      "scope_fn"
     ],
     "general": [
-      "concurrency",
       "security",
       "release",
-      "mobile_general"
+      "mobile_general",
+      "security"
     ],
     "ios": [
-      "codable",
       "swiftui",
       "performance",
-      "concurrency"
+      "concurrency",
+      "types"
     ]
   }
 }
