@@ -307,6 +307,21 @@
       "q": "What does this Kotlin code print?",
       "topic": "scope_fn",
       "type": "code-output"
+    },
+    {
+      "a": [
+        "Code runs fresh for each collector; no emission until collected",
+        "Always emits cached values to new collectors (typical misconception)",
+        "Runs on main thread only",
+        "Cannot use operators"
+      ],
+      "c": 0,
+      "e": "A cold Flow (e.g. flow { emit(load()) }) restarts collection per subscriber. StateFlow/SharedFlow are hot.",
+      "hash": "a3ef6e7342",
+      "posted_at": "2026-07-31T08:09:06Z",
+      "q": "What is a Flow cold stream?",
+      "topic": "flow",
+      "type": "keyword"
     }
   ],
   "general": [
@@ -1085,14 +1100,30 @@
       "q": "What is the difference between Any and AnyObject?",
       "topic": "types",
       "type": "keyword"
+    },
+    {
+      "a": [
+        "Optional(5)",
+        "5",
+        "nil",
+        "Compilation error"
+      ],
+      "c": 0,
+      "code": "let x: Int? = 5\nprint(x.map { $0 })",
+      "e": "Optional.map transforms the wrapped value if present. 5 becomes Optional(5); print shows Optional(5), not bare 5.",
+      "hash": "7eaf219b01",
+      "posted_at": "2026-07-31T08:09:05Z",
+      "q": "What does this Swift code print?",
+      "topic": "optionals",
+      "type": "code-output"
     }
   ],
   "recent_topics": {
     "android": [
-      "companion",
       "collections",
       "coroutines",
-      "scope_fn"
+      "scope_fn",
+      "flow"
     ],
     "general": [
       "security",
@@ -1101,10 +1132,10 @@
       "security"
     ],
     "ios": [
-      "swiftui",
       "performance",
       "concurrency",
-      "types"
+      "types",
+      "optionals"
     ]
   }
 }
