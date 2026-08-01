@@ -322,6 +322,21 @@
       "q": "What is a Flow cold stream?",
       "topic": "flow",
       "type": "keyword"
+    },
+    {
+      "a": [
+        "Directly drawing UI widgets and handling their click and touch listeners itself",
+        "Holding UI state without referencing the View, surviving its recreation",
+        "Managing files on disk",
+        "Running database migrations"
+      ],
+      "c": 1,
+      "e": "The ViewModel holds UI state and presentation logic and exposes it via LiveData/StateFlow. It keeps no View reference — hence testability and rotation survival.",
+      "hash": "d38f45a942",
+      "posted_at": "2026-08-01T07:37:22Z",
+      "q": "What is the ViewModel responsible for in MVVM?",
+      "topic": "architecture",
+      "type": "pattern"
     }
   ],
   "general": [
@@ -1116,14 +1131,29 @@
       "q": "What does this Swift code print?",
       "topic": "optionals",
       "type": "code-output"
+    },
+    {
+      "a": [
+        "Copy-on-write avoids accidental shared mutation across owners",
+        "Structs are always heap-allocated — incorrect in typical mobile interview context",
+        "Classes are deprecated",
+        "Structs can't conform to protocols"
+      ],
+      "c": 0,
+      "e": "Value types copy by default — fewer shared-state bugs. Swift optimizes large structs with copy-on-write for collections.",
+      "hash": "0ff78c53e3",
+      "posted_at": "2026-08-01T07:37:21Z",
+      "q": "Why prefer value semantics (struct) for simple models?",
+      "topic": "value_types",
+      "type": "concept"
     }
   ],
   "recent_topics": {
     "android": [
-      "collections",
       "coroutines",
       "scope_fn",
-      "flow"
+      "flow",
+      "architecture"
     ],
     "general": [
       "security",
@@ -1132,10 +1162,10 @@
       "security"
     ],
     "ios": [
-      "performance",
       "concurrency",
       "types",
-      "optionals"
+      "optionals",
+      "value_types"
     ]
   }
 }
