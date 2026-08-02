@@ -337,6 +337,22 @@
       "q": "What is the ViewModel responsible for in MVVM?",
       "topic": "architecture",
       "type": "pattern"
+    },
+    {
+      "a": [
+        "[2, 3]",
+        "[1, 2, 3]",
+        "[3]",
+        "Error"
+      ],
+      "c": 0,
+      "code": "println(listOf(1, 2, 3).drop(1))",
+      "e": "drop(1) skips the first element → [2, 3]. take/drop are cheap views on lists.",
+      "hash": "5c79246a12",
+      "posted_at": "2026-08-02T07:40:25Z",
+      "q": "What does this Kotlin code print?",
+      "topic": "collections",
+      "type": "code-output"
     }
   ],
   "general": [
@@ -1146,14 +1162,30 @@
       "q": "Why prefer value semantics (struct) for simple models?",
       "topic": "value_types",
       "type": "concept"
+    },
+    {
+      "a": [
+        "true",
+        "false",
+        "0",
+        "Error"
+      ],
+      "c": 1,
+      "code": "print([1, 2] == [2, 1])",
+      "e": "Array equality compares elements. [1,2] != [2,1] because order matters — false.",
+      "hash": "1fb7c35e87",
+      "posted_at": "2026-08-02T07:40:24Z",
+      "q": "What does this Swift code print?",
+      "topic": "collections",
+      "type": "code-output"
     }
   ],
   "recent_topics": {
     "android": [
-      "coroutines",
       "scope_fn",
       "flow",
-      "architecture"
+      "architecture",
+      "collections"
     ],
     "general": [
       "security",
@@ -1162,10 +1194,10 @@
       "security"
     ],
     "ios": [
-      "concurrency",
       "types",
       "optionals",
-      "value_types"
+      "value_types",
+      "collections"
     ]
   }
 }
