@@ -353,6 +353,21 @@
       "q": "What does this Kotlin code print?",
       "topic": "collections",
       "type": "code-output"
+    },
+    {
+      "a": [
+        "It pins every coroutine to the main thread and caches their results between rotations",
+        "They are auto-cancelled when the ViewModel is cleared — no leaks",
+        "It makes coroutines faster",
+        "It retries failed coroutines automatically"
+      ],
+      "c": 1,
+      "e": "viewModelScope is tied to the ViewModel lifecycle: on onCleared() all its coroutines are cancelled, preventing leaks and wasted work.",
+      "hash": "2f70c2ed4e",
+      "posted_at": "2026-08-03T08:42:00Z",
+      "q": "Why use viewModelScope for coroutines in a ViewModel?",
+      "topic": "coroutines",
+      "type": "concept"
     }
   ],
   "general": [
@@ -1178,14 +1193,29 @@
       "q": "What does this Swift code print?",
       "topic": "collections",
       "type": "code-output"
+    },
+    {
+      "a": [
+        "Check Task.isCancelled and throw CancellationError at suspension points",
+        "Ignore cancellation — tasks always finish — incorrect in typical mobile interview context",
+        "Only cancel on deinit of UIView",
+        "Use Thread.stop()"
+      ],
+      "c": 0,
+      "e": "Cooperative cancellation: check isCancelled in loops and before heavy work. Structured concurrency propagates cancel to child tasks.",
+      "hash": "2c41ca5c92",
+      "posted_at": "2026-08-03T08:41:59Z",
+      "q": "Task cancellation in Swift concurrency — best practice?",
+      "topic": "concurrency",
+      "type": "practical"
     }
   ],
   "recent_topics": {
     "android": [
-      "scope_fn",
       "flow",
       "architecture",
-      "collections"
+      "collections",
+      "coroutines"
     ],
     "general": [
       "security",
@@ -1194,10 +1224,10 @@
       "security"
     ],
     "ios": [
-      "types",
       "optionals",
       "value_types",
-      "collections"
+      "collections",
+      "concurrency"
     ]
   }
 }
