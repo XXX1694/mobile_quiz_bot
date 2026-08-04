@@ -368,6 +368,21 @@
       "q": "Why use viewModelScope for coroutines in a ViewModel?",
       "topic": "coroutines",
       "type": "concept"
+    },
+    {
+      "a": [
+        "The compiler caches its return value so repeated calls with same args are skipped",
+        "Its body and lambdas are inlined at the call site, avoiding lambda overhead",
+        "To make it private",
+        "To run it asynchronously"
+      ],
+      "c": 1,
+      "e": "inline on a higher-order function avoids allocating Function objects and enables non-local return and reified types. Overuse bloats bytecode.",
+      "hash": "9d37bca6f5",
+      "posted_at": "2026-08-04T07:47:29Z",
+      "q": "Why mark a function inline?",
+      "topic": "inline",
+      "type": "keyword"
     }
   ],
   "general": [
@@ -1208,14 +1223,29 @@
       "q": "Task cancellation in Swift concurrency — best practice?",
       "topic": "concurrency",
       "type": "practical"
+    },
+    {
+      "a": [
+        "struct can't have methods, while class supports both methods and stored properties",
+        "class is always faster than struct",
+        "struct is a value type (copied); class is a reference type",
+        "struct doesn't support stored properties"
+      ],
+      "c": 2,
+      "e": "struct is copied by value; class is a reference type with ARC and identity (===). Apple recommends struct by default.",
+      "hash": "4d128665f9",
+      "posted_at": "2026-08-04T07:47:28Z",
+      "q": "struct vs class in Swift — the main difference?",
+      "topic": "value_types",
+      "type": "keyword"
     }
   ],
   "recent_topics": {
     "android": [
-      "flow",
       "architecture",
       "collections",
-      "coroutines"
+      "coroutines",
+      "inline"
     ],
     "general": [
       "security",
@@ -1224,10 +1254,10 @@
       "security"
     ],
     "ios": [
-      "optionals",
       "value_types",
       "collections",
-      "concurrency"
+      "concurrency",
+      "value_types"
     ]
   }
 }
