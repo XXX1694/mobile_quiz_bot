@@ -383,6 +383,21 @@
       "q": "Why mark a function inline?",
       "topic": "inline",
       "type": "keyword"
+    },
+    {
+      "a": [
+        "Group multiple DAO operations atomically in one DB transaction",
+        "Speed up network calls — incorrect in typical mobile interview context",
+        "Replace migrations",
+        "Make queries run on main thread"
+      ],
+      "c": 0,
+      "e": "@Transaction ensures all queries in the method succeed or roll back together — critical for consistent local data updates.",
+      "hash": "6501ba47c9",
+      "posted_at": "2026-08-05T07:48:24Z",
+      "q": "Room @Transaction — why use it?",
+      "topic": "room",
+      "type": "concept"
     }
   ],
   "general": [
@@ -1242,10 +1257,10 @@
   ],
   "recent_topics": {
     "android": [
-      "architecture",
       "collections",
       "coroutines",
-      "inline"
+      "inline",
+      "room"
     ],
     "general": [
       "security",
