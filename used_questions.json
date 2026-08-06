@@ -398,6 +398,21 @@
       "q": "Room @Transaction — why use it?",
       "topic": "room",
       "type": "concept"
+    },
+    {
+      "a": [
+        "Declaring too many data classes, since each generates equals, hashCode and copy",
+        "A long-lived object holding an Activity Context (static, singleton, stray thread)",
+        "Using val instead of var",
+        "Launching many coroutines in viewModelScope without ever cancelling the parent job"
+      ],
+      "c": 1,
+      "e": "If a singleton/static/anonymous thread holds an Activity Context, GC can't collect it after destruction. Use applicationContext or weak references.",
+      "hash": "e4763cc092",
+      "posted_at": "2026-08-06T07:48:16Z",
+      "q": "Classic cause of a memory leak on Android?",
+      "topic": "memory",
+      "type": "concept"
     }
   ],
   "general": [
@@ -1257,10 +1272,10 @@
   ],
   "recent_topics": {
     "android": [
-      "collections",
       "coroutines",
       "inline",
-      "room"
+      "room",
+      "memory"
     ],
     "general": [
       "security",
