@@ -413,6 +413,21 @@
       "q": "Classic cause of a memory leak on Android?",
       "topic": "memory",
       "type": "concept"
+    },
+    {
+      "a": [
+        "It safely calls a method on a nullable receiver and returns null if it was nil",
+        "It throws an exception on null",
+        "It returns the left operand if non-null, else the right one",
+        "It compares two values for equality"
+      ],
+      "c": 2,
+      "e": "val name = input ?: \"default\" — if input is null, \"default\" is used. Handy for defaults and early returns.",
+      "hash": "ca0106a9be",
+      "posted_at": "2026-08-07T06:17:38Z",
+      "q": "What does the Elvis operator ?: do in Kotlin?",
+      "topic": "null_safety",
+      "type": "keyword"
     }
   ],
   "general": [
@@ -1272,10 +1287,10 @@
   ],
   "recent_topics": {
     "android": [
-      "coroutines",
       "inline",
       "room",
-      "memory"
+      "memory",
+      "null_safety"
     ],
     "general": [
       "security",
