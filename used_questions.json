@@ -428,6 +428,21 @@
       "q": "What does the Elvis operator ?: do in Kotlin?",
       "topic": "null_safety",
       "type": "keyword"
+    },
+    {
+      "a": [
+        "launch is fully synchronous and blocks, while async runs the work on a new thread",
+        "launch returns a Job; async returns a Deferred result you await",
+        "async can't be cancelled",
+        "There is no difference"
+      ],
+      "c": 1,
+      "e": "launch is for work without a return value (fire-and-forget). async starts a computation whose result you get via .await() — great for parallel requests.",
+      "hash": "8183d1a883",
+      "posted_at": "2026-08-08T05:55:12Z",
+      "q": "launch vs async in coroutines — the difference?",
+      "topic": "coroutines",
+      "type": "concept"
     }
   ],
   "general": [
@@ -1287,10 +1302,10 @@
   ],
   "recent_topics": {
     "android": [
-      "inline",
       "room",
       "memory",
-      "null_safety"
+      "null_safety",
+      "coroutines"
     ],
     "general": [
       "security",
