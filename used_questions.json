@@ -443,6 +443,21 @@
       "q": "launch vs async in coroutines — the difference?",
       "topic": "coroutines",
       "type": "concept"
+    },
+    {
+      "a": [
+        "StateFlow always has a current value; SharedFlow is for events without mandatory replay",
+        "SharedFlow is cold",
+        "StateFlow can't be collected",
+        "SharedFlow replaces LiveData only on API 30+ — incorrect in typical mobile interview context"
+      ],
+      "c": 0,
+      "e": "StateFlow holds .value and replays latest to collectors. SharedFlow suits one-shot events (snackbar, navigation) with configurable replay.",
+      "hash": "cd7553058f",
+      "posted_at": "2026-08-09T05:57:00Z",
+      "q": "What is the difference between SharedFlow and StateFlow?",
+      "topic": "flow",
+      "type": "concept"
     }
   ],
   "general": [
@@ -1302,10 +1317,10 @@
   ],
   "recent_topics": {
     "android": [
-      "room",
       "memory",
       "null_safety",
-      "coroutines"
+      "coroutines",
+      "flow"
     ],
     "general": [
       "security",
