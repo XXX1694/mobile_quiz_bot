@@ -458,6 +458,21 @@
       "q": "What is the difference between SharedFlow and StateFlow?",
       "topic": "flow",
       "type": "concept"
+    },
+    {
+      "a": [
+        "Re-invoking Composable functions when observed state changes, to update the UI",
+        "Rebuilding and recompiling the whole project whenever any Composable state changes",
+        "Clearing memory",
+        "Restarting the entire app"
+      ],
+      "c": 0,
+      "e": "Compose is declarative: when state (e.g. MutableState) changes, the affected Composables are re-invoked, updating only the necessary UI parts.",
+      "hash": "089d07878d",
+      "posted_at": "2026-08-10T06:21:31Z",
+      "q": "What is recomposition in Jetpack Compose?",
+      "topic": "compose",
+      "type": "concept"
     }
   ],
   "general": [
@@ -1317,10 +1332,10 @@
   ],
   "recent_topics": {
     "android": [
-      "memory",
       "null_safety",
       "coroutines",
-      "flow"
+      "flow",
+      "compose"
     ],
     "general": [
       "security",
