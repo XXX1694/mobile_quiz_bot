@@ -473,6 +473,22 @@
       "q": "What is recomposition in Jetpack Compose?",
       "topic": "compose",
       "type": "concept"
+    },
+    {
+      "a": [
+        "Kotlin",
+        "Java (typical misconception)",
+        "Error",
+        "null"
+      ],
+      "c": 0,
+      "code": "val s: Any = \"Kotlin\"\nval r = when (s) {\n  is String -> s\n  else -> \"Java\"\n}\nprintln(r)",
+      "e": "When expression with smart cast: s is String after is check, so length branch returns Kotlin.",
+      "hash": "0e2e5d8497",
+      "posted_at": "2026-08-11T06:02:57Z",
+      "q": "What does this Kotlin code print?",
+      "topic": "control_flow",
+      "type": "code-output"
     }
   ],
   "general": [
@@ -1332,10 +1348,10 @@
   ],
   "recent_topics": {
     "android": [
-      "null_safety",
       "coroutines",
       "flow",
-      "compose"
+      "compose",
+      "control_flow"
     ],
     "general": [
       "security",
