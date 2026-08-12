@@ -489,6 +489,21 @@
       "q": "What does this Kotlin code print?",
       "topic": "control_flow",
       "type": "code-output"
+    },
+    {
+      "a": [
+        "apply: receiver this, returns object; also: receiver it, returns object",
+        "They are identical",
+        "apply returns Unit",
+        "also returns the lambda's result while apply returns the receiver object itself"
+      ],
+      "c": 0,
+      "e": "Both return the object itself. apply suits configuration (this.field = ...), also suits side effects with it (logging, validation).",
+      "hash": "58fc1df53c",
+      "posted_at": "2026-08-12T06:40:59Z",
+      "q": "apply vs also — the difference?",
+      "topic": "scope_fn",
+      "type": "keyword"
     }
   ],
   "general": [
@@ -1348,10 +1363,10 @@
   ],
   "recent_topics": {
     "android": [
-      "coroutines",
       "flow",
       "compose",
-      "control_flow"
+      "control_flow",
+      "scope_fn"
     ],
     "general": [
       "security",
