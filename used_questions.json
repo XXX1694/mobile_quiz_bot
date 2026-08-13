@@ -504,6 +504,21 @@
       "q": "apply vs also — the difference?",
       "topic": "scope_fn",
       "type": "keyword"
+    },
+    {
+      "a": [
+        "For closed state hierarchies (Loading/Success/Error) with an exhaustive when",
+        "To create singletons",
+        "To replace interfaces",
+        "Only for defining a fixed set of enum-like integer constants shared across modules"
+      ],
+      "c": 0,
+      "e": "sealed restricts subclasses to one module. A when over a sealed type is checked for completeness — add a state, forget to handle it, get an error.",
+      "hash": "a28ecf5886",
+      "posted_at": "2026-08-13T06:44:04Z",
+      "q": "Where is a sealed class especially useful?",
+      "topic": "sealed",
+      "type": "keyword"
     }
   ],
   "general": [
@@ -1363,10 +1378,10 @@
   ],
   "recent_topics": {
     "android": [
-      "flow",
       "compose",
       "control_flow",
-      "scope_fn"
+      "scope_fn",
+      "sealed"
     ],
     "general": [
       "security",
