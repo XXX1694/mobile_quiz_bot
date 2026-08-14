@@ -519,6 +519,21 @@
       "q": "Where is a sealed class especially useful?",
       "topic": "sealed",
       "type": "keyword"
+    },
+    {
+      "a": [
+        "Central graph defines destinations, args, and back stack in one place",
+        "It removes the need for ViewModels — incorrect in typical mobile interview context",
+        "Only one Activity is allowed on Android",
+        "It disables deep links"
+      ],
+      "c": 0,
+      "e": "NavHost + nav graph gives type-safe routes, argument passing, and predictable back stack vs manual FragmentTransaction tags.",
+      "hash": "3968022b7d",
+      "posted_at": "2026-08-14T06:41:06Z",
+      "q": "Navigation Component — why use a single NavHost?",
+      "topic": "navigation",
+      "type": "pattern"
     }
   ],
   "general": [
@@ -1378,10 +1393,10 @@
   ],
   "recent_topics": {
     "android": [
-      "compose",
       "control_flow",
       "scope_fn",
-      "sealed"
+      "sealed",
+      "navigation"
     ],
     "general": [
       "security",
