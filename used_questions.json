@@ -534,6 +534,21 @@
       "q": "Navigation Component — why use a single NavHost?",
       "topic": "navigation",
       "type": "pattern"
+    },
+    {
+      "a": [
+        "WorkManager persists and reschedules work with system constraints and Doze awareness",
+        "Coroutines always survive process death — incorrect in typical mobile interview context",
+        "WorkManager runs only on main thread",
+        "No difference"
+      ],
+      "c": 0,
+      "e": "WorkManager is for deferrable, guaranteed background work (sync, upload). Coroutines die with the process unless persisted elsewhere.",
+      "hash": "f9bd47b9af",
+      "posted_at": "2026-08-15T05:39:28Z",
+      "q": "WorkManager vs a raw coroutine for background work?",
+      "topic": "background",
+      "type": "concept"
     }
   ],
   "general": [
@@ -1393,10 +1408,10 @@
   ],
   "recent_topics": {
     "android": [
-      "control_flow",
       "scope_fn",
       "sealed",
-      "navigation"
+      "navigation",
+      "background"
     ],
     "general": [
       "security",
