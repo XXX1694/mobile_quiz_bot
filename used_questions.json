@@ -549,6 +549,21 @@
       "q": "WorkManager vs a raw coroutine for background work?",
       "topic": "background",
       "type": "concept"
+    },
+    {
+      "a": [
+        "Always wrap it manually in withContext(Dispatchers.IO) or it will block the UI",
+        "Retrofit moves off the main thread itself; calling from Main is fine",
+        "Only Dispatchers.Default",
+        "Only a new Thread"
+      ],
+      "c": 1,
+      "e": "Modern Retrofit with suspend functions does IO in the background (enqueue). So calling it from viewModelScope (Main) is safe, no manual withContext(IO).",
+      "hash": "1c4851a41b",
+      "posted_at": "2026-08-16T05:41:20Z",
+      "q": "A suspend Retrofit call — which dispatcher should you run it on?",
+      "topic": "coroutines",
+      "type": "code-output"
     }
   ],
   "general": [
@@ -1408,10 +1423,10 @@
   ],
   "recent_topics": {
     "android": [
-      "scope_fn",
       "sealed",
       "navigation",
-      "background"
+      "background",
+      "coroutines"
     ],
     "general": [
       "security",
